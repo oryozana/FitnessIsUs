@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "32227427277",
+    "project_id": "fitnessisus-10ebb",
+    "storage_bucket": "fitnessisus-10ebb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32227427277:android:0b0bd692c7868fa434fa84",
+        "android_client_info": {
+          "package_name": "com.example.fitnessisus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "32227427277-o1k83r99k14hfvu5u1gfr9m248aim1vp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvLm9Vp0SIP951fgrQ95Klssni66lTFPg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "32227427277-o1k83r99k14hfvu5u1gfr9m248aim1vp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
