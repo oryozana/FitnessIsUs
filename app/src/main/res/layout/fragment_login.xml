@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".LoginFragment">
+
+    <LinearLayout
+        android:id="@+id/loginLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="top|center">
+
+        <TextView
+            android:layout_width="150pt"
+            android:layout_height="wrap_content"
+            android:textSize="11pt"
+            android:layout_marginTop="10pt"
+            android:layout_marginBottom="10pt"
+            android:text="Enter the needed information below to login: " />
+
+        <EditText
+            android:id="@+id/etGetUsernameLoginInfo"
+            android:layout_width="150pt"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:hint="Enter username: " />
+
+        <EditText
+            android:id="@+id/etGetPasswordLoginInfo"
+            android:layout_width="150pt"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:hint="Enter password: " />
+
+        <CheckBox
+            android:id="@+id/cbRememberLoggedUserInLocalDatabase"
+            android:layout_width="150pt"
+            android:layout_height="15pt"
+            android:checked="true"
+            android:text="Remember user?" />
+
+        <TextView
+            android:id="@+id/tvForgotPassword"
+            android:layout_width="150pt"
+            android:layout_height="wrap_content"
+            android:textSize="7pt"
+            android:textColor="#2b2fd4"
+            android:gravity="start"
+            android:layout_margin="2pt"
+            android:clickable="true"
+            android:text="Forgot password?"/>
+
+        <Button
+            android:id="@+id/btLogin"
+            android:layout_width="125pt"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10pt"
+            android:text="Login" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/loginLoadingLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="150pt"
+            android:layout_height="wrap_content"
+            android:textSize="20pt"
+            android:gravity="center"
+            android:layout_margin="10pt"
+            android:text="Please wait..." />
+
+        <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="150pt"
+            android:layout_height="150pt" />
+    </LinearLayout>
+</LinearLayout>

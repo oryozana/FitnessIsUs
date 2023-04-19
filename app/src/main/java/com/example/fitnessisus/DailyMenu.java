@@ -644,6 +644,11 @@ public class DailyMenu {
         DailyMenu.newCustomMeal = newCustomMeal;
     }
 
+    public static void saveDailyMenusIntoFile(ArrayList<DailyMenu> dailyMenus, Context context){
+        for(DailyMenu dailyMenu : dailyMenus)
+            saveDailyMenuIntoFile(dailyMenu, context);
+    }
+
     public static void saveDailyMenuIntoFile(DailyMenu dailyMenu, Context context){
         FileOutputStream fos;
         OutputStreamWriter osw;

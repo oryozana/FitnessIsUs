@@ -49,12 +49,12 @@ public class User implements Serializable {
         this.userDailyMenus = dailyMenus;
     }
 
-    public User(String username, String password, String email, String startingWeight, String targetCalories, String targetProteins, String targetFats, String profilePictureId, String dailyMenus){
+    public User(String username, String password, String email, String startingWeight, String weight, String targetCalories, String targetProteins, String targetFats, String profilePictureId, String dailyMenus){
         this.username = username;
         this.password = password;
         this.email = email;
         this.startingWeight = Double.parseDouble(startingWeight);
-        this.weight = Double.parseDouble(startingWeight);
+        this.weight = Double.parseDouble(weight);
         this.currentPlan = new Plan(targetCalories, targetProteins, targetFats);
         this.profilePictureId = Integer.parseInt(profilePictureId);
         this.userDailyMenus = dailyMenus;

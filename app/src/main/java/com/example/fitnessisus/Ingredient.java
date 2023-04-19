@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Ingredient extends Food {
     private int imgId = R.drawable.image_not_available;
-    private Context context;
+    private static Context context;
 
     public Ingredient(String name, double grams, double proteins, double fats, double calories, int imgId) {  // Full info ingredient, not for new ones.
         super(name, grams, proteins, fats, calories);
@@ -110,7 +110,9 @@ public class Ingredient extends Food {
         return super.toString();
     }
 
-    public static void initiateIngredientsList(){
+    public static void initiateIngredientsList(Context context){
+        Ingredient.context = context;
+
         // Vegetables, fruits and mushrooms:
         new Ingredient("tomato", 0.887, 0.2, 18);
         new Ingredient("cucumber",  0.65, 0.11, 15);
@@ -204,5 +206,7 @@ public class Ingredient extends Food {
         // Oils:
         new Ingredient("olive oil", 0, 92, 828);
         new Ingredient("canola oil", 0, 92, 828);
+
+        Ingredient.context = null;
     }
 }

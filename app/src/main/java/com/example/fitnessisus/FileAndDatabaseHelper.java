@@ -60,43 +60,88 @@ public class FileAndDatabaseHelper {
         return allData;
     }
 
-//    public Song implementSettingsData(){
-//        Song activeSong = Song.getActiveSong();
-//        if(getFileData("settings") != null){
-//            String[] settingsParts = getFileData("settings").split("\n");
-//            Boolean playMusic, useVideos, useManuallySave;
-//
-//            playMusic = Boolean.parseBoolean(settingsParts[0].split(": ")[1]);
-//            useVideos = Boolean.parseBoolean(settingsParts[1].split(": ")[1]);
-//            useManuallySave = Boolean.parseBoolean(settingsParts[2].split(": ")[1]);
-//            activeSong = Song.getSongByName(settingsParts[3].split(": ")[1]);
-//
-//            me.putExtra("playMusic", playMusic);
-//            me.putExtra("useVideos", useVideos);
-//            me.putExtra("useManuallySave", useManuallySave);
-//            me.putExtra("activeSong", activeSong);
-//            return activeSong;
-//        }
-//        return activeSong;
-//    }
-//
+    public Song implementSettingsData(){
+        Song activeSong = Song.getActiveSong();
+        if(getFileData("settings") != null){
+            String[] settingsParts = getFileData("settings").split("\n");
+            Boolean playMusic, useVideos, useManuallySave;
+
+            playMusic = Boolean.parseBoolean(settingsParts[0].split(": ")[1]);
+            useVideos = Boolean.parseBoolean(settingsParts[1].split(": ")[1]);
+            useManuallySave = Boolean.parseBoolean(settingsParts[2].split(": ")[1]);
+            activeSong = Song.getSongByName(settingsParts[3].split(": ")[1]);
+
+            me.putExtra("playMusic", playMusic);
+            me.putExtra("useVideos", useVideos);
+            me.putExtra("useManuallySave", useManuallySave);
+            me.putExtra("activeSong", activeSong);
+            return activeSong;
+        }
+        return activeSong;
+    }
 
     public void setPrimaryUser(User user){
         User.setPrimaryUser(user);
 
-        SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
-        sharedPreferences.edit().putString("Username: ", user.getUsername()).apply();
-        sharedPreferences.edit().putString("Password: ", user.getPassword()).apply();
+        if(user != null){
+            SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
+            sharedPreferences.edit().clear().apply();
+
+            sharedPreferences.edit().putString("Username: ", user.getUsername()).apply();
+            sharedPreferences.edit().putString("Password: ", user.getPassword()).apply();
+            sharedPreferences.edit().putString("Email: ", user.getEmail()).apply();
+            sharedPreferences.edit().putString("StartingWeight: ", user.getStartingWeight() + "").apply();
+            sharedPreferences.edit().putString("Weight: ", user.getWeight() + "").apply();
+            sharedPreferences.edit().putString("TargetCalories: ", user.getCurrentPlan().getTargetCalories() + "").apply();
+            sharedPreferences.edit().putString("TargetProteins: ", user.getCurrentPlan().getTargetProteins() + "").apply();
+            sharedPreferences.edit().putString("TargetFats: ", user.getCurrentPlan().getTargetFats() + "").apply();
+            sharedPreferences.edit().putString("ProfilePictureId: ", user.getProfilePictureId() + "").apply();
+            sharedPreferences.edit().putString("DailyMenus: ", user.getUserDailyMenus()).apply();
+            sharedPreferences.edit().commit();
+        }
     }
 
-    public String[] getPrimaryUserInfo(){
-        String[] info = new String[]{"", ""};
+    public void updatePrimaryUserPassword(String newPassword){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString("Password: ", newPassword).apply();
+        sharedPreferences.edit().commit();
+    }
+
+    public void updatePrimaryUserDailyMenus(String dailyMenus){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString("DailyMenus: ", dailyMenus).apply();
+        sharedPreferences.edit().commit();
+    }
+
+    public User getPrimaryUser(){
+        String[] info = new String[10];
+        User user = null;
+
         if(checkIfPrimaryUserExist()){
             SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
             info[0] = sharedPreferences.getString("Username: ", "");
             info[1] = sharedPreferences.getString("Password: ", "");
+            info[2] = sharedPreferences.getString("Email: ", "");
+            info[3] = sharedPreferences.getString("StartingWeight: ", "");
+            info[4] = sharedPreferences.getString("Weight: ", "");
+            info[5] = sharedPreferences.getString("TargetCalories: ", "");
+            info[6] = sharedPreferences.getString("TargetProteins: ", "");
+            info[7] = sharedPreferences.getString("TargetFats: ", "");
+            info[8] = sharedPreferences.getString("ProfilePictureId: ", "");
+            info[9] = sharedPreferences.getString("DailyMenus: ", "");
+            sharedPreferences.edit().commit();
+
+            user = new User(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7], info[8], info[9]);
         }
-        return info;
+        return user;
+    }
+
+    public String getPrimaryUsername(){
+        if(checkIfPrimaryUserExist()){
+            SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
+            return sharedPreferences.getString("Username: ", "");
+        }
+        return "";
     }
 
     public boolean checkIfPrimaryUserExist(){
@@ -109,6 +154,7 @@ public class FileAndDatabaseHelper {
 
         SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
         sharedPreferences.edit().clear().apply();
+        sharedPreferences.edit().commit();
     }
 
     public void addIngredientIntoLocalDatabase(Ingredient ingredient){
@@ -192,19 +238,19 @@ public class FileAndDatabaseHelper {
         return ingredients;
     }
 
-    public boolean isDatabaseEmpty() {
-        sqdb = my_db.getWritableDatabase();
-        boolean flag = true;
-
-        Cursor c = sqdb.query(DBHelper.TABLE_NAME,null, null, null, null, null, null);
-        c.moveToFirst();
-
-        if(!c.isAfterLast())
-            flag = false;
-
-        c.close();
-        sqdb.close();
-
-        return flag;
-    }
+//    public boolean isDatabaseEmpty() {
+//        sqdb = my_db.getWritableDatabase();
+//        boolean flag = true;
+//
+//        Cursor c = sqdb.query(DBHelper.TABLE_NAME,null, null, null, null, null, null);
+//        c.moveToFirst();
+//
+//        if(!c.isAfterLast())
+//            flag = false;
+//
+//        c.close();
+//        sqdb.close();
+//
+//        return flag;
+//    }
 }

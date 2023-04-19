@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,8 +15,21 @@
         android:theme="@style/Theme.FitnessIsUs"
         tools:targetApi="31">
         <activity
+            android:name=".UserInfoScreen"
+            android:exported="false" />
+
+        <receiver
+            android:name=".NetworkConnectionReceiver"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity
+            android:name=".LoginAndRegister"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
