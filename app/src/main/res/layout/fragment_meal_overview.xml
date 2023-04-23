@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
+    android:background="@drawable/ingredient_custom_alert_dialog_background"
     tools:context=".MealOverviewFragment">
 
     <TextView

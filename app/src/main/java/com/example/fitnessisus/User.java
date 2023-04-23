@@ -35,7 +35,7 @@ public class User implements Serializable {
         this.weight = startingWeight;
 
         this.profilePictureId = Integer.parseInt(String.valueOf(dataSnapshot.child("profilePictureId").getValue()));
-        this.userDailyMenus = String.valueOf(dataSnapshot.child("dailyMenus").getValue());
+        this.userDailyMenus = String.valueOf(dataSnapshot.child("userDailyMenus").getValue());
     }
 
     public User(String username, String password, String email, double startingWeight, Plan currentPlan, int profilePictureId, String dailyMenus){

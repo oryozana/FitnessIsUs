@@ -11,11 +11,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //הצהרה על שדות הטבלה
     public static final String TABLE_NAME = "all_ingredients";
-    public static final String INGREDIENT_NAME = "Name";
-    public static final String PROTEINS = "Proteins";
-    public static final String FATS = "Fats";
-    public static final String CALORIES = "Calories";
-    public static final String INGREDIENT_PICTURE_ID = "Ingredient_picture_id";
+    public static final String INGREDIENT_NAME = "name";
+    public static final String PROTEINS = "proteins";
+    public static final String FATS = "fats";
+    public static final String CALORIES = "calories";
+    public static final String INGREDIENT_PICTURE_ID = "ingredient_picture_id";
 
     //מחרוזות שבאמצעותן נריץ שאילתות SQL ליצירת טבלה או עדכון ומחיקת טבלה
     String SQL_Create="";

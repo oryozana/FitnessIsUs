@@ -1,16 +1,22 @@
 package com.example.fitnessisus;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
 
 public class Ingredient extends Food {
+    private static ArrayList<Ingredient> ingredients = new ArrayList<Ingredient>();
     private int imgId = R.drawable.image_not_available;
-    private static Context context;
+    private static Context context;  // Handled.
 
     public Ingredient(String name, double grams, double proteins, double fats, double calories, int imgId) {  // Full info ingredient, not for new ones.
         super(name, grams, proteins, fats, calories);
+        this.proteins *= grams;
+        this.fats *= grams;
+        this.calories *= grams;
         this.imgId = imgId;
+        roundValues();
     }
 
     public Ingredient(String name, double grams, double proteins, double fats, double calories) {
@@ -18,7 +24,7 @@ public class Ingredient extends Food {
     }
 
     public Ingredient(Ingredient ingredient, double grams){  // Copy other ingredient info and adjust by grams.
-        super(ingredient.name, grams, ingredient.proteins, ingredient.fats, ingredient.calories);
+        super(ingredient.name, grams, ingredient.proteins / ingredient.grams, ingredient.fats / ingredient.grams, ingredient.calories / ingredient.grams);
         this.proteins *= grams;
         this.fats *= grams;
         this.calories *= grams;
@@ -37,14 +43,20 @@ public class Ingredient extends Food {
         roundValues();
 
         String customIngredientName;
-        if(name.contains(" ")){
-            customIngredientName = name.replaceAll(" ", "_");
-            this.imgId = this.context.getResources().getIdentifier(customIngredientName, "drawable", this.context.getPackageName());
+        try {
+            if(name.contains(" ")){
+                customIngredientName = name.replaceAll(" ", "_");
+                this.imgId = context.getResources().getIdentifier(customIngredientName, "drawable", context.getPackageName());
+            }
+            else
+                this.imgId = context.getResources().getIdentifier(name, "drawable", context.getPackageName());
         }
-        else
-            this.imgId = this.context.getResources().getIdentifier(name, "drawable", this.context.getPackageName());
+        catch (NullPointerException e) {
+            e.printStackTrace();
+        }
 
-        FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(this.context);
+
+        FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(context);
         fileAndDatabaseHelper.addIngredientIntoLocalDatabase(this);
     }
 
@@ -67,21 +79,21 @@ public class Ingredient extends Food {
     }
 
     public static Ingredient getIngredientByName(String name, double grams){
-        Ingredient tmp = FileAndDatabaseHelper.getIngredientByName(name);
-        tmp.grams = grams;
-        tmp.proteins *= grams;
-        tmp.fats *= grams;
-        tmp.calories *= grams;
-
-        tmp.proteins = Math.round(tmp.proteins * 1000.0) / 1000.0;
-        tmp.fats = Math.round(tmp.fats * 1000.0) / 1000.0;
-        tmp.calories = Math.round(tmp.calories * 1000.0) / 1000.0;
-
-        return tmp;
+        for(Ingredient ingredient : Ingredient.ingredients){
+            if(ingredient.name.equals(name)) {
+                return new Ingredient(ingredient, grams);
+            }
+        }
+        return new Ingredient(name, -1, -1, -1, -1);
     }
 
     public static Ingredient getIngredientByName(String name){
-        return FileAndDatabaseHelper.getIngredientByName(name);
+        for(Ingredient ingredient : Ingredient.ingredients){
+            if(ingredient.name.equals(name)) {
+                return new Ingredient(ingredient, 1);
+            }
+        }
+        return new Ingredient(name, -1, -1, -1, -1);
     }
 
     public int getImgId() {
@@ -93,7 +105,12 @@ public class Ingredient extends Food {
     }
 
     public static ArrayList<Ingredient> getIngredientsList(){
-        return FileAndDatabaseHelper.getAllOfTheIngredients();
+        return Ingredient.ingredients;
+    }
+
+    public static void initiateIngredientList(Context context){
+        FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(context);
+        Ingredient.ingredients = fileAndDatabaseHelper.getAllOfTheIngredients();
     }
 
     public void addGrams(double grams){
@@ -110,7 +127,7 @@ public class Ingredient extends Food {
         return super.toString();
     }
 
-    public static void initiateIngredientsList(Context context){
+    public static void initiateIngredientsDatabase(Context context){
         Ingredient.context = context;
 
         // Vegetables, fruits and mushrooms:

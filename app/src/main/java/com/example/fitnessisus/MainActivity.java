@@ -2,8 +2,11 @@ package com.example.fitnessisus;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -47,6 +50,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
+    NetworkConnectionReceiver networkConnectionReceiver;
+    MyAsyncClass mac;
 
     private AnalogClock analogClock;
     private TextClock textClock;
@@ -135,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         if(me.hasExtra("activeSong"))
             activeSong = (Song) me.getSerializableExtra("activeSong");
 
+        setCustomNetworkConnectionReceiver();
         implementSettingsData();
         initiateMediaPlayer();
         initiateVideoPlayer();
@@ -154,6 +160,11 @@ public class MainActivity extends AppCompatActivity {
             activeSong = Song.getActiveSong();
             me.putExtra("activeSong", activeSong);
 
+            FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(this);
+            if(fileAndDatabaseHelper.isDatabaseEmpty())
+                Ingredient.initiateIngredientsDatabase(this);
+            Ingredient.initiateIngredientList(this);
+
             DailyMenu.setDailyMenus(MainActivity.this);
             if(DailyMenu.hasTodayMenuInsideAllDailyMenus(currentDate))
                 todayMenu = DailyMenu.getTodayMenuFromAllDailyMenus(currentDate);
@@ -161,11 +172,13 @@ public class MainActivity extends AppCompatActivity {
                 todayMenu = new DailyMenu(currentDate);
             DailyMenu.setTodayMenu(todayMenu);
 
-            FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(this);
             if(fileAndDatabaseHelper.checkIfPrimaryUserExist()) {
                 User primary = fileAndDatabaseHelper.getPrimaryUser();
                 Toast.makeText(this, "Welcome back " + primary.getUsername() + "!.", Toast.LENGTH_SHORT).show();
                 User.setCurrentUser(primary);
+
+                me.setClass(this, MainActivity.class);
+                startActivity(me);
             }
             else{
                 me.setClass(this, LoginAndRegister.class);
@@ -199,7 +212,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Today saved data not exists yet.", Toast.LENGTH_SHORT).show();
             if(fileName.equals("settings")) {  // If setting don't exist it's the first time opening the app.
                 firstInitiateSettingsFile();
-                Ingredient.initiateIngredientsList(this);
+//                Ingredient.initiateIngredientsDatabase(this);
+//                Ingredient.initiateIngredientList(this); // Needed also for the first time...
                 firstInitiateCustomMealsNamesFile();
                 firstInitiateLocalUsersDatabase();
                 firstInitiateDailyMenusFile();
@@ -279,6 +293,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void setCustomNetworkConnectionReceiver(){
+        networkConnectionReceiver = new NetworkConnectionReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if(!isOnline(context))
+                    Toast.makeText(context, "Internet connection lost, data won't be saved.", Toast.LENGTH_SHORT).show();
+                else {
+                    Toast.makeText(context, "Saving today data...", Toast.LENGTH_SHORT).show();
+                    mac = new MyAsyncClass(MainActivity.this);
+                    mac.execute();
+                }
+            }
+        };
+    }
+
     @Override
     protected void onPostResume() {
         super.onPostResume();
@@ -298,6 +327,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        IntentFilter networkConnectionFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            registerReceiver(networkConnectionReceiver, networkConnectionFilter);
+        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            registerReceiver(networkConnectionReceiver, networkConnectionFilter);
+        }
+
         mediaPlayer.start();
         if(!me.getBooleanExtra("playMusic", true)){
             mediaPlayer.stop();
@@ -306,6 +344,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+
+        try{
+            unregisterReceiver(networkConnectionReceiver);
+        }
+        catch (IllegalArgumentException e){
+            e.getStackTrace();
+        }
+
         videoView.suspend();
         mediaPlayer.pause();
         super.onPause();
@@ -418,11 +464,16 @@ public class MainActivity extends AppCompatActivity {
         sqdb.close();
     }
 
-    public class MyAsyncClass extends AsyncTask<Void, Void, Void> {
+    public static class MyAsyncClass extends AsyncTask<Void, Void, Void> {
         FirebaseDatabase usersDb;
         DatabaseReference userReference;
-        Context context = MainActivity.this;
+        Context context;
         boolean isAlreadyRunning = false;
+        DailyMenu todayMenu;
+
+        public MyAsyncClass(Context context){
+            this.context = context;
+        }
 
         @Override
         protected Void doInBackground(Void... voids) {  // "..." - means that every amount of parameters will do.
@@ -438,24 +489,30 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
 
+        @Override
+        protected void onPreExecute() {
+            todayMenu = DailyMenu.getTodayMenu();
+            super.onPreExecute();
+        }
+
         public void startUpdateDailyMenusPreparations(int counter) {
             User user = User.getCurrentUser();
             isAlreadyRunning = true;
 
             usersDb = FirebaseDatabase.getInstance();
-            userReference = usersDb.getReference("users").child(user.getUsername());
+            userReference = usersDb.getReference("users");
 
-            userReference.child("userDailyMenus").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            userReference.child(user.getUsername()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DataSnapshot> task) {
                     if (task.isSuccessful()) {
                         if (task.getResult().exists()) {
                             DataSnapshot dataSnapshot = task.getResult();
-                            String[] tmpDailyMenus = String.valueOf(dataSnapshot.getValue()).split("       ");
+                            String[] fbDailyMenus = String.valueOf(dataSnapshot.child("userDailyMenus").getValue()).split("       ");
 
                             ArrayList<String> dailyMenus = new ArrayList<String>();
-                            for (String dailyMenu : tmpDailyMenus) {
-                                if (dailyMenu.contains("{") && dailyMenu.contains("}"))
+                            for (String dailyMenu : fbDailyMenus) {
+                                if (dailyMenu.contains(" { ") && dailyMenu.contains(" }"))
                                     dailyMenus.add(dailyMenu);
                             }
 
@@ -469,16 +526,16 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
 
-                            if (found) {
-                                String info = DailyMenu.getTodayMenu().generateDailyMenuDescriptionForFiles();
-                                dailyMenus.add(firebaseTodayMenuIndex, info);
+                            String info = DailyMenu.getTodayMenu().generateDailyMenuDescriptionForFiles();
+                            if(found)
+                                dailyMenus.remove(firebaseTodayMenuIndex);
+                            dailyMenus.add(info);
 
-                                String userDailyMenus = "";
-                                for(String dailyMenu : dailyMenus)
-                                    userDailyMenus += dailyMenu;
+                            String userDailyMenus = "";
+                            for(String dailyMenu : dailyMenus)
+                                userDailyMenus += dailyMenu;
 
-                                updateDailyMenusInFirebase(userDailyMenus, 0);
-                            }
+                            updateDailyMenusInFirebase(userDailyMenus, 0);
                         }
                         else
                             isAlreadyRunning = false;
@@ -494,13 +551,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void updateDailyMenusInFirebase(String userDailyMenus, int counter){
-            userReference.child("userDailyMenus").setValue(userDailyMenus)
+            String username = User.getCurrentUser().getUsername();
+
+            userReference.child(username).child("userDailyMenus").setValue(userDailyMenus)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            String currentUserName = User.getCurrentUser().getUsername();
                             FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(context);
-                            if(fileAndDatabaseHelper.getPrimaryUsername().equals(currentUserName))
+                            if(fileAndDatabaseHelper.getPrimaryUsername().equals(username))
                                 fileAndDatabaseHelper.updatePrimaryUserDailyMenus(userDailyMenus);
 
                             isAlreadyRunning = false;

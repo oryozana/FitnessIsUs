@@ -21,8 +21,8 @@ import java.util.ArrayList;
 public class FileAndDatabaseHelper {
     private static SQLiteDatabase sqdb;
     private static DBHelper my_db;
-    private Context context;
-    private Intent me;
+    private final Context context;
+    private final Intent me;
 
     private FileOutputStream fos;
     private OutputStreamWriter osw;
@@ -146,7 +146,9 @@ public class FileAndDatabaseHelper {
 
     public boolean checkIfPrimaryUserExist(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
-        return sharedPreferences.contains("Username: ") && sharedPreferences.contains("Password: ");
+        if(sharedPreferences.contains("Username: ") && sharedPreferences.contains("Password: "))
+            return !sharedPreferences.getString("Username: ", "").equals("");
+        return false;
     }
 
     public void removePrimaryUser() {
@@ -171,7 +173,7 @@ public class FileAndDatabaseHelper {
         sqdb.close();
     }
 
-    public static Ingredient getIngredientByName(String name) {
+    public Ingredient getIngredientByName(String name) {
         sqdb = my_db.getWritableDatabase();
 
         Cursor c = sqdb.query(DBHelper.TABLE_NAME,null, null, null, null, null, null);
@@ -208,10 +210,10 @@ public class FileAndDatabaseHelper {
         return ingredient;
     }
 
-    public static ArrayList<Ingredient> getAllOfTheIngredients() {
+    public ArrayList<Ingredient> getAllOfTheIngredients() {
         sqdb = my_db.getWritableDatabase();
 
-        Cursor c = sqdb.query(DBHelper.TABLE_NAME,null, null, null, null, null, null);
+        Cursor c = sqdb.query(DBHelper.TABLE_NAME, new String[] {DBHelper.INGREDIENT_NAME, DBHelper.PROTEINS, DBHelper.FATS, DBHelper.CALORIES, DBHelper.INGREDIENT_PICTURE_ID},null, null, null, null, null);
 
         int col1 = c.getColumnIndex(DBHelper.INGREDIENT_NAME);
         int col2 = c.getColumnIndex(DBHelper.PROTEINS);
@@ -229,7 +231,7 @@ public class FileAndDatabaseHelper {
             double t4 = c.getDouble(col4);
             int t5 = c.getInt(col5);
 
-            ingredients.add(new Ingredient(t1, t2, t3, t4, t5));
+            ingredients.add(new Ingredient(t1, 100, t2, t3, t4, t5));
             c.moveToNext();
         }
 
@@ -238,19 +240,19 @@ public class FileAndDatabaseHelper {
         return ingredients;
     }
 
-//    public boolean isDatabaseEmpty() {
-//        sqdb = my_db.getWritableDatabase();
-//        boolean flag = true;
-//
-//        Cursor c = sqdb.query(DBHelper.TABLE_NAME,null, null, null, null, null, null);
-//        c.moveToFirst();
-//
-//        if(!c.isAfterLast())
-//            flag = false;
-//
-//        c.close();
-//        sqdb.close();
-//
-//        return flag;
-//    }
+    public boolean isDatabaseEmpty() {
+        sqdb = my_db.getWritableDatabase();
+        boolean flag = true;
+
+        Cursor c = sqdb.query(DBHelper.TABLE_NAME,null, null, null, null, null, null);
+        c.moveToFirst();
+
+        if(!c.isAfterLast())
+            flag = false;
+
+        c.close();
+        sqdb.close();
+
+        return flag;
+    }
 }

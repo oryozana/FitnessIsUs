@@ -1,6 +1,7 @@
 package com.example.fitnessisus;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -149,30 +150,36 @@ public class DailyMenu {
         if(!breakfastData.equals("null")){
             breakfastDataParts = breakfastData.split("     ");
             for (String breakfastDataPart : breakfastDataParts) {
-                if (breakfastDataPart.split(" \\[ ")[0].equals("Meal"))
-                    breakfastFood.add(Meal.generateMealObjectFromFileDescription(breakfastDataPart + " ]"));
-                if (breakfastDataPart.split(" \\[ ")[0].equals("Ingredient"))
-                    breakfastFood.add(Ingredient.generateIngredientObjectFromFileDescription(breakfastDataPart + " ]"));
+                if(!breakfastDataPart.equals("")){
+                    if (breakfastDataPart.split(" \\[ ")[0].equals("Meal"))
+                        breakfastFood.add(Meal.generateMealObjectFromFileDescription(breakfastDataPart + " ]"));
+                    if (breakfastDataPart.split(" \\[ ")[0].equals("Ingredient"))
+                        breakfastFood.add(Ingredient.generateIngredientObjectFromFileDescription(breakfastDataPart + " ]"));
+                }
             }
         }
 
         if(!lunchData.equals("null")){
             lunchDataParts = lunchData.split("     ");
             for (String lunchDataPart : lunchDataParts) {
-                if (lunchDataPart.split(" \\[ ")[0].equals("Meal"))
-                    lunchFood.add(Meal.generateMealObjectFromFileDescription(lunchDataPart));
-                if (lunchDataPart.split(" \\[ ")[0].equals("Ingredient"))
-                    lunchFood.add(Ingredient.generateIngredientObjectFromFileDescription(lunchDataPart));
+                if(!lunchDataPart.equals("")){
+                    if (lunchDataPart.split(" \\[ ")[0].equals("Meal"))
+                        lunchFood.add(Meal.generateMealObjectFromFileDescription(lunchDataPart));
+                    if (lunchDataPart.split(" \\[ ")[0].equals("Ingredient"))
+                        lunchFood.add(Ingredient.generateIngredientObjectFromFileDescription(lunchDataPart));
+                }
             }
         }
 
         if(!dinnerData.equals("null")){
             dinnerDataParts = dinnerData.split("     ");
             for (String dinnerDataPart : dinnerDataParts) {
-                if (dinnerDataPart.split(" \\[ ")[0].equals("Meal"))
-                    dinnerFood.add(Meal.generateMealObjectFromFileDescription(dinnerDataPart));
-                if (dinnerDataPart.split(" \\[ ")[0].equals("Ingredient"))
-                    dinnerFood.add(Ingredient.generateIngredientObjectFromFileDescription(dinnerDataPart));
+                if(!dinnerDataPart.equals("")){
+                    if (dinnerDataPart.split(" \\[ ")[0].equals("Meal"))
+                        dinnerFood.add(Meal.generateMealObjectFromFileDescription(dinnerDataPart));
+                    if (dinnerDataPart.split(" \\[ ")[0].equals("Ingredient"))
+                        dinnerFood.add(Ingredient.generateIngredientObjectFromFileDescription(dinnerDataPart));
+                }
             }
         }
 
@@ -586,7 +593,7 @@ public class DailyMenu {
                     return dailyMenus.get(i);
             }
         }
-        return null;
+        return new DailyMenu(currentDate);
     }
 
     public static void removeDailyMenuDuplications(){
@@ -675,6 +682,7 @@ public class DailyMenu {
     public static ArrayList<DailyMenu> getDailyMenusFromFile(Context context){
         String[] dataParts = getFileData("dailyMenusFile", context).split("\n");
         ArrayList<DailyMenu> dailyMenus = new ArrayList<DailyMenu>();
+
 
         for(int i = 1; i < dataParts.length; i++)
             dailyMenus.add(DailyMenu.generateDailyMenuObjectFromFile(dataParts[i]));

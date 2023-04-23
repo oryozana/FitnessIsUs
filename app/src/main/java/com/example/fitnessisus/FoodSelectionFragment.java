@@ -1,64 +1,440 @@
 package com.example.fitnessisus;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FoodSelectionFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class FoodSelectionFragment extends Fragment {
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import java.util.ArrayList;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+public class FoodSelectionFragment extends Fragment implements View.OnClickListener {
 
-    public FoodSelectionFragment() {
-        // Required empty public constructor
+    private NetworkConnectionReceiver networkConnectionReceiver;
+
+    CustomMealsFragment customMealsFragment = new CustomMealsFragment();
+    MealOverviewFragment mealOverviewFragment;
+
+    LinearLayout linearLayout, loadingWorldSavedCustomMealsLinearLayout;
+    Button btSwitchBetweenLocalAndGlobalFood;
+    EditText etFilterFood;
+    ListView listView;
+
+    DailyMenu todayMenu = DailyMenu.getTodayMenu();
+    ArrayList<Meal> internetMealsList = new ArrayList<Meal>();
+    MealListAdapter mealsAdapter;
+
+    ArrayList<Ingredient> ingredients;
+    IngredientListAdapter ingredientsAdapter;
+
+    boolean isOnLocalMode = true;
+
+    DatabaseReference databaseReference;
+
+    String cameFrom;
+
+    public FoodSelectionFragment(){
+        cameFrom = "";
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FoodSelectionFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static FoodSelectionFragment newInstance(String param1, String param2) {
-        FoodSelectionFragment fragment = new FoodSelectionFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public FoodSelectionFragment(String fromWhere){
+        cameFrom = fromWhere;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_food_selection, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        listView = (ListView) view.findViewById(R.id.listViewFood);
+
+        loadingWorldSavedCustomMealsLinearLayout = (LinearLayout) view.findViewById(R.id.loadingWorldSavedCustomMealsLinearLayout);
+        loadingWorldSavedCustomMealsLinearLayout.setVisibility(View.GONE);
+        linearLayout = (LinearLayout) view.findViewById(R.id.foodSelectionLinearLayout);
+        linearLayout.setVisibility(View.VISIBLE);
+
+        btSwitchBetweenLocalAndGlobalFood = (Button) view.findViewById(R.id.btSwitchBetweenLocalAndGlobalFood);
+        btSwitchBetweenLocalAndGlobalFood.setOnClickListener(this);
+
+        etFilterFood = (EditText) view.findViewById(R.id.etFilterFood);
+        etFilterFood.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(isOnLocalMode)
+                    ingredientsAdapter.getFilter().filter(s);
+                else
+                    mealsAdapter.getFilter().filter(s);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        if(cameFrom.equals("CustomMealsFragment"))
+            btSwitchBetweenLocalAndGlobalFood.setVisibility(View.INVISIBLE);
+
+        isOnLocalMode = true;
+
+        setIngredientListViewAdapters();
+    }
+
+    public void setIngredientListViewAdapters() {
+        ingredients = Ingredient.getIngredientsList();
+
+        ingredientsAdapter = new IngredientListAdapter(getActivity(), ingredients);
+        listView.setAdapter(ingredientsAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Ingredient selectedItem = (Ingredient) parent.getItemAtPosition(position);
+
+                ingredientOverviewAlertDialog(selectedItem);
+            }
+        });
+    }
+
+    public void setInternetListViewAdapter(){
+        initiateInternetListViewFields();
+
+        mealsAdapter = new MealListAdapter(getActivity(), internetMealsList);
+        listView.setAdapter(mealsAdapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Meal selectedItem = (Meal) adapterView.getItemAtPosition(i);
+                selectedItem.setName(selectedItem.getName().split(" - ")[1]);
+
+                mealOverviewFragment = new MealOverviewFragment("FoodSelectionFragment", selectedItem);
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, mealOverviewFragment).commit();
+            }
+        });
+    }
+
+    public void initiateInternetListViewFields(){
+        loadingWorldSavedCustomMealsLinearLayout.setVisibility(View.VISIBLE);
+        linearLayout.setVisibility(View.GONE);
+
+        internetMealsList.clear();
+        databaseReference = FirebaseDatabase.getInstance().getReference("recipes");
+        databaseReference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                ArrayList<Ingredient> ingredientsNeededInfo = new ArrayList<Ingredient>();
+                Ingredient ingredient;
+                String mealName, ingredientName;
+                Double ingredientGrams;
+
+                if(isAdded() && isVisible() && getUserVisibleHint()) {
+                    if (task.isSuccessful()) {
+                        if (task.getResult().exists()) {
+                            DataSnapshot dataSnapshot = task.getResult();
+                            for (DataSnapshot customMeal : dataSnapshot.getChildren()) {
+                                ingredientsNeededInfo.clear();
+                                mealName = customMeal.getKey();
+                                for (int i = 0; i < customMeal.getChildrenCount(); i++) {
+                                    ingredientName = (customMeal.child(i + "").child("name").getValue().toString());
+                                    ingredientGrams = Double.parseDouble((customMeal.child(i + "").child("grams").getValue().toString()));
+
+                                    ingredient = new Ingredient(Ingredient.getIngredientByName(ingredientName), ingredientGrams);
+                                    ingredientsNeededInfo.add(ingredient);
+                                }
+                                internetMealsList.add(new Meal(mealName, ingredientsNeededInfo));
+                                mealsAdapter.notifyDataSetChanged();
+                            }
+
+                            try {
+                                getActivity().unregisterReceiver(networkConnectionReceiver);
+                            }
+                            catch (IllegalArgumentException e) {
+                                e.getStackTrace();
+                            }
+                        }
+                        else {
+                            notEvenOneCustomMealAdded();
+                        }
+                    }
+                    else {
+                        recipesDatabaseNotFound();
+                        Toast.makeText(getActivity(), "Failed to load meals.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                loadingWorldSavedCustomMealsLinearLayout.setVisibility(View.GONE);
+                linearLayout.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    public void recipesDatabaseNotFound(){
+        AlertDialog ad;
+        AlertDialog.Builder adb;
+        adb = new AlertDialog.Builder(getActivity());
+        adb.setTitle("Custom meals not found!");
+        adb.setMessage("We have trouble connecting our database right now, please come back later");
+        adb.setIcon(R.drawable.ic_error_icon);
+        adb.setCancelable(false);
+
+        adb.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                switchBetweenLocalAndGlobalFood();
+            }
+        });
+
+        ad = adb.create();
+        ad.show();
+    }
+
+    public void notEvenOneCustomMealAdded(){
+        AlertDialog ad;
+        AlertDialog.Builder adb;
+        adb = new AlertDialog.Builder(getActivity());
+        adb.setTitle("Custom meals not found!");
+        adb.setMessage("It's seems like no one saved any custom meal so far, you can be the first!.");
+        adb.setIcon(R.drawable.ic_food_icon);
+        adb.setCancelable(false);
+
+        adb.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                switchBetweenLocalAndGlobalFood();
+            }
+        });
+
+        ad = adb.create();
+        ad.show();
+    }
+
+    public void ingredientOverviewAlertDialog(Ingredient ingredient){
+        AlertDialog ad;
+        AlertDialog.Builder adb;
+        adb = new AlertDialog.Builder(getActivity());
+
+        Ingredient tmpIngredient = new Ingredient(ingredient);
+
+        View customAlertDialog = LayoutInflater.from(getActivity()).inflate(R.layout.ingredient_overview_alert_dialog, null);
+        TextView tvAlertDialogIngredientName = (TextView) customAlertDialog.findViewById(R.id.tvAlertDialogIngredientName);
+        tvAlertDialogIngredientName.setText("Name: " + ingredient.getName());
+        TextView tvAlertDialogIngredientCalories = (TextView) customAlertDialog.findViewById(R.id.tvAlertDialogIngredientCalories);
+        tvAlertDialogIngredientCalories.setText("Calories: " + ingredient.getCalories());
+        TextView tvAlertDialogIngredientProteins = (TextView) customAlertDialog.findViewById(R.id.tvAlertDialogIngredientProteins);
+        tvAlertDialogIngredientProteins.setText("Proteins: " + ingredient.getProteins());
+        TextView tvAlertDialogIngredientFats = (TextView) customAlertDialog.findViewById(R.id.tvAlertDialogIngredientFats);
+        tvAlertDialogIngredientFats.setText("Fats: " + ingredient.getFats());
+
+        ImageView ivAlertDialogIngredientImage = (ImageView) customAlertDialog.findViewById(R.id.ivAlertDialogIngredientImage);
+        ivAlertDialogIngredientImage.setImageResource(ingredient.getImgId());
+
+        Spinner sAlertDialogSelectMeal = (Spinner) customAlertDialog.findViewById(R.id.sAlertDialogSelectMeal);
+        String[] selectMealOptions = new String[]{"Breakfast", "Lunch", "Dinner"};
+        ArrayAdapter<String> alertDialogSelectedMealAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, selectMealOptions);
+        sAlertDialogSelectMeal.setAdapter(alertDialogSelectedMealAdapter);
+
+        LinearLayout alertDialogMealSelectionLinearLayout = (LinearLayout) customAlertDialog.findViewById(R.id.alertDialogMealSelectionLinearLayout);
+
+        if(cameFrom.equals("CustomMealsFragment")) {
+            alertDialogMealSelectionLinearLayout.setVisibility(View.INVISIBLE);
+            sAlertDialogSelectMeal.setVisibility(View.INVISIBLE);
+        }
+
+        EditText etAlertDialogIngredientGrams = customAlertDialog.findViewById(R.id.etAlertDialogIngredientGrams);
+        etAlertDialogIngredientGrams.setText("100");
+        etAlertDialogIngredientGrams.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(!etAlertDialogIngredientGrams.getText().toString().equals("")){
+                    tmpIngredient.setGrams(Integer.parseInt(etAlertDialogIngredientGrams.getText().toString()));
+                    tvAlertDialogIngredientCalories.setText("Calories: " + tmpIngredient.getCalories());
+                    tvAlertDialogIngredientProteins.setText("Proteins: " + tmpIngredient.getProteins());
+                    tvAlertDialogIngredientFats.setText("Fats: " + tmpIngredient.getFats());
+                }
+                else{
+                    tvAlertDialogIngredientCalories.setText("Calories: 0");
+                    tvAlertDialogIngredientProteins.setText("Proteins: 0");
+                    tvAlertDialogIngredientFats.setText("Fats: 0");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
+        adb.setView(customAlertDialog);
+        ad = adb.create();
+
+        Button btAlertDialogConfirmIngredient = (Button) customAlertDialog.findViewById(R.id.btAlertDialogConfirmIngredient);
+        btAlertDialogConfirmIngredient.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean passTests = true;
+                if(etAlertDialogIngredientGrams.getText().toString().replaceAll(" ", "").equals("")){
+                    Toast.makeText(getActivity(), "Must enter grams value first.", Toast.LENGTH_SHORT).show();
+                    passTests = false;
+                }
+
+                if(etAlertDialogIngredientGrams.getText().toString().equals("0") && passTests) {
+                    Toast.makeText(getActivity(), "Must be more than 0 grams.", Toast.LENGTH_SHORT).show();
+                    passTests = false;
+                }
+
+                if(sAlertDialogSelectMeal.getSelectedItem() == null && passTests) {
+                    Toast.makeText(getActivity(), "Choose breakfast, lunch or dinner.", Toast.LENGTH_SHORT).show();
+                    passTests = false;
+                }
+
+                if(passTests){
+                    Toast.makeText(getActivity(), "Ingredient successfully added.", Toast.LENGTH_SHORT).show();
+
+                    String selectedMeal = sAlertDialogSelectMeal.getSelectedItem().toString();
+                    int grams = Integer.parseInt(etAlertDialogIngredientGrams.getText().toString());
+
+                    if(cameFrom.equals("CustomMealsFragment")) {
+                        DailyMenu.getCustomMeal().addNeededIngredientForMeal(new Ingredient(Ingredient.getIngredientByName(ingredient.getName()), grams));
+                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, customMealsFragment).commit();
+                    }
+                    else
+                        todayMenu.addIngredientByMealName(selectedMeal, ingredient, grams);
+
+                    DailyMenu.saveDailyMenuIntoFile(todayMenu, getActivity());
+
+                    ad.cancel();
+                }
+            }
+        });
+
+        Button btAlertDialogCancelIngredient = (Button) customAlertDialog.findViewById(R.id.btAlertDialogCancelIngredient);
+        btAlertDialogCancelIngredient.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ad.cancel();
+            }
+        });
+
+        ad.show();
+    }
+
+    public void switchBetweenLocalAndGlobalFood(){
+        isOnLocalMode = !isOnLocalMode;
+
+        if(!etFilterFood.getText().toString().equals(""))
+            etFilterFood.setText("");
+
+        if(isOnLocalMode){
+            btSwitchBetweenLocalAndGlobalFood.setText("Choose from internet");
+
+            setIngredientListViewAdapters();
+
+            try{
+                getActivity().unregisterReceiver(networkConnectionReceiver);
+            }
+            catch (IllegalArgumentException e){
+                e.getStackTrace();
+            }
+        }
+        else{
+            btSwitchBetweenLocalAndGlobalFood.setText("Choose from local");
+            setCustomNetworkConnectionReceiver();
+            setInternetListViewAdapter();
+        }
+    }
+
+    public void setCustomNetworkConnectionReceiver(){
+        networkConnectionReceiver = new NetworkConnectionReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                try{
+                    if(!isOnline(getActivity()))
+                        noInternetAccess(context);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void noInternetAccess(Context context){
+                AlertDialog ad;
+                AlertDialog.Builder adb;
+                adb = new AlertDialog.Builder(context);
+                adb.setTitle("Internet connection not found!");
+                adb.setMessage("Connect to the internet and try again.");
+                adb.setIcon(R.drawable.ic_network_not_found);
+                adb.setCancelable(false);
+
+                adb.setNegativeButton("Go back to local", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switchBetweenLocalAndGlobalFood();
+                    }
+                });
+
+                ad = adb.create();
+                ad.show();
+            }
+        };
+
+        IntentFilter networkConnectionFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            getActivity().registerReceiver(networkConnectionReceiver, networkConnectionFilter);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            getActivity().registerReceiver(networkConnectionReceiver, networkConnectionFilter);
+
+        if(!networkConnectionReceiver.isOnline(getActivity())) {
+            networkConnectionReceiver.noInternetAccess(getActivity());
+            getActivity().unregisterReceiver(networkConnectionReceiver);
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_food_selection, container, false);
+    public void onClick(View v) {
+        int viewId = v.getId();
+
+        if(viewId == btSwitchBetweenLocalAndGlobalFood.getId())
+            switchBetweenLocalAndGlobalFood();
     }
 }
