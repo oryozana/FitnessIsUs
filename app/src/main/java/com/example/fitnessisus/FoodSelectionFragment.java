@@ -41,6 +41,8 @@ public class FoodSelectionFragment extends Fragment implements View.OnClickListe
 
     private NetworkConnectionReceiver networkConnectionReceiver;
 
+    MainActivity.MyAsyncClass mac;
+
     CustomMealsFragment customMealsFragment = new CustomMealsFragment();
     MealOverviewFragment mealOverviewFragment;
 
@@ -339,6 +341,9 @@ public class FoodSelectionFragment extends Fragment implements View.OnClickListe
                     }
                     else
                         todayMenu.addIngredientByMealName(selectedMeal, ingredient, grams);
+
+                    mac = new MainActivity.MyAsyncClass(getActivity());
+                    mac.execute();
 
                     DailyMenu.saveDailyMenuIntoFile(todayMenu, getActivity());
 

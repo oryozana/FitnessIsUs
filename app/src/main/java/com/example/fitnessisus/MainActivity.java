@@ -300,7 +300,6 @@ public class MainActivity extends AppCompatActivity {
                 if(!isOnline(context))
                     Toast.makeText(context, "Internet connection lost, data won't be saved.", Toast.LENGTH_SHORT).show();
                 else {
-                    Toast.makeText(context, "Saving today data...", Toast.LENGTH_SHORT).show();
                     mac = new MyAsyncClass(MainActivity.this);
                     mac.execute();
                 }
@@ -478,7 +477,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {  // "..." - means that every amount of parameters will do.
             try {
-                if(!isAlreadyRunning)
+                if(!isAlreadyRunning && todayMenu.isNeedToBeSaved())
                     startUpdateDailyMenusPreparations(0);
             }
             catch (DatabaseException e) {
@@ -561,6 +560,7 @@ public class MainActivity extends AppCompatActivity {
                             if(fileAndDatabaseHelper.getPrimaryUsername().equals(username))
                                 fileAndDatabaseHelper.updatePrimaryUserDailyMenus(userDailyMenus);
 
+                            todayMenu.setIsNeedToBeSaved(false);
                             isAlreadyRunning = false;
                         }
                     })

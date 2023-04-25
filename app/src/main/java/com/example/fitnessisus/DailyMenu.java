@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 public class DailyMenu {
     private static ArrayList<DailyMenu> dailyMenus;
+    private boolean isNeedToBeSaved = false;
     private static DailyMenu todayMenu;
     private static Meal newCustomMeal;
     private ArrayList<Food> breakfast;
@@ -234,6 +235,7 @@ public class DailyMenu {
         this.totalProteins = Math.round(this.totalProteins * 1000.0) / 1000.0;
         this.totalFats = Math.round(this.totalFats * 1000.0) / 1000.0;
         this.totalCalories = Math.round(this.totalCalories * 1000.0) / 1000.0;
+        this.isNeedToBeSaved = true;
     }
 
     private void addFoodNutritionalValues(Food food) {
@@ -497,6 +499,8 @@ public class DailyMenu {
         this.totalCalories = 0;
 
         saveDailyMenuIntoFile(this, context);
+        isNeedToBeSaved = true;
+
         Toast.makeText(context, "Successfully deleted all food.", Toast.LENGTH_SHORT).show();
     }
 
@@ -711,6 +715,14 @@ public class DailyMenu {
             e.printStackTrace();
         }
         return allData;
+    }
+
+    public boolean isNeedToBeSaved(){
+        return this.isNeedToBeSaved;
+    }
+
+    public void setIsNeedToBeSaved(boolean isNeedToBeSaved){
+        this.isNeedToBeSaved = isNeedToBeSaved;
     }
 
     public double getTotalProteins() {

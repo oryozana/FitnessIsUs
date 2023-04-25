@@ -51,6 +51,8 @@ import java.util.ArrayList;
 public class CustomMealsFragment extends Fragment implements View.OnClickListener {
     NetworkConnectionReceiver networkConnectionReceiver;
 
+    MainActivity.MyAsyncClass mac;
+
     Button btSendToCustomSelection, btShowMealInfo, btSaveCustomMeal, btUseCodeAlertDialog;
     LinearLayout customMealsAdditionsLinearLayout;
     ListView lvCustomMealIngredients;
@@ -751,6 +753,10 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
                     String selectedMeal = sCodeMealSelectMealType.getSelectedItem().toString();
                     DailyMenu.getTodayMenu().addMealByMealName(selectedMeal, codeMeal);
                     DailyMenu.saveDailyMenuIntoFile(DailyMenu.getTodayMenu(), getActivity());
+
+                    mac = new MainActivity.MyAsyncClass(getActivity());
+                    mac.execute();
+
                     Toast.makeText(getActivity(), "Meal successfully added.", Toast.LENGTH_SHORT).show();
                 }
                 else

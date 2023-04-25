@@ -24,6 +24,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MealOverviewFragment extends Fragment implements View.OnClickListener {
+
+    MainActivity.MyAsyncClass mac;
+
     private String fromWhere;
     private Meal meal, tmpMeal;
 
@@ -117,10 +120,6 @@ public class MealOverviewFragment extends Fragment implements View.OnClickListen
     }
 
     public void setIngredientListViewAdapters() {
-//        ArrayList<Ingredient> neededIngredients = new ArrayList<Ingredient>();
-//        for(int i = 0; i < meal.getNeededIngredientsForMeal().size(); i++)
-//            neededIngredients.add(new Ingredient(meal.getNeededIngredientsForMeal().get(i)));
-
         ingredientsAdapter = new IngredientListAdapter(getActivity(), tmpMeal.getNeededIngredientsForMeal());
         lvMealOverviewIngredients.setAdapter(ingredientsAdapter);
         lvMealOverviewIngredients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -243,6 +242,9 @@ public class MealOverviewFragment extends Fragment implements View.OnClickListen
             String selectedMeal = sMealOverviewSelectMeal.getSelectedItem().toString();
             DailyMenu.getTodayMenu().addMealByMealName(selectedMeal, tmpMeal);
             DailyMenu.saveDailyMenuIntoFile(DailyMenu.getTodayMenu(), getActivity());
+
+            mac = new MainActivity.MyAsyncClass(getActivity());
+            mac.execute();
         }
     }
 
@@ -250,6 +252,9 @@ public class MealOverviewFragment extends Fragment implements View.OnClickListen
         Toast.makeText(getActivity(), "Meal successfully changed.", Toast.LENGTH_SHORT).show();
         DailyMenu.getTodayMenu().replaceMeal(tmpMeal, mealType);
         DailyMenu.saveDailyMenuIntoFile(DailyMenu.getTodayMenu(), getActivity());
+
+        mac = new MainActivity.MyAsyncClass(getActivity());
+        mac.execute();
     }
 
     public void updateCustomMeal(){
