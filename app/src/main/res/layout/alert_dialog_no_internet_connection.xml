@@ -22,7 +22,7 @@
         android:layout_height="125pt"
         android:layout_marginTop="10pt"
         android:layout_marginBottom="10pt"
-        app:srcCompat="@drawable/no_internet" />
+        app:srcCompat="@drawable/no_internet_connection" />
 
     <Button
         android:id="@+id/btRecheckInternetConnectionStatus"
