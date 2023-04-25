@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class MealListAdapter extends ArrayAdapter<Meal> {
     public MealListAdapter(Context context, ArrayList<Meal> meals){
-        super(context, R.layout.basic_meal_list_view, meals);
+        super(context, R.layout.list_view_basic_meal, meals);
     }
 
     @NonNull
@@ -21,7 +21,7 @@ public class MealListAdapter extends ArrayAdapter<Meal> {
     public View getView(int position, @NonNull View convertView, @NonNull ViewGroup parent){
         Meal meal = getItem(position);
         if(convertView == null)
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.basic_meal_list_view, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_view_basic_meal, parent, false);
 
         TextView tvMealName = convertView.findViewById(R.id.tvListMealName);
         TextView tvMealDescription = convertView.findViewById(R.id.tvListMealDescription);

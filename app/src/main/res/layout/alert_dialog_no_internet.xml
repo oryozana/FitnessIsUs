@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ingredient_custom_alert_dialog_background"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="150pt"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="9pt"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="25pt"
+        android:text="Oh no it's seems like your internet connection has been lost!" />
+
+    <ImageView
+        android:layout_width="125pt"
+        android:layout_height="125pt"
+        android:layout_marginTop="10pt"
+        android:layout_marginBottom="10pt"
+        app:srcCompat="@drawable/no_internet" />
+
+    <Button
+        android:id="@+id/btRecheckInternetConnectionStatus"
+        android:layout_width="125pt"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25pt"
+        android:text="Retry" />
+</LinearLayout>

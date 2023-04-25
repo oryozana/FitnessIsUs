@@ -6,6 +6,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -39,22 +48,24 @@ public class NetworkConnectionReceiver extends BroadcastReceiver {
         AlertDialog ad;
         AlertDialog.Builder adb;
         adb = new AlertDialog.Builder(context);
-        adb.setTitle("Internet connection not found!");
-        adb.setMessage("Connect to the internet and try again.");
-        adb.setIcon(R.drawable.ic_network_not_found);
         adb.setCancelable(false);
 
-        adb.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+        View customAlertDialog = LayoutInflater.from(context).inflate(R.layout.alert_dialog_no_internet, null);
+        Button btRecheckInternetConnectionStatus = customAlertDialog.findViewById(R.id.btRecheckInternetConnectionStatus);
+
+        adb.setView(customAlertDialog);
+        ad = adb.create();
+
+        btRecheckInternetConnectionStatus.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if(!isOnline(context))
-                    noInternetAccess(context);
+            public void onClick(View v) {
+                if(isOnline(context))
+                    ad.cancel();
                 else
-                    Toast.makeText(context, "Network connection available.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Internet connection unavailable!", Toast.LENGTH_SHORT).show();
             }
         });
 
-        ad = adb.create();
         ad.show();
     }
 }

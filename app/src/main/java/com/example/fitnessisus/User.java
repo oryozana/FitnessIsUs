@@ -149,10 +149,8 @@ public class User implements Serializable {
     }
 
     public void uploadUserDailyMenusIntoTemporaryFile(Context context){
-        if(this.userDailyMenus.equals("")) {
+        if(this.userDailyMenus.equals(""))
             return;
-//            this.userDailyMenus = DailyMenu.getTodayMenu().generateEmptyDailyMenuDescriptionForFiles();
-        }
 
         String[] dataParts = this.userDailyMenus.split("DailyMenu ");  // Just upload it into the file
         DailyMenu.restartDailyMenusFile(context);
@@ -165,9 +163,7 @@ public class User implements Serializable {
             Log.d("User", dataParts[i]);
             if(!dataParts[i].replaceAll(" ", "").equals("")) {
                 dataParts[i] = "       DailyMenu " + dataParts[i];
-                String tmp = dataParts[i].split(" date: ")[1];
-                Log.d("User", tmp.split(" \\}")[0]);  ???????????????????????????????????????????????????????
-                if(dataParts[i].split(" date: ")[1].split(" }")[0].equals(currentDate))
+                if(dataParts[i].split(" date: ")[1].split(" \\}")[0].equals(currentDate))
                     DailyMenu.setTodayMenu(generateDailyMenuFromDescription(dataParts[i]));
                 DailyMenu.saveDailyMenuIntoFile(generateDailyMenuFromDescription(dataParts[i]), context);
             }

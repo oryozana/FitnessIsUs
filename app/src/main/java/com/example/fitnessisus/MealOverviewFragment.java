@@ -139,7 +139,7 @@ public class MealOverviewFragment extends Fragment implements View.OnClickListen
 
         Ingredient tmpIngredient = new Ingredient(ingredient);
 
-        View customAlertDialog = LayoutInflater.from(getActivity()).inflate(R.layout.ingredient_overview_alert_dialog, null);
+        View customAlertDialog = LayoutInflater.from(getActivity()).inflate(R.layout.alert_dialog_ingredient_overview, null);
         TextView tvAlertDialogIngredientName = (TextView) customAlertDialog.findViewById(R.id.tvAlertDialogIngredientName);
         tvAlertDialogIngredientName.setText("Name: " + ingredient.getName());
         TextView tvAlertDialogIngredientCalories = (TextView) customAlertDialog.findViewById(R.id.tvAlertDialogIngredientCalories);

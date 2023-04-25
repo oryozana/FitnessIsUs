@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class IngredientListAdapter extends ArrayAdapter<Ingredient> {
 
     public IngredientListAdapter(Context context, ArrayList<Ingredient> ingredients){
-        super(context, R.layout.basic_ingredient_list_view, ingredients);
+        super(context, R.layout.list_view_basic_ingredient, ingredients);
     }
 
     @NonNull
@@ -23,7 +23,7 @@ public class IngredientListAdapter extends ArrayAdapter<Ingredient> {
     public View getView(int position, @NonNull View convertView, @NonNull ViewGroup parent){
         Ingredient ingredient = getItem(position);
         if(convertView == null)
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.basic_ingredient_list_view, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_view_basic_ingredient, parent, false);
 
         ImageView civIngredientImage = convertView.findViewById(R.id.civIngredientImage);
         TextView tvIngredientName = convertView.findViewById(R.id.tvListIngredientName);

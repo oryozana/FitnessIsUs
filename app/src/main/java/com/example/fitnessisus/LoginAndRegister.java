@@ -63,38 +63,10 @@ public class LoginAndRegister extends AppCompatActivity {
         });
 
         videoView = (VideoView) findViewById(R.id.loginAndRegisterVideoView);
-
-        setCustomNetworkConnectionReceiver();
+        networkConnectionReceiver = new NetworkConnectionReceiver();
+        
         initiateVideoPlayer();
         initiateMediaPlayer();
-    }
-
-    public void setCustomNetworkConnectionReceiver(){
-        networkConnectionReceiver = new NetworkConnectionReceiver() {
-            @Override
-            public void noInternetAccess(Context context){
-                AlertDialog ad;
-                AlertDialog.Builder adb;
-                adb = new AlertDialog.Builder(context);
-                adb.setTitle("Internet connection not found!");
-                adb.setMessage("Connect to the internet and try again.");
-                adb.setIcon(R.drawable.ic_network_not_found);
-                adb.setCancelable(false);
-
-                adb.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        if(!isOnline(context))
-                            noInternetAccess(context);
-                        else
-                            Toast.makeText(context, "Network connection available.", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                ad = adb.create();
-                ad.show();
-            }
-        };
     }
 
     public void initiateVideoPlayer(){

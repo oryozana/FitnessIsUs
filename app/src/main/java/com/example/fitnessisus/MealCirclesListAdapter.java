@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 
 public class MealCirclesListAdapter extends ArrayAdapter<Meal> {
     public MealCirclesListAdapter(Context context, ArrayList<Meal> meals){
-        super(context, R.layout.circles_meal_list_view, meals);
+        super(context, R.layout.list_view_circles_meal, meals);
     }
 
     @NonNull
@@ -22,7 +21,7 @@ public class MealCirclesListAdapter extends ArrayAdapter<Meal> {
     public View getView(int position, @NonNull View convertView, @NonNull ViewGroup parent){
         Meal meal = getItem(position);
         if(convertView == null)
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.circles_meal_list_view, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_view_circles_meal, parent, false);
 
         TextView tvMealName = convertView.findViewById(R.id.tvCircleListMealName);
         TextView tvMealDescription = convertView.findViewById(R.id.tvCircleListMealDescription);
