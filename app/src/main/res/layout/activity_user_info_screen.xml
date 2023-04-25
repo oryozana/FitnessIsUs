@@ -1,9 +1,246 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".UserInfoScreen">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <VideoView
+        android:id="@+id/userInfoScreenVideoView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/userInfoScreenLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center|top"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15pt"
+                android:gravity="center"
+                android:text="This is your user information: "
+                android:textSize="20pt" />
+
+            <ImageView
+                android:id="@+id/ivProfilePicture"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:adjustViewBounds="true"
+                android:background="@android:color/transparent"
+                android:scaleType="centerInside"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <TextView
+                android:id="@+id/tvUsernameDisplay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="2pt"
+                android:textSize="10pt"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="150pt"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15pt"
+                android:gravity="center"
+                android:text="You can change your profile picture by pressing here: "
+                android:textSize="8pt" />
+
+            <Button
+                android:id="@+id/btSendToProfilePictureSelection"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10pt"
+                android:text="Change picture" />
+
+            <TextView
+                android:layout_width="150pt"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15pt"
+                android:layout_marginBottom="15pt"
+                android:gravity="center"
+                android:text="You can change your password here: "
+                android:textSize="8pt" />
+
+            <EditText
+                android:id="@+id/etGetOldPassword"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Enter old password: "
+                android:inputType="textPersonName" />
+
+            <EditText
+                android:id="@+id/etGetNewPassword"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Enter new password: "
+                android:inputType="textPersonName" />
+
+            <Button
+                android:id="@+id/btChangePassword"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10pt"
+                android:text="Change password" />
+
+            <TextView
+                android:layout_width="150pt"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15pt"
+                android:layout_marginBottom="15pt"
+                android:gravity="center"
+                android:text="More options:"
+                android:textSize="8pt" />
+
+            <Button
+                android:id="@+id/btShareUserByCode"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2pt"
+                android:text="Share user" />
+
+            <LinearLayout
+                android:id="@+id/shareUserByCodeLinearLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:visibility="gone"
+                android:layoutDirection="ltr">
+
+                <TextView
+                    android:id="@+id/tvShowGeneratedCode"
+                    android:layout_width="100pt"
+                    android:layout_height="wrap_content"
+                    android:textSize="14pt" />
+
+                <ImageButton
+                    android:id="@+id/ibtShowCopyCodeOption"
+                    android:layout_width="25pt"
+                    android:layout_height="fill_parent"
+                    android:background="@null"
+                    app:srcCompat="@drawable/ic_copy_icon" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btSetPrimaryUser"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2pt"
+                android:text="Set primary user" />
+
+            <Button
+                android:id="@+id/btRemovePrimaryUser"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2pt"
+                android:visibility="gone"
+                android:text="Remove primary user" />
+
+            <Button
+                android:id="@+id/btLogoutUser"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2pt"
+                android:text="Logout" />
+
+            <Button
+                android:id="@+id/btDeleteUser"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:textColor="#Ff0005"
+                android:text="Delete user" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/profilePictureSelectionLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="150pt"
+            android:layout_height="wrap_content"
+            android:textSize="10pt"
+            android:text="You can choose a profile picture from the selection below: " />
+
+        <ImageView
+            android:id="@+id/ivProfilePictureSelector"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_marginTop="20pt"
+            android:layout_marginBottom="20pt"/>
+
+        <androidx.gridlayout.widget.GridLayout
+            android:layout_width="160pt"
+            android:layout_height="wrap_content"
+            app:orientation="horizontal"
+            android:layoutDirection="ltr">
+
+            <ImageButton
+                android:id="@+id/ibtPreviousPicture"
+                android:layout_width="25pt"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_previous_arrow_icon"
+                android:visibility="invisible"
+                android:layoutDirection="ltr"/>
+
+            <TextView
+                android:id="@+id/tvPictureNumberOutOf"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textSize="8pt"
+                android:gravity="center|bottom" />
+
+            <ImageButton
+                android:id="@+id/ibtNextPicture"
+                android:layout_width="25pt"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_next_arrow_icon"
+                android:layoutDirection="ltr"/>
+
+        </androidx.gridlayout.widget.GridLayout>
+
+        <Button
+            android:id="@+id/btChoseProfilePicture"
+            android:layout_width="125pt"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15pt"
+            android:text="Choose this one" />
+
+        <Button
+            android:id="@+id/btCancelProfilePictureSelection"
+            android:layout_width="125pt"
+            android:layout_height="wrap_content"
+            android:text="Cancel" />
+
+        <TextView
+            android:id="@+id/tvNoInternetConnectionToChangePictureMessage"
+            android:layout_width="150pt"
+            android:layout_height="wrap_content"
+            android:textSize="6pt"
+            android:layout_marginTop="6pt"
+            android:textColor="#Ff0005"
+            android:gravity="center" />
+    </LinearLayout>
+</RelativeLayout>

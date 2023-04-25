@@ -95,7 +95,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
                         if(enteredPassword.equals(password)){
                             User.setCurrentUser(new User(dataSnapshot));
-                            // User.getCurrentUser().uploadUserDailyMenusIntoTemporaryFile(getActivity());
+                            User.getCurrentUser().uploadUserDailyMenusIntoTemporaryFile(getActivity());
 
                             if(cbRememberLoggedUserInLocalDatabase.isChecked())
                                 fileAndDatabaseHelper.setPrimaryUser(User.getCurrentUser());

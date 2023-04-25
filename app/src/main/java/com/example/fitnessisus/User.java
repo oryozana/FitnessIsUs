@@ -1,16 +1,18 @@
 package com.example.fitnessisus;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class User implements Serializable {
     private static ArrayList<User> localUsers;
-    private static User PrimaryUser;
     private static User currentUser;
     private String username;
     private String password;
@@ -120,14 +122,6 @@ public class User implements Serializable {
         User.localUsers = localUsers;
     }
 
-    public static User obtainPrimaryUser() {
-        return PrimaryUser;
-    }
-
-    public static void setPrimaryUser(User primaryUser) {
-        PrimaryUser = primaryUser;
-    }
-
     public static User getCurrentUser() {
         return currentUser;
     }
@@ -155,22 +149,28 @@ public class User implements Serializable {
     }
 
     public void uploadUserDailyMenusIntoTemporaryFile(Context context){
-        if(this.userDailyMenus.equals("null")) {
-            this.userDailyMenus = DailyMenu.getTodayMenu().generateEmptyDailyMenuDescriptionForFiles();
+        if(this.userDailyMenus.equals("")) {
+            return;
+//            this.userDailyMenus = DailyMenu.getTodayMenu().generateEmptyDailyMenuDescriptionForFiles();
         }
-        Toast.makeText(context, this.userDailyMenus + "      gegusbvusvo", Toast.LENGTH_SHORT).show();
 
-        String[] dataParts = this.userDailyMenus.split("       ");  // Just upload it into the file
+        String[] dataParts = this.userDailyMenus.split("DailyMenu ");  // Just upload it into the file
         DailyMenu.restartDailyMenusFile(context);
 
-        String tmp = "";
-        for(String data : dataParts)
-            tmp += data;
-        Toast.makeText(context, tmp, Toast.LENGTH_SHORT).show();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
+        LocalDateTime today = LocalDateTime.now();
+        String currentDate = dtf.format(today);
 
         for(int i = 0; i < dataParts.length; i++) {
-            if(!dataParts[i].replaceAll(" ", "").equals(""))
+            Log.d("User", dataParts[i]);
+            if(!dataParts[i].replaceAll(" ", "").equals("")) {
+                dataParts[i] = "       DailyMenu " + dataParts[i];
+                String tmp = dataParts[i].split(" date: ")[1];
+                Log.d("User", tmp.split(" \\}")[0]);  ???????????????????????????????????????????????????????
+                if(dataParts[i].split(" date: ")[1].split(" }")[0].equals(currentDate))
+                    DailyMenu.setTodayMenu(generateDailyMenuFromDescription(dataParts[i]));
                 DailyMenu.saveDailyMenuIntoFile(generateDailyMenuFromDescription(dataParts[i]), context);
+            }
         }
     }
 

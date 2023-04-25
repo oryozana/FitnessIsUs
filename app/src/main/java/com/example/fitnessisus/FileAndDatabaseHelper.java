@@ -81,8 +81,6 @@ public class FileAndDatabaseHelper {
     }
 
     public void setPrimaryUser(User user){
-        User.setPrimaryUser(user);
-
         if(user != null){
             SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
             sharedPreferences.edit().clear().apply();
@@ -110,6 +108,12 @@ public class FileAndDatabaseHelper {
     public void updatePrimaryUserDailyMenus(String dailyMenus){
         SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
         sharedPreferences.edit().putString("DailyMenus: ", dailyMenus).apply();
+        sharedPreferences.edit().commit();
+    }
+
+    public void updatePrimaryUserProfilePictureId(int profilePictureId){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString("DailyMenus: ", profilePictureId + "").apply();
         sharedPreferences.edit().commit();
     }
 
@@ -152,10 +156,17 @@ public class FileAndDatabaseHelper {
     }
 
     public void removePrimaryUser() {
-        User.setPrimaryUser(null);
-
         SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
-        sharedPreferences.edit().clear().apply();
+        sharedPreferences.edit().putString("Username: ", "").apply();
+        sharedPreferences.edit().putString("Password: ", "").apply();
+        sharedPreferences.edit().putString("Email: ", "").apply();
+        sharedPreferences.edit().putString("StartingWeight: ", "").apply();
+        sharedPreferences.edit().putString("Weight: ", "").apply();
+        sharedPreferences.edit().putString("TargetCalories: ", "").apply();
+        sharedPreferences.edit().putString("TargetProteins: ", "").apply();
+        sharedPreferences.edit().putString("TargetFats: ", "").apply();
+        sharedPreferences.edit().putString("ProfilePictureId: ", "").apply();
+        sharedPreferences.edit().putString("DailyMenus: ", "").apply();
         sharedPreferences.edit().commit();
     }
 
