@@ -56,8 +56,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15pt"
                 android:gravity="center"
+                android:textStyle="bold"
                 android:text="You can change your profile picture by pressing here: "
-                android:textSize="8pt" />
+                android:textSize="9pt" />
 
             <Button
                 android:id="@+id/btSendToProfilePictureSelection"
@@ -72,8 +73,9 @@
                 android:layout_marginTop="15pt"
                 android:layout_marginBottom="15pt"
                 android:gravity="center"
+                android:textStyle="bold"
                 android:text="You can change your password here: "
-                android:textSize="8pt" />
+                android:textSize="9pt" />
 
             <EditText
                 android:id="@+id/etGetOldPassword"
@@ -104,8 +106,56 @@
                 android:layout_marginTop="15pt"
                 android:layout_marginBottom="15pt"
                 android:gravity="center"
+                android:textStyle="bold"
+                android:text="You can change your plan here: "
+                android:textSize="9pt" />
+
+            <EditText
+                android:id="@+id/etGetNewTargetCalories"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Enter your target calories: "
+                android:inputType="numberDecimal" />
+
+            <EditText
+                android:id="@+id/etGetNewTargetProteins"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Enter your target proteins: "
+                android:inputType="numberDecimal" />
+
+            <EditText
+                android:id="@+id/etGetNewTargetFats"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Enter your target fats: "
+                android:inputType="numberDecimal" />
+
+            <Button
+                android:id="@+id/btGetHelpCreatingANewPlan"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4pt"
+                android:text="Get help creating a plan" />
+
+            <Button
+                android:id="@+id/btUpdatePlan"
+                android:layout_width="125pt"
+                android:layout_height="wrap_content"
+                android:text="Update plan" />
+
+            <TextView
+                android:layout_width="150pt"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15pt"
+                android:layout_marginBottom="15pt"
+                android:gravity="center"
+                android:textStyle="bold"
                 android:text="More options:"
-                android:textSize="8pt" />
+                android:textSize="9pt" />
 
             <Button
                 android:id="@+id/btShareUserByCode"

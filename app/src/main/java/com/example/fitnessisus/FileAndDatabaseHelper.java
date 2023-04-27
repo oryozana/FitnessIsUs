@@ -105,6 +105,14 @@ public class FileAndDatabaseHelper {
         sharedPreferences.edit().commit();
     }
 
+    public void updatePrimaryUserPlan(Plan plan){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString("TargetCalories: ", plan.getTargetCalories() + "").apply();
+        sharedPreferences.edit().putString("TargetProteins: ", plan.getTargetProteins() + "").apply();
+        sharedPreferences.edit().putString("TargetFats: ", plan.getTargetFats() + "").apply();
+        sharedPreferences.edit().commit();
+    }
+
     public void updatePrimaryUserDailyMenus(String dailyMenus){
         SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
         sharedPreferences.edit().putString("DailyMenus: ", dailyMenus).apply();

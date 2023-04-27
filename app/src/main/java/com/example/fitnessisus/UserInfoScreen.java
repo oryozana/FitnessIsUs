@@ -15,15 +15,19 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -44,12 +48,17 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
     private MediaPlayer mediaPlayer;
     private VideoView videoView;
 
-    Button btSendToProfilePictureSelection, btChangePassword, btShareUserByCode;
+    EditText etGetNewTargetCalories, etGetNewTargetProteins, etGetNewTargetFats;
     Button btSetPrimaryUser, btRemovePrimaryUser, btLogoutUser, btDeleteUser;
+    Button btSendToProfilePictureSelection, btChangePassword;
+    Button btGetHelpCreatingANewPlan, btUpdatePlan;
     EditText etGetOldPassword, etGetNewPassword;
     TextView tvUsernameDisplay;
     ImageView ivProfilePicture;
     LinearLayout linearLayout;
+
+    Plan currentGeneratedPlan, maintainWeightPlan, loseWeightPlan, gainWeightPlan;
+    int currentPlanIndex = 1, maxPlansAmount = 3;
 
     TextView tvPictureNumberOutOf, tvNoInternetConnectionToChangePictureMessage;
     Button btChoseProfilePicture, btCancelProfilePictureSelection;
@@ -88,10 +97,10 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
 
         btSendToProfilePictureSelection = (Button) findViewById(R.id.btSendToProfilePictureSelection);
         btSendToProfilePictureSelection.setOnClickListener(this);
+        btGetHelpCreatingANewPlan = (Button) findViewById(R.id.btGetHelpCreatingANewPlan);
+        btGetHelpCreatingANewPlan.setOnClickListener(this);
         btChangePassword = (Button) findViewById(R.id.btChangePassword);
         btChangePassword.setOnClickListener(this);
-        btShareUserByCode = (Button) findViewById(R.id.btShareUserByCode);
-        btShareUserByCode.setOnClickListener(this);
         btRemovePrimaryUser = (Button) findViewById(R.id.btRemovePrimaryUser);
         btRemovePrimaryUser.setOnClickListener(this);
         btSetPrimaryUser = (Button) findViewById(R.id.btSetPrimaryUser);
@@ -100,9 +109,15 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         btLogoutUser.setOnClickListener(this);
         btDeleteUser = (Button) findViewById(R.id.btDeleteUser);
         btDeleteUser.setOnClickListener(this);
+        btUpdatePlan = (Button) findViewById(R.id.btUpdatePlan);
+        btUpdatePlan.setOnClickListener(this);
 
         etGetOldPassword = (EditText) findViewById(R.id.etGetOldPassword);
         etGetNewPassword = (EditText) findViewById(R.id.etGetNewPassword);
+
+        etGetNewTargetCalories = (EditText) findViewById(R.id.etGetNewTargetCalories);
+        etGetNewTargetProteins = (EditText) findViewById(R.id.etGetNewTargetProteins);
+        etGetNewTargetFats = (EditText) findViewById(R.id.etGetNewTargetFats);
 
         tvUsernameDisplay = (TextView) findViewById(R.id.tvUsernameDisplay);
         tvUsernameDisplay.setText(User.getCurrentUser().getUsername());
@@ -222,6 +237,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         if(passTests){
             if(internetConnection){
                 String userPassword = User.getCurrentUser().getPassword();
+
                 if(userPassword.equals(etGetOldPassword.getText().toString())){
                     User.getCurrentUser().setPassword(etGetNewPassword.getText().toString());
                     updateUserPasswordInFirebaseAndInPrimaryUser(User.getCurrentUser());
@@ -270,6 +286,84 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         });
     }
 
+    public void updatePlan(){
+        boolean passTests = passUpdatePlanTests();
+
+        if(passTests){
+            if(internetConnection){
+                String targetCalories = etGetNewTargetCalories.getText().toString();
+                String targetProteins = etGetNewTargetProteins.getText().toString();
+                String targetFats = etGetNewTargetFats.getText().toString();
+                Plan tmpPlan = new Plan(targetCalories, targetProteins, targetFats);
+                User.getCurrentUser().setCurrentPlan(tmpPlan);
+                updateUserPlanInFirebaseAndInPrimaryUser(User.getCurrentUser());
+            }
+            else
+                Toast.makeText(this, "No internet connection, can't change password.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public boolean passUpdatePlanTests(){
+        boolean passTests = true;
+        String targetCalories = etGetNewTargetCalories.getText().toString();
+        String targetProteins = etGetNewTargetProteins.getText().toString();
+        String targetFats = etGetNewTargetFats.getText().toString();
+
+        if(targetCalories.replaceAll(" ", "").equals("")){
+            Toast.makeText(UserInfoScreen.this, "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
+            passTests = false;
+        }
+        else{
+            if(!(0 < Double.parseDouble(targetCalories) && Double.parseDouble(targetCalories) < 5000)){
+                Toast.makeText(UserInfoScreen.this, "Target calories should be between 0 to 5000.", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
+        }
+
+        if(passTests){
+            if(targetProteins.replaceAll(" ", "").equals("")){
+                Toast.makeText(UserInfoScreen.this, "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
+            else{
+                if(!(0 < Double.parseDouble(targetProteins) && Double.parseDouble(targetProteins) < 1000)){
+                    Toast.makeText(UserInfoScreen.this, "Target proteins should be between 0 to 1000.", Toast.LENGTH_SHORT).show();
+                    passTests = false;
+                }
+            }
+        }
+
+        if(passTests){
+            if(targetFats.replaceAll(" ", "").equals("")){
+                Toast.makeText(UserInfoScreen.this, "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
+            else{
+                if(!(0 < Double.parseDouble(targetFats) && Double.parseDouble(targetFats) < 1000)){
+                    Toast.makeText(UserInfoScreen.this, "Target fats should be between 0 to 1000.", Toast.LENGTH_SHORT).show();
+                    passTests = false;
+                }
+            }
+        }
+
+        return passTests;
+    }
+
+    public void updateUserPlanInFirebaseAndInPrimaryUser(User user){
+        usersDb = FirebaseDatabase.getInstance();
+        databaseReference = usersDb.getReference("users");
+        databaseReference.child(user.getUsername()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(UserInfoScreen.this, "Plan successfully updated.", Toast.LENGTH_SHORT).show();
+                fileAndDatabaseHelper.updatePrimaryUserPlan(user.getCurrentPlan());
+                etGetNewTargetCalories.setText("");
+                etGetNewTargetProteins.setText("");
+                etGetNewTargetFats.setText("");
+            }
+        });
+    }
+
     public void getUserFromFirebaseDatabase(String username, String entered_password){
         databaseReference = FirebaseDatabase.getInstance().getReference("users");
         databaseReference.child(username).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
@@ -290,6 +384,202 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
                 }
             }
         });
+    }
+
+    public void generatePlanAlertDialog(){
+        AlertDialog ad;
+        AlertDialog.Builder adb;
+        adb = new AlertDialog.Builder(UserInfoScreen.this);
+
+        View customAlertDialog = LayoutInflater.from(UserInfoScreen.this).inflate(R.layout.alert_dialog_generate_plan, null);
+
+        LinearLayout generatePlansLinearLayout = (LinearLayout) customAlertDialog.findViewById(R.id.generatePlansLinearLayout);
+        EditText etGetAge = (EditText) customAlertDialog.findViewById(R.id.etGetAge);
+        EditText etGetHeight = (EditText) customAlertDialog.findViewById(R.id.etGetHeight);
+        EditText etGetWeight = (EditText) customAlertDialog.findViewById(R.id.etGetWeight);
+        Spinner sHowActiveAreYou = (Spinner) customAlertDialog.findViewById(R.id.sHowActiveAreYou);
+        RadioGroup rgChooseGender = (RadioGroup) customAlertDialog.findViewById(R.id.rgChooseGender);
+        Button btGeneratePlans = (Button) customAlertDialog.findViewById(R.id.btGeneratePlans);
+
+        ArrayAdapter<String> alertDialogAdapter = new ArrayAdapter<String>(UserInfoScreen.this, android.R.layout.simple_spinner_dropdown_item, Plan.getActiveLevelOptions());
+        sHowActiveAreYou.setAdapter(alertDialogAdapter);
+
+        LinearLayout showPlansLinearLayout = (LinearLayout) customAlertDialog.findViewById(R.id.showPlansLinearLayout);
+        TextView tvPlanName = (TextView) customAlertDialog.findViewById(R.id.tvPlanName);
+        TextView tvPlanCalories = (TextView) customAlertDialog.findViewById(R.id.tvPlanCalories);
+        TextView tvPlanProteins = (TextView) customAlertDialog.findViewById(R.id.tvPlanProteins);
+        TextView tvPlanFats = (TextView) customAlertDialog.findViewById(R.id.tvPlanFats);
+        ImageButton ibtPreviousPlan = (ImageButton) customAlertDialog.findViewById(R.id.ibtPreviousPlan);
+        TextView tvPlanNumberOutOf = (TextView) customAlertDialog.findViewById(R.id.tvPlanNumberOutOf);
+        ImageButton ibtNextPlan = (ImageButton) customAlertDialog.findViewById(R.id.ibtNextPlan);
+        Button btChoosePlan = (Button) customAlertDialog.findViewById(R.id.btChoosePlan);
+        Button btCancelPlan = (Button) customAlertDialog.findViewById(R.id.btCancelPlan);
+
+        adb.setView(customAlertDialog);
+        ad = adb.create();
+
+        btGeneratePlans.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String testWeight = etGetWeight.getText().toString();
+                String testHeight = etGetHeight.getText().toString();
+                String testAge = etGetAge.getText().toString();
+                String activeLevel = sHowActiveAreYou.getSelectedItem().toString();
+
+                if(passAlertDialogInfoTests(testWeight, testHeight, testAge, activeLevel)) {
+                    double weight = Double.parseDouble(testWeight);
+                    double height = Double.parseDouble(testHeight);
+                    int age = Integer.parseInt(testAge);
+
+                    String gender;
+                    if(rgChooseGender.getCheckedRadioButtonId() == R.id.rbChooseMale)
+                        gender = "Male";
+                    else
+                        gender = "Female";
+
+                    loseWeightPlan = new Plan("Lose weight", gender, weight, height, age, activeLevel);
+                    maintainWeightPlan = new Plan("Maintain weight", gender, weight, height, age, activeLevel);
+                    gainWeightPlan = new Plan("Gain weight", gender, weight, height, age, activeLevel);
+
+                    generatePlansLinearLayout.setVisibility(View.GONE);
+                    showPlansLinearLayout.setVisibility(View.VISIBLE);
+
+                    tvPlanName.setText("Name: Lose weight");
+                    tvPlanCalories.setText("Calories: " + loseWeightPlan.getTargetCalories());
+                    tvPlanProteins.setText("Proteins: " + loseWeightPlan.getTargetProteins());
+                    tvPlanFats.setText("Fats: " + loseWeightPlan.getTargetFats());
+
+                    tvPlanNumberOutOf.setText("Plan number 1 out of " + maxPlansAmount);
+                    ibtPreviousPlan.setVisibility(View.INVISIBLE);
+                    ibtNextPlan.setVisibility(View.VISIBLE);
+
+                    currentPlanIndex = 1;
+                }
+            }
+        });
+
+        ibtPreviousPlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(0 < currentPlanIndex && currentPlanIndex <= maxPlansAmount){
+                    currentPlanIndex--;
+
+                    if(currentPlanIndex == 1)
+                        currentGeneratedPlan = loseWeightPlan;
+                    if(currentPlanIndex == 2)
+                        currentGeneratedPlan = maintainWeightPlan;
+                    if(currentPlanIndex == 3)
+                        currentGeneratedPlan = gainWeightPlan;
+
+                    tvPlanName.setText("Name: " + currentGeneratedPlan.getGoal());
+                    tvPlanCalories.setText("Calories: " + currentGeneratedPlan.getTargetCalories());
+                    tvPlanProteins.setText("Proteins: " + currentGeneratedPlan.getTargetProteins());
+                    tvPlanFats.setText("Fats: " + currentGeneratedPlan.getTargetFats());
+
+                    tvPlanNumberOutOf.setText("Plan number " + currentPlanIndex + " out of " + maxPlansAmount);
+
+                    ibtNextPlan.setVisibility(View.VISIBLE);
+                    if(currentPlanIndex == 1)
+                        ibtPreviousPlan.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        ibtNextPlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(0 <= currentPlanIndex && currentPlanIndex < maxPlansAmount) {
+                    currentPlanIndex++;
+
+                    if(currentPlanIndex == 1)
+                        currentGeneratedPlan = loseWeightPlan;
+                    if(currentPlanIndex == 2)
+                        currentGeneratedPlan = maintainWeightPlan;
+                    if(currentPlanIndex == 3)
+                        currentGeneratedPlan = gainWeightPlan;
+
+                    tvPlanName.setText("Name: " + currentGeneratedPlan.getGoal());
+                    tvPlanCalories.setText("Calories: " + currentGeneratedPlan.getTargetCalories());
+                    tvPlanProteins.setText("Proteins: " + currentGeneratedPlan.getTargetProteins());
+                    tvPlanFats.setText("Fats: " + currentGeneratedPlan.getTargetFats());
+
+                    tvPlanNumberOutOf.setText("Plan number " + currentPlanIndex + " out of " + maxPlansAmount);
+
+                    if(1 < currentPlanIndex)
+                        ibtPreviousPlan.setVisibility(View.VISIBLE);
+                    if(currentPlanIndex == maxPlansAmount)
+                        ibtNextPlan.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        btChoosePlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(UserInfoScreen.this, "The plan to " + currentGeneratedPlan.getGoal() + " chosen successfully !", Toast.LENGTH_SHORT).show();
+                etGetNewTargetCalories.setText(currentGeneratedPlan.getTargetCalories() + "");
+                etGetNewTargetProteins.setText(currentGeneratedPlan.getTargetProteins() + "");
+                etGetNewTargetFats.setText(currentGeneratedPlan.getTargetFats() + "");
+                ad.cancel();
+            }
+        });
+
+        btCancelPlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ad.cancel();
+            }
+        });
+
+        ad.show();
+    }
+
+    public boolean passAlertDialogInfoTests(String weight, String height, String age, String activeLevel) {
+        boolean passTests = true;
+
+        if(weight.replaceAll(" ", "").equals("")){
+            Toast.makeText(UserInfoScreen.this, "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
+            passTests = false;
+        }
+        else{
+            if(!(0 < Double.parseDouble(weight) && Double.parseDouble(weight) < 500)){
+                Toast.makeText(UserInfoScreen.this, "Starting weight should be between 0 to 500 kg.", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
+        }
+
+        if(passTests){
+            if(height.replaceAll(" ", "").equals("")){
+                Toast.makeText(UserInfoScreen.this, "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
+            else{
+                if((!(50 < Double.parseDouble(height) && Double.parseDouble(height) < 250))){
+                    Toast.makeText(UserInfoScreen.this, "Height should be between 50 to 250 cm.", Toast.LENGTH_SHORT).show();
+                    passTests = false;
+                }
+            }
+        }
+
+        if(passTests){
+            if(age.replaceAll(" ", "").equals("")){
+                Toast.makeText(UserInfoScreen.this, "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
+            else{
+                if((!(0 < Integer.parseInt(age) && Integer.parseInt(age) < 120))){
+                    Toast.makeText(UserInfoScreen.this, "Age should be between 0 to 120 years.", Toast.LENGTH_SHORT).show();
+                    passTests = false;
+                }
+            }
+        }
+
+        if(activeLevel == null && passTests){
+            Toast.makeText(UserInfoScreen.this, "Choose an active level first.", Toast.LENGTH_SHORT).show();
+            passTests = false;
+        }
+
+        return passTests;
     }
 
 //    public void showCodeGenerator(){
@@ -558,6 +848,12 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
 
         if(viewId == btCancelProfilePictureSelection.getId())
             switchBetweenProfilePictureSelectionAndUserInfoScreen();
+
+        if(viewId == btGetHelpCreatingANewPlan.getId())
+            generatePlanAlertDialog();
+
+        if(viewId == btUpdatePlan.getId())
+            updatePlan();
 
         if(viewId == btRemovePrimaryUser.getId())
             removePrimaryUser();
