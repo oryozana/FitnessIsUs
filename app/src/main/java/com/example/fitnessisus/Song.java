@@ -42,6 +42,7 @@ public class Song extends AppCompatActivity implements Serializable {
             if(songs.get(i).isPlaying)
                 return songs.get(i);
         }
+
         songs.get(0).playSong();
         return songs.get(0);  // Initiated song;
     }

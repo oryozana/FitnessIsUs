@@ -30,7 +30,7 @@ public class LoginAndRegister extends AppCompatActivity {
     RegisterFragment registerFragment = new RegisterFragment();
     LoginFragment loginFragment = new LoginFragment();
 
-    Song activeSong = Song.getActiveSong();
+    Song activeSong = Song.getSongs().get(0);
 
     Intent me;
 
@@ -40,6 +40,8 @@ public class LoginAndRegister extends AppCompatActivity {
         setContentView(R.layout.activity_login_and_register);
 
         me = getIntent();
+        if(me.hasExtra("activeSong"))
+            activeSong = (Song) me.getSerializableExtra("activeSong");
 
         bottomNavigationView = findViewById(R.id.bnvLoginAndRegister);
         getSupportFragmentManager().beginTransaction().replace(R.id.loginAndRegisterFragmentHolder, loginFragment).commit();

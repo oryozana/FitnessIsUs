@@ -51,7 +51,7 @@
         <ListView
             android:id="@+id/lvCustomMealIngredients"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="375dp"
             android:layout_marginTop="10pt"
             android:layout_marginBottom="10pt" />
 
@@ -79,5 +79,13 @@
             android:layout_height="wrap_content"
             android:text="Use shared code"
             android:visibility="gone" />
+
+        <TextView
+            android:layout_width="125pt"
+            android:layout_height="wrap_content"
+            android:textSize="6pt"
+            android:gravity="center"
+            android:textColor="#Ff0005"
+            android:text="Custom meals only be saved locally and will appear to all of this phone users!"/>
     </LinearLayout>
 </RelativeLayout>

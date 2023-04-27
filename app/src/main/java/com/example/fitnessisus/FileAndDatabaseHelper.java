@@ -60,24 +60,131 @@ public class FileAndDatabaseHelper {
         return allData;
     }
 
+//    public Song implementSettingsData(){
+//        Song activeSong = Song.getActiveSong();
+//        if(getFileData("settings") != null){
+//            String[] settingsParts = getFileData("settings").split("\n");
+//            boolean playMusic, useVideos, useManuallySave;
+//
+//            playMusic = Boolean.parseBoolean(settingsParts[0].split(": ")[1]);
+//            useVideos = Boolean.parseBoolean(settingsParts[1].split(": ")[1]);
+//            useManuallySave = Boolean.parseBoolean(settingsParts[2].split(": ")[1]);
+//            activeSong = Song.getSongByName(settingsParts[3].split(": ")[1]);
+//
+//            me.putExtra("playMusic", playMusic);
+//            me.putExtra("useVideos", useVideos);
+//            me.putExtra("useManuallySave", useManuallySave);
+//            me.putExtra("activeSong", activeSong);
+//            return activeSong;
+//        }
+//        return activeSong;
+//    }
+
     public Song implementSettingsData(){
-        Song activeSong = Song.getActiveSong();
-        if(getFileData("settings") != null){
-            String[] settingsParts = getFileData("settings").split("\n");
-            Boolean playMusic, useVideos, useManuallySave;
+        if(isSettingsExist() && me != null){
+            me.putExtra("playMusic", getPlayMusicStatus());
+            me.putExtra("useVideos", getUseVideosStatus());
+            me.putExtra("holder1", getHolder1Status());
+            me.putExtra("holder2", getHolder2Status());
+            me.putExtra("activeSong", getCurrentActiveSong());
+            me.putExtra("shuffle", getShuffleStatus());
 
-            playMusic = Boolean.parseBoolean(settingsParts[0].split(": ")[1]);
-            useVideos = Boolean.parseBoolean(settingsParts[1].split(": ")[1]);
-            useManuallySave = Boolean.parseBoolean(settingsParts[2].split(": ")[1]);
-            activeSong = Song.getSongByName(settingsParts[3].split(": ")[1]);
-
-            me.putExtra("playMusic", playMusic);
-            me.putExtra("useVideos", useVideos);
-            me.putExtra("useManuallySave", useManuallySave);
-            me.putExtra("activeSong", activeSong);
-            return activeSong;
+            return getCurrentActiveSong();
         }
-        return activeSong;
+        return Song.getActiveSong();
+    }
+
+    public void firstInitiateSettings(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        sharedPreferences.edit().putBoolean("PlayMusic ?: ", true).apply();
+        sharedPreferences.edit().putBoolean("UseVideos ?: ", true).apply();
+        sharedPreferences.edit().putBoolean("Holder1: ", true).apply();
+        sharedPreferences.edit().putBoolean("Holder2: ", true).apply();
+        sharedPreferences.edit().putString("ActiveSongName: ", Song.getSongs().get(0).getName()).apply();
+        sharedPreferences.edit().putBoolean("Shuffle ?: ", false).apply();
+    }
+
+    public void updateAppSettings(boolean[] newSettings){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        sharedPreferences.edit().putBoolean("PlayMusic ?: ", newSettings[0]).apply();
+        sharedPreferences.edit().putBoolean("UseVideos ?: ", newSettings[1]).apply();
+        sharedPreferences.edit().putBoolean("Holder1: ", newSettings[2]).apply();
+        sharedPreferences.edit().putBoolean("Holder2: ", newSettings[3]).apply();
+    }
+
+    public void updateSongSettings(String activeSongName, boolean shuffle){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        sharedPreferences.edit().putString("ActiveSongName: ", activeSongName).apply();
+        sharedPreferences.edit().putBoolean("Shuffle ?: ", shuffle).apply();
+    }
+
+    public boolean isSettingsExist(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        return sharedPreferences.contains("PlayMusic ?: ");
+    }
+
+    public void saveRandomizeSongName(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString("ActiveSongName: ", Song.getSongs().get(((int)(Math.random() * Song.getSongs().size()))).getName()).apply();
+    }
+
+    public boolean getPlayMusicStatus(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("PlayMusic ?: ", true);
+    }
+
+    public boolean getUseVideosStatus(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("UseVideos ?: ", true);
+    }
+
+    public boolean getHolder1Status(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("Holder1: ", true);
+    }
+
+    public boolean getHolder2Status(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("Holder2: ", true);
+    }
+
+    public Song getActiveSongAndShuffleIfNeedTo(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        if(getShuffleStatus())
+            saveRandomizeSongName();
+
+        String songName = sharedPreferences.getString("ActiveSongName: ", Song.getSongs().get(0).getName());
+        Song tmp = Song.getSongByName(songName);
+
+        if(tmp != null)
+            tmp.playSong();
+        else
+            return Song.getSongs().get(0);
+
+        return tmp;
+    }
+
+    public Song getCurrentActiveSong(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        String songName = sharedPreferences.getString("ActiveSongName: ", Song.getSongs().get(0).getName());
+        Song tmp = Song.getSongByName(songName);
+
+        if(tmp != null)
+            tmp.playSong();
+        else
+            return Song.getSongs().get(0);
+
+        return tmp;
+    }
+
+    public boolean getShuffleStatus(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("Shuffle ?: ", false);
     }
 
     public void setPrimaryUser(User user){
@@ -95,14 +202,12 @@ public class FileAndDatabaseHelper {
             sharedPreferences.edit().putString("TargetFats: ", user.getCurrentPlan().getTargetFats() + "").apply();
             sharedPreferences.edit().putString("ProfilePictureId: ", user.getProfilePictureId() + "").apply();
             sharedPreferences.edit().putString("DailyMenus: ", user.getUserDailyMenus()).apply();
-            sharedPreferences.edit().commit();
         }
     }
 
     public void updatePrimaryUserPassword(String newPassword){
         SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
         sharedPreferences.edit().putString("Password: ", newPassword).apply();
-        sharedPreferences.edit().commit();
     }
 
     public void updatePrimaryUserPlan(Plan plan){
@@ -110,19 +215,16 @@ public class FileAndDatabaseHelper {
         sharedPreferences.edit().putString("TargetCalories: ", plan.getTargetCalories() + "").apply();
         sharedPreferences.edit().putString("TargetProteins: ", plan.getTargetProteins() + "").apply();
         sharedPreferences.edit().putString("TargetFats: ", plan.getTargetFats() + "").apply();
-        sharedPreferences.edit().commit();
     }
 
     public void updatePrimaryUserDailyMenus(String dailyMenus){
         SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
         sharedPreferences.edit().putString("DailyMenus: ", dailyMenus).apply();
-        sharedPreferences.edit().commit();
     }
 
     public void updatePrimaryUserProfilePictureId(int profilePictureId){
         SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
         sharedPreferences.edit().putString("DailyMenus: ", profilePictureId + "").apply();
-        sharedPreferences.edit().commit();
     }
 
     public User getPrimaryUser(){
@@ -141,7 +243,6 @@ public class FileAndDatabaseHelper {
             info[7] = sharedPreferences.getString("TargetFats: ", "");
             info[8] = sharedPreferences.getString("ProfilePictureId: ", "");
             info[9] = sharedPreferences.getString("DailyMenus: ", "");
-            sharedPreferences.edit().commit();
 
             user = new User(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7], info[8], info[9]);
         }
@@ -175,7 +276,6 @@ public class FileAndDatabaseHelper {
         sharedPreferences.edit().putString("TargetFats: ", "").apply();
         sharedPreferences.edit().putString("ProfilePictureId: ", "").apply();
         sharedPreferences.edit().putString("DailyMenus: ", "").apply();
-        sharedPreferences.edit().commit();
     }
 
     public void addIngredientIntoLocalDatabase(Ingredient ingredient){

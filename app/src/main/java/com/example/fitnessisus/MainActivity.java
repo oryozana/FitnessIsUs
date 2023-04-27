@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         currentHour = calendar.get(Calendar.HOUR_OF_DAY);
 
         analogClock = (AnalogClock) findViewById(R.id.mainActivityAnalogClock);
+        analogClock.setVisibility(View.INVISIBLE);
         textClock = (TextClock) findViewById(R.id.mainActivityTextClock);
 
         videoView = (VideoView) findViewById(R.id.mainActivityVideoView);
@@ -116,9 +117,10 @@ public class MainActivity extends AppCompatActivity {
 
                 if(itemId == R.id.sendToHome) {
                     getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, homeFragment).commit();
-                    analogClock.setVisibility(View.VISIBLE);
+                    // analogClock.setVisibility(View.VISIBLE);
                     textClock.setVisibility(View.VISIBLE);
-                    implementSettingsData();
+                    FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(MainActivity.this, me);
+                    fileAndDatabaseHelper.implementSettingsData();
                     return true;
                 }
 
@@ -140,8 +142,10 @@ public class MainActivity extends AppCompatActivity {
         if(me.hasExtra("activeSong"))
             activeSong = (Song) me.getSerializableExtra("activeSong");
 
+        FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(this, me);
+        activeSong = fileAndDatabaseHelper.implementSettingsData();
+
         setCustomNetworkConnectionReceiver();
-        implementSettingsData();
         initiateMediaPlayer();
         initiateVideoPlayer();
     }
@@ -150,17 +154,22 @@ public class MainActivity extends AppCompatActivity {
         if(!me.hasExtra("exists")){
             me = new Intent(this, UserInfoScreen.class);
             me.putExtra("exists", true);
-
-            me.putExtra("playMusic", true);
-            me.putExtra("useVideos", true);
-            me.putExtra("useManuallySave", true);
             me.putExtra("currentDate", currentDate);
 
             Song.initiateSongs();
-            activeSong = Song.getActiveSong();
-            me.putExtra("activeSong", activeSong);
 
-            FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(this);
+            FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(MainActivity.this, me);
+            if(!fileAndDatabaseHelper.isSettingsExist()){
+                fileAndDatabaseHelper.firstInitiateSettings();
+                fileAndDatabaseHelper.implementSettingsData();
+                firstInitiateCustomMealsNamesFile();
+                firstInitiateLocalUsersDatabase();
+                firstInitiateDailyMenusFile();
+                firstInitiatePrimaryUser();
+            }
+
+            activeSong = fileAndDatabaseHelper.getActiveSongAndShuffleIfNeedTo();
+
             if(fileAndDatabaseHelper.isDatabaseEmpty())
                 Ingredient.initiateIngredientsDatabase(this);
             Ingredient.initiateIngredientList(this);
@@ -207,63 +216,11 @@ public class MainActivity extends AppCompatActivity {
             }
             br.close();
         }
-        catch (FileNotFoundException e) {
-            if(fileName.equals(me.getStringExtra("todayDate")))
-                Toast.makeText(this, "Today saved data not exists yet.", Toast.LENGTH_SHORT).show();
-            if(fileName.equals("settings")) {  // If setting don't exist it's the first time opening the app.
-                firstInitiateSettingsFile();
-//                Ingredient.initiateIngredientsDatabase(this);
-//                Ingredient.initiateIngredientList(this); // Needed also for the first time...
-                firstInitiateCustomMealsNamesFile();
-                firstInitiateLocalUsersDatabase();
-                firstInitiateDailyMenusFile();
-                firstInitiatePrimaryUser();
-                implementSettingsData();
-            }
-        }
         catch (IOException e) {
             e.printStackTrace();
         }
         return allData;
     }
-
-    public void implementSettingsData(){
-        if(getFileData("settings") != null){
-            String[] settingsParts = getFileData("settings").split("\n");
-            boolean playMusic, useVideos, useManuallySave, useDigitalClock;
-
-            playMusic = Boolean.parseBoolean(settingsParts[0].split(": ")[1]);
-            useVideos = Boolean.parseBoolean(settingsParts[1].split(": ")[1]);
-            useManuallySave = Boolean.parseBoolean(settingsParts[2].split(": ")[1]);
-            activeSong = Song.getSongByName(settingsParts[3].split(": ")[1]);
-            useDigitalClock = Boolean.parseBoolean(settingsParts[4].split(": ")[1]);
-
-            if(useDigitalClock)
-                analogClock.setVisibility(View.INVISIBLE);
-            else
-                textClock.setVisibility(View.INVISIBLE);
-
-            me.putExtra("playMusic", playMusic);
-            me.putExtra("useVideos", useVideos);
-            me.putExtra("useManuallySave", useManuallySave);
-            me.putExtra("activeSong", activeSong);
-        }
-    }
-
-//    public void initiateIngredientsPictures(){  // Save all the ingredients pictures IDs.
-//        String customIngredientName;
-//        for(Ingredient ingredient : Ingredient.getIngredientsList()) {
-//            if(Ingredient.getIngredientsList().contains(ingredient)){
-//                if(ingredient.getName().contains(" ")){
-//                    customIngredientName = ingredient.getName().replaceAll(" ", "_");
-//                    ingredient.setImgId(getResources().getIdentifier(customIngredientName, "drawable", getPackageName()));
-//                }
-//                else{
-//                    ingredient.setImgId(getResources().getIdentifier(ingredient.getName(), "drawable", getPackageName()));
-//                }
-//            }
-//        }
-//    }
 
     public void initiateVideoPlayer(){
         if(6 <= currentHour && currentHour < 12)
@@ -374,12 +331,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemID = item.getItemId();
-//        if(itemID == R.id.sendToMusicMaster){
-//            me.setClass(MainActivity.this, musicMaster.class);
-//            me.putExtra("cameToMusicMasterFrom", getLocalClassName());
-//            startActivity(me);
-//        }
-//
+        if(itemID == R.id.sendToMusicMaster){
+            me.setClass(MainActivity.this, MusicMaster.class);
+            me.putExtra("cameToMusicMasterFrom", getLocalClassName());
+            startActivity(me);
+        }
+
 //        if(itemID == R.id.sendToSettings){
 //            me.setClass(MainActivity.this, settingsSetter.class);
 //            me.putExtra("cameToSettingsFrom", getLocalClassName());
@@ -394,24 +351,24 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void firstInitiateSettingsFile(){
-        try {
-            fos = openFileOutput("settings", Context.MODE_PRIVATE);
-            osw = new OutputStreamWriter(fos);
-            bw = new BufferedWriter(osw);
-
-            bw.write("Play music ?: " + true + "\n");
-            bw.write("Use Videos ?: " + true + "\n");
-            bw.write("Use manually Save ?: " + true + "\n");
-            bw.write("Active song name: " + activeSong.getName() + "\n");
-            bw.write("Use digital clock ?: " + true);
-
-            bw.close();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void firstInitiateSettingsFile(){
+//        try {
+//            fos = openFileOutput("settings", Context.MODE_PRIVATE);
+//            osw = new OutputStreamWriter(fos);
+//            bw = new BufferedWriter(osw);
+//
+//            bw.write("Play music ?: " + true + "\n");
+//            bw.write("Use Videos ?: " + true + "\n");
+//            bw.write("Use manually Save ?: " + true + "\n");
+//            bw.write("Active song name: " + activeSong.getName() + "\n");
+//            bw.write("Use digital clock ?: " + true);
+//
+//            bw.close();
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public void firstInitiateCustomMealsNamesFile(){
         try {

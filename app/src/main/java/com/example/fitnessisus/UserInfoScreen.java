@@ -762,12 +762,12 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemID = item.getItemId();
-//        if(itemID == R.id.sendToMusicMaster){
-//            me.setClass(UserInfoScreen.this, musicMaster.class);
-//            me.putExtra("cameToMusicMasterFrom", getLocalClassName());
-//            startActivity(me);
-//        }
-//
+        if(itemID == R.id.sendToMusicMaster){
+            me.setClass(UserInfoScreen.this, MusicMaster.class);
+            me.putExtra("cameToMusicMasterFrom", getLocalClassName());
+            startActivity(me);
+        }
+
 //        if(itemID == R.id.sendToSettings){
 //            me.setClass(UserInfoScreen.this, settingsSetter.class);
 //            me.putExtra("cameToSettingsFrom", getLocalClassName());

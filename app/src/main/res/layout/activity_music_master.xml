@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MusicMaster">
+
+    <VideoView
+        android:id="@+id/musicMasterVideoView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
+
+    <LinearLayout
+        android:id="@+id/musicMasterLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="150pt"
+            android:layout_height="wrap_content"
+            android:text="You can choose the music you want from here: "
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="12pt"/>
+
+        <RadioGroup
+            android:id="@+id/rgMusicChose"
+            android:layout_width="150pt"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10pt"
+            android:layout_marginTop="10pt">
+
+            <RadioButton
+                android:id="@+id/rbMusicTrack1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/rbMusicTrack2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black" />
+
+            <RadioButton
+                android:id="@+id/rbMusicTrack3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black" />
+
+            <RadioButton
+                android:id="@+id/rbMusicTrack4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black" />
+
+            <RadioButton
+                android:id="@+id/rbMusicTrack5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black" />
+
+            <RadioButton
+                android:id="@+id/rbMusicTrack6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black" />
+
+            <RadioButton
+                android:id="@+id/rbMusicTrack7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black" />
+
+            <RadioButton
+                android:id="@+id/rbMusicTrack8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black" />
+
+            <RadioButton
+                android:id="@+id/rbMusicTrack9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black" />
+
+            <RadioButton
+                android:id="@+id/rbMusicTrack10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black" />
+        </RadioGroup>
+
+<!--        <ImageButton-->
+<!--            android:id="@+id/ibtPauseOrPlayMusic"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layoutDirection="ltr"-->
+<!--            android:layout_marginRight="30pt"-->
+<!--            android:layout_marginLeft="30pt"-->
+<!--            app:srcCompat="@drawable/ic_pause_music_icon" />-->
+
+        <Button
+            android:id="@+id/btShuffleMusicMaster"
+            android:layout_width="125pt"
+            android:layout_height="wrap_content"
+            android:text="Enable shuffle" />
+
+        <Button
+            android:id="@+id/btFinishMusicMaster"
+            android:layout_width="125pt"
+            android:layout_height="wrap_content"
+            android:text="Finish" />
+    </LinearLayout>
+</RelativeLayout>

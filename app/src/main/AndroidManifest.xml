@@ -15,6 +15,9 @@
         android:theme="@style/Theme.FitnessIsUs"
         tools:targetApi="31">
         <activity
+            android:name=".MusicMaster"
+            android:exported="false" />
+        <activity
             android:name=".UserInfoScreen"
             android:exported="false" />
 
