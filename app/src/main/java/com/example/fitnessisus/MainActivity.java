@@ -477,8 +477,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {  // "..." - means that every amount of parameters will do.
             try {
-                if(!isAlreadyRunning && todayMenu.isNeedToBeSaved())
+                if(!isAlreadyRunning && todayMenu.isNeedToBeSaved()) {
+                    User user = User.getCurrentUser();
+                    user.downloadUserDailyMenusFromTemporaryFile(context);
+                    User.setCurrentUser(user);
+
                     startUpdateDailyMenusPreparations(0);
+                }
             }
             catch (DatabaseException e) {
                 Toast.makeText(context, "Failed to save info.", Toast.LENGTH_SHORT).show();

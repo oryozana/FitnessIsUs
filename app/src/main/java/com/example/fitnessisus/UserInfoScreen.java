@@ -382,6 +382,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         User.setCurrentUser(null);
         me.setClass(UserInfoScreen.this, LoginAndRegister.class);
         DailyMenu.restartDailyMenusFile(UserInfoScreen.this);
+        DailyMenu.setTodayMenu(null);
 
         if(fileAndDatabaseHelper.checkIfPrimaryUserExist()){
             if(fileAndDatabaseHelper.getPrimaryUsername().equals(user.getUsername()))

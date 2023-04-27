@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -364,10 +365,10 @@ public class FoodSelectionFragment extends Fragment implements View.OnClickListe
     }
 
     public void switchBetweenLocalAndGlobalFood(){
-        isOnLocalMode = !isOnLocalMode;
-
         if(!etFilterFood.getText().toString().equals(""))
             etFilterFood.setText("");
+
+        isOnLocalMode = !isOnLocalMode;  // Must be after the filter reset... if not produce error.
 
         if(isOnLocalMode){
             btSwitchBetweenLocalAndGlobalFood.setText("Choose from internet");

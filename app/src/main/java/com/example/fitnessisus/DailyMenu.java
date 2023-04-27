@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
@@ -476,12 +478,17 @@ public class DailyMenu {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
 
         for(int i = 0; i < dailyMenus.size(); i++){
-            if(oldestDailyMenu.isAfter(LocalDateTime.parse(dailyMenus.get(i).getDate())))
-                oldestDailyMenu = LocalDateTime.parse(dailyMenus.get(i).getDate());
+            String date = dailyMenus.get(i).getDate();
+            int day = Integer.parseInt(date.split("_")[0]);
+            int month = Integer.parseInt(date.split("_")[1]);
+            int year = Integer.parseInt(date.split("_")[2]);
+
+            if(oldestDailyMenu.isAfter(LocalDateTime.of(year, month, day, 23, 59)))
+                oldestDailyMenu = LocalDateTime.of(year, month, day, 23, 59);
         }
 
         int daysUntilToday = (int) oldestDailyMenu.until(today, ChronoUnit.DAYS);
-        for(int i = 0; i < daysUntilToday; i++){
+        for(int i = 0; i <= daysUntilToday; i++){
             if(!hasTodayMenuInsideAllDailyMenus(dtf.format(oldestDailyMenu.plusDays(i)))) {
                 DailyMenu tmpDailyMenu = new DailyMenu(dtf.format(oldestDailyMenu.plusDays(i)));
                 saveDailyMenuIntoFile(tmpDailyMenu, context);
