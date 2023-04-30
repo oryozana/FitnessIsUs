@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/settings_setter_background"
+    android:gravity="center|top"
+    tools:context=".SettingsSetter">
+
+    <VideoView
+        android:id="@+id/settingsSetterVideoView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true" />
+
+    <LinearLayout
+        android:id="@+id/settingsSetterLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center|top">
+
+        <TextView
+            android:layout_width="125pt"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15pt"
+            android:layout_marginTop="15pt"
+            android:layout_marginEnd="15pt"
+            android:layout_marginBottom="15pt"
+            android:text="Set your preferred settings here:"
+            android:textSize="8pt" />
+
+        <RadioGroup
+            android:id="@+id/rgPlayMusic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5pt"
+            android:layout_marginTop="5pt"
+            android:layout_marginEnd="5pt"
+            android:layout_marginBottom="5pt">
+
+            <RadioButton
+                android:id="@+id/rbPlayMusic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Play music" />
+
+            <RadioButton
+                android:id="@+id/rbMuteMusic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mute music" />
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/rgUseVideos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5pt">
+
+            <RadioButton
+                android:id="@+id/rbUseVideos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Use videos" />
+
+            <RadioButton
+                android:id="@+id/rbUseImages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Use images" />
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/rgUseManuallySave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5pt">
+
+            <RadioButton
+                android:id="@+id/rbManuallySave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Use manually save" />
+
+            <RadioButton
+                android:id="@+id/rbAutoSave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Use auto save" />
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/rgChooseClock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5pt"
+            android:layout_marginTop="5pt"
+            android:layout_marginEnd="5pt"
+            android:layout_marginBottom="5pt">
+
+            <RadioButton
+                android:id="@+id/rbDigitalClock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Use digital clock" />
+
+            <RadioButton
+                android:id="@+id/rbAnalogClock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Use analog clock" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/tvCurrentSongName"
+            android:layout_width="125pt"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10pt"
+            android:layout_marginBottom="4pt"
+            android:singleLine="true"
+            android:text="Current song: " />
+
+        <Button
+            android:id="@+id/btChangeMusic"
+            android:layout_width="125pt"
+            android:layout_height="wrap_content"
+            android:text="Change music" />
+
+        <Button
+            android:id="@+id/btReturnToRecentActivity"
+            android:layout_width="125pt"
+            android:layout_height="wrap_content"
+            android:text="Finish" />
+    </LinearLayout>
+</RelativeLayout>
