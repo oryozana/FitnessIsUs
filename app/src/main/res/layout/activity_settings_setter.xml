@@ -78,23 +78,23 @@
         </RadioGroup>
 
         <RadioGroup
-            android:id="@+id/rgUseManuallySave"
+            android:id="@+id/rgSendNotifications"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5pt">
 
             <RadioButton
-                android:id="@+id/rbManuallySave"
+                android:id="@+id/rbEnableNotifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Use manually save" />
+                android:text="Send notifications" />
 
             <RadioButton
-                android:id="@+id/rbAutoSave"
+                android:id="@+id/rbDisableNotifications"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Use auto save" />
+                android:text="Don't send notifications" />
         </RadioGroup>
 
         <RadioGroup

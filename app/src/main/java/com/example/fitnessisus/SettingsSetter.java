@@ -35,25 +35,20 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     private VideoView videoView;
     private MediaPlayer mediaPlayer;
 
-    RadioGroup rgPlayMusic, rgUseVideos, rgUseManuallySave, rgChooseClock;
+    RadioGroup rgPlayMusic, rgUseVideos, rgSendNotifications, rgChooseClock;
     Button btReturnToRecentActivity, btChangeMusic;
-    boolean playMusic, useVideos, useManuallySave, useDigitalClock;
+    boolean playMusic, useVideos, sendNotifications, useDigitalClock;
     boolean wantToSave = false, chooseIfWantToSave = false, needSave = true;
     boolean playMusicAtStart, useVideosAtStart, useManuallySaveAtStart, useDigitalClockAtStart;
     LinearLayout settingsSetterLinearLayout;
     Song activeSong = Song.getSongs().get(0);
     TextView tvCurrentSongName;
 
-    FileOutputStream fos;
-    OutputStreamWriter osw;
-    BufferedWriter bw;
-    String fileName = "settings";
-
     FileInputStream is;
     InputStreamReader isr;
     BufferedReader br;
 
-    Intent exitAppService;
+    FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(SettingsSetter.this);
     Intent me;
 
     @Override
@@ -72,7 +67,7 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
 
         rgPlayMusic = (RadioGroup) findViewById(R.id.rgPlayMusic);
         rgUseVideos = (RadioGroup) findViewById(R.id.rgUseVideos);
-        rgUseManuallySave = (RadioGroup) findViewById(R.id.rgUseManuallySave);
+        rgSendNotifications = (RadioGroup) findViewById(R.id.rgSendNotifications);
         rgChooseClock = (RadioGroup) findViewById(R.id.rgChooseClock);
 
         settingsSetterLinearLayout = (LinearLayout) findViewById(R.id.settingsSetterLinearLayout);
@@ -88,25 +83,27 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     public void saveSettings(){
         getRadioGroupsOptionsSelected();
 
-        try {
-            fos = openFileOutput(fileName, Context.MODE_PRIVATE);
-            osw = new OutputStreamWriter(fos);
-            bw = new BufferedWriter(osw);
+        fileAndDatabaseHelper.updateAppSettings(playMusic, useVideos, sendNotifications, );
 
-            bw.write("Play music ?: " + playMusic + "\n");
-            bw.write("Use Videos ?: " + useVideos + "\n");
-            bw.write("Use manually Save ?: " + useManuallySave + "\n");
-            bw.write("Active song name: " + activeSong.getName() + "\n");
-            bw.write("Use digital clock ?: " + useDigitalClock);
-
-            bw.close();
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            fos = openFileOutput(fileName, Context.MODE_PRIVATE);
+//            osw = new OutputStreamWriter(fos);
+//            bw = new BufferedWriter(osw);
+//
+//            bw.write("Play music ?: " + playMusic + "\n");
+//            bw.write("Use Videos ?: " + useVideos + "\n");
+//            bw.write("Use manually Save ?: " + useManuallySave + "\n");
+//            bw.write("Active song name: " + activeSong.getName() + "\n");
+//            bw.write("Use digital clock ?: " + useDigitalClock);
+//
+//            bw.close();
+//        }
+//        catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public String getFileData(String fileName){
@@ -143,14 +140,14 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
             if(!Boolean.parseBoolean(settingsParts[1].split(": ")[1]))
                 rgUseVideos.check(R.id.rbUseImages);
             if(!Boolean.parseBoolean(settingsParts[2].split(": ")[1]))
-                rgUseManuallySave.check(R.id.rbAutoSave);
+                rgSendNotifications.check(R.id.rbDisableNotifications);
             if(!Boolean.parseBoolean(settingsParts[4].split(": ")[1]))
                 rgChooseClock.check(R.id.rbAnalogClock);
 
             getRadioGroupsOptionsSelected();
             playMusicAtStart = playMusic;
             useVideosAtStart = useVideos;
-            useManuallySaveAtStart = useManuallySave;
+            useManuallySaveAtStart = sendNotifications;
             useDigitalClockAtStart = useDigitalClock;
             tvCurrentSongName.setText("Current song: " + activeSong.getName().replaceAll("_", " "));
         }
@@ -165,8 +162,8 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         radioID = rgUseVideos.getCheckedRadioButtonId();
         useVideos = radioID == R.id.rbUseVideos;
 
-        radioID = rgUseManuallySave.getCheckedRadioButtonId();
-        useManuallySave = radioID == R.id.rbManuallySave;
+        radioID = rgSendNotifications.getCheckedRadioButtonId();
+        sendNotifications = radioID == R.id.rbEnableNotifications;
 
         radioID = rgChooseClock.getCheckedRadioButtonId();
         useDigitalClock = radioID == R.id.rbDigitalClock;
@@ -181,7 +178,7 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     public void returnToRecentActivity(){
         getRadioGroupsOptionsSelected();
         if(!chooseIfWantToSave || needSave){
-            if(((playMusicAtStart != playMusic) || (useVideosAtStart != useVideos) || (useManuallySaveAtStart != useManuallySave) || (useDigitalClockAtStart != useDigitalClock)) && !chooseIfWantToSave)
+            if(((playMusicAtStart != playMusic) || (useVideosAtStart != useVideos) || (useManuallySaveAtStart != sendNotifications) || (useDigitalClockAtStart != useDigitalClock)) && !chooseIfWantToSave)
                 checkIfWantToSave();
             else {
                 needSave = false;
@@ -210,7 +207,7 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         AlertDialog.Builder adb;
         adb = new AlertDialog.Builder(this);
         adb.setTitle("Your settings are: ");
-        adb.setMessage("Play music ?: " + playMusic + "\n" + "Use videos ?: " + useVideos + "\n" + "Use manually save ?: " + useManuallySave + "\n" + "Use digital clock ?: " + useDigitalClock);
+        adb.setMessage("Play music ?: " + playMusic + "\n" + "Use videos ?: " + useVideos + "\n" + "Send notifications ?: " + sendNotifications + "\n" + "Use digital clock ?: " + useDigitalClock);
         adb.setNegativeButton("Continue", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -249,9 +246,9 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         if(!useVideosAtStart)
             rgUseVideos.check(R.id.rbUseImages);
 
-        rgUseManuallySave.check(R.id.rbManuallySave);
+        rgSendNotifications.check(R.id.rbEnableNotifications);
         if(!useManuallySaveAtStart)
-            rgUseManuallySave.check(R.id.rbAutoSave);
+            rgSendNotifications.check(R.id.rbDisableNotifications);
 
         rgChooseClock.check(R.id.rbDigitalClock);
         if(!useDigitalClock)
@@ -335,7 +332,6 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         videoView.stopPlayback();
         mediaPlayer.stop();
         mediaPlayer.release();
-        startService(exitAppService);
         super.onDestroy();
     }
 
