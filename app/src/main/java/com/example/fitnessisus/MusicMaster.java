@@ -133,8 +133,8 @@ public class MusicMaster extends AppCompatActivity implements View.OnClickListen
         String cameToMusicMasterFrom = me.getStringExtra("cameToMusicMasterFrom");
         if(cameToMusicMasterFrom.equals("MainActivity"))
             me.setClass(MusicMaster.this, MainActivity.class);
-//        if(cameToMusicMasterFrom.equals("SettingsSetter"))
-//            me.setClass(MusicMaster.this, SettingsSetter.class);
+        if(cameToMusicMasterFrom.equals("SettingsSetter"))
+            me.setClass(MusicMaster.this, SettingsSetter.class);
         if(cameToMusicMasterFrom.equals("UserInfoScreen"))
             me.setClass(MusicMaster.this, UserInfoScreen.class);
 
