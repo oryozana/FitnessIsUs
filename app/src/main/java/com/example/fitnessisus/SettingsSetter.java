@@ -95,6 +95,8 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         useDigitalClockAtStart = me.getBooleanExtra("useDigitalClock", true);
         if(!useDigitalClockAtStart)
             rgChooseClock.check(R.id.rbAnalogClock);
+
+        tvCurrentSongName.setText("Current song: " + fileAndDatabaseHelper.getCurrentActiveSong().getName());
     }
 
     public void saveSettings(){
