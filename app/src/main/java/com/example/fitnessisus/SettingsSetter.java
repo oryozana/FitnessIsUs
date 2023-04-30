@@ -56,13 +56,30 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         if(me.hasExtra("activeSong"))
             activeSong = (Song) me.getSerializableExtra("activeSong");
 
+        fileAndDatabaseHelper = new FileAndDatabaseHelper(SettingsSetter.this, me);
+
         rgPlayMusic = (RadioGroup) findViewById(R.id.rgPlayMusic);
         rgUseVideos = (RadioGroup) findViewById(R.id.rgUseVideos);
         rgSendNotifications = (RadioGroup) findViewById(R.id.rgSendNotifications);
         rgChooseClock = (RadioGroup) findViewById(R.id.rgChooseClock);
 
-        fileAndDatabaseHelper = new FileAndDatabaseHelper(SettingsSetter.this, me);
+        btReturnToRecentActivity = (Button) findViewById(R.id.btReturnToRecentActivity);
+        btReturnToRecentActivity.setOnClickListener(this);
+        btChangeMusic = (Button) findViewById(R.id.btChangeMusic);
+        btChangeMusic.setOnClickListener(this);
 
+        settingsSetterLinearLayout = (LinearLayout) findViewById(R.id.settingsSetterLinearLayout);
+        videoView = (VideoView) findViewById(R.id.settingsSetterVideoView);
+
+        tvCurrentSongName = (TextView) findViewById(R.id.tvCurrentSongName);
+
+        fileAndDatabaseHelper.implementSettingsData();
+        setInitialChoices();
+        initiateVideoPlayer();
+        initiateMediaPlayer();
+    }
+
+    public void setInitialChoices(){
         playMusicAtStart = me.getBooleanExtra("playMusic", true);
         if(!playMusicAtStart)
             rgPlayMusic.check(R.id.rbMuteMusic);
@@ -78,21 +95,6 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         useDigitalClockAtStart = me.getBooleanExtra("useDigitalClock", true);
         if(!useDigitalClockAtStart)
             rgChooseClock.check(R.id.rbAnalogClock);
-
-
-        btReturnToRecentActivity = (Button) findViewById(R.id.btReturnToRecentActivity);
-        btReturnToRecentActivity.setOnClickListener(this);
-        btChangeMusic = (Button) findViewById(R.id.btChangeMusic);
-        btChangeMusic.setOnClickListener(this);
-
-        settingsSetterLinearLayout = (LinearLayout) findViewById(R.id.settingsSetterLinearLayout);
-        videoView = (VideoView) findViewById(R.id.settingsSetterVideoView);
-
-        tvCurrentSongName = (TextView) findViewById(R.id.tvCurrentSongName);
-
-        fileAndDatabaseHelper.implementSettingsData();
-        initiateVideoPlayer();
-        initiateMediaPlayer();
     }
 
     public void saveSettings(){
