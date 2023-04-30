@@ -3,7 +3,7 @@ package com.example.fitnessisus;
 public class RecipeCode {
     final String allLettersAndDigits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvxyz0123456789";
     final int codeMaximumLength = 8;
-    private String expirationTime;
+    private String expirationTime;  // Show like not working...
     private String code;
     private FirebaseMeal firebaseMeal;
 
