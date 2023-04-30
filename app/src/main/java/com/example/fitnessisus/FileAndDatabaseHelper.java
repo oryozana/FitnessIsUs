@@ -84,8 +84,8 @@ public class FileAndDatabaseHelper {
         if(isSettingsExist() && me != null){
             me.putExtra("playMusic", getPlayMusicStatus());
             me.putExtra("useVideos", getUseVideosStatus());
-            me.putExtra("holder1", getHolder1Status());
-            me.putExtra("holder2", getHolder2Status());
+            me.putExtra("sendNotifications", getSendNotificationsStatus());
+            me.putExtra("useDigitalClock", getUseDigitalClockStatus());
             me.putExtra("activeSong", getCurrentActiveSong());
             me.putExtra("shuffle", getShuffleStatus());
 
@@ -99,8 +99,8 @@ public class FileAndDatabaseHelper {
 
         sharedPreferences.edit().putBoolean("PlayMusic ?: ", true).apply();
         sharedPreferences.edit().putBoolean("UseVideos ?: ", true).apply();
-        sharedPreferences.edit().putBoolean("Holder1: ", true).apply();
-        sharedPreferences.edit().putBoolean("Holder2: ", true).apply();
+        sharedPreferences.edit().putBoolean("SendNotifications ?: ", true).apply();
+        sharedPreferences.edit().putBoolean("UseDigitalClock ?: ", true).apply();
         sharedPreferences.edit().putString("ActiveSongName: ", Song.getSongs().get(0).getName()).apply();
         sharedPreferences.edit().putBoolean("Shuffle ?: ", false).apply();
     }
@@ -110,8 +110,8 @@ public class FileAndDatabaseHelper {
 
         sharedPreferences.edit().putBoolean("PlayMusic ?: ", newSettings[0]).apply();
         sharedPreferences.edit().putBoolean("UseVideos ?: ", newSettings[1]).apply();
-        sharedPreferences.edit().putBoolean("Holder1: ", newSettings[2]).apply();
-        sharedPreferences.edit().putBoolean("Holder2: ", newSettings[3]).apply();
+        sharedPreferences.edit().putBoolean("SendNotifications ?: ", newSettings[2]).apply();
+        sharedPreferences.edit().putBoolean("UseDigitalClock ?: ", newSettings[3]).apply();
     }
 
     public void updateSongSettings(String activeSongName, boolean shuffle){
@@ -141,14 +141,14 @@ public class FileAndDatabaseHelper {
         return sharedPreferences.getBoolean("UseVideos ?: ", true);
     }
 
-    public boolean getHolder1Status(){
+    public boolean getSendNotificationsStatus(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
-        return sharedPreferences.getBoolean("Holder1: ", true);
+        return sharedPreferences.getBoolean("SendNotifications ?: ", true);
     }
 
-    public boolean getHolder2Status(){
+    public boolean getUseDigitalClockStatus(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
-        return sharedPreferences.getBoolean("Holder2: ", true);
+        return sharedPreferences.getBoolean("UseDigitalClock ?: ", true);
     }
 
     public Song getActiveSongAndShuffleIfNeedTo(){

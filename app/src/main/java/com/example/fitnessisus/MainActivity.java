@@ -337,11 +337,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(me);
         }
 
-//        if(itemID == R.id.sendToSettings){
-//            me.setClass(MainActivity.this, settingsSetter.class);
-//            me.putExtra("cameToSettingsFrom", getLocalClassName());
-//            startActivity(me);
-//        }
+        if(itemID == R.id.sendToSettings){
+            me.setClass(MainActivity.this, SettingsSetter.class);
+            me.putExtra("cameToSettingsFrom", getLocalClassName());
+            startActivity(me);
+        }
 
         if(itemID == R.id.sendToUserScreen){
             me.setClass(MainActivity.this, UserInfoScreen.class);
@@ -350,25 +350,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-//    public void firstInitiateSettingsFile(){
-//        try {
-//            fos = openFileOutput("settings", Context.MODE_PRIVATE);
-//            osw = new OutputStreamWriter(fos);
-//            bw = new BufferedWriter(osw);
-//
-//            bw.write("Play music ?: " + true + "\n");
-//            bw.write("Use Videos ?: " + true + "\n");
-//            bw.write("Use manually Save ?: " + true + "\n");
-//            bw.write("Active song name: " + activeSong.getName() + "\n");
-//            bw.write("Use digital clock ?: " + true);
-//
-//            bw.close();
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     public void firstInitiateCustomMealsNamesFile(){
         try {

@@ -582,28 +582,6 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         return passTests;
     }
 
-//    public void showCodeGenerator(){
-//        AlertDialog ad;
-//        AlertDialog.Builder adb;
-//        adb = new AlertDialog.Builder(this);
-//        adb.setTitle("Your user code is: ");
-//        adb.setIcon(R.drawable.ic_code_icon);
-//
-//        LinearLayout shareUserByCodeLinearLayout = (LinearLayout) findViewById(R.id.shareUserByCodeLinearLayout);
-//        shareUserByCodeLinearLayout.setVisibility(View.VISIBLE);
-//        adb.setView(shareUserByCodeLinearLayout);
-//
-//        adb.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//
-//            }
-//        });
-//
-//        ad = adb.create();
-//        ad.show();
-//    }
-
     public void deleteUserAlertDialog(){
         AlertDialog ad;
         AlertDialog.Builder adb;
@@ -768,11 +746,11 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
             startActivity(me);
         }
 
-//        if(itemID == R.id.sendToSettings){
-//            me.setClass(UserInfoScreen.this, settingsSetter.class);
-//            me.putExtra("cameToSettingsFrom", getLocalClassName());
-//            startActivity(me);
-//        }
+        if(itemID == R.id.sendToSettings){
+            me.setClass(UserInfoScreen.this, SettingsSetter.class);
+            me.putExtra("cameToSettingsFrom", getLocalClassName());
+            startActivity(me);
+        }
         return super.onOptionsItemSelected(item);
     }
 

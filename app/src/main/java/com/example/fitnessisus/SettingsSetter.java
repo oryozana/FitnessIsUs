@@ -39,16 +39,12 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     Button btReturnToRecentActivity, btChangeMusic;
     boolean playMusic, useVideos, sendNotifications, useDigitalClock;
     boolean wantToSave = false, chooseIfWantToSave = false, needSave = true;
-    boolean playMusicAtStart, useVideosAtStart, useManuallySaveAtStart, useDigitalClockAtStart;
+    boolean playMusicAtStart, useVideosAtStart, sendNotificationsAtStart, useDigitalClockAtStart;
     LinearLayout settingsSetterLinearLayout;
     Song activeSong = Song.getSongs().get(0);
     TextView tvCurrentSongName;
 
-    FileInputStream is;
-    InputStreamReader isr;
-    BufferedReader br;
-
-    FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(SettingsSetter.this);
+    FileAndDatabaseHelper fileAndDatabaseHelper;
     Intent me;
 
     @Override
@@ -60,22 +56,41 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         if(me.hasExtra("activeSong"))
             activeSong = (Song) me.getSerializableExtra("activeSong");
 
-        btReturnToRecentActivity = (Button) findViewById(R.id.btReturnToRecentActivity);
-        btReturnToRecentActivity.setOnClickListener(this);
-        btChangeMusic = (Button) findViewById(R.id.btChangeMusic);
-        btChangeMusic.setOnClickListener(this);
-
         rgPlayMusic = (RadioGroup) findViewById(R.id.rgPlayMusic);
         rgUseVideos = (RadioGroup) findViewById(R.id.rgUseVideos);
         rgSendNotifications = (RadioGroup) findViewById(R.id.rgSendNotifications);
         rgChooseClock = (RadioGroup) findViewById(R.id.rgChooseClock);
+
+        fileAndDatabaseHelper = new FileAndDatabaseHelper(SettingsSetter.this, me);
+
+        playMusicAtStart = me.getBooleanExtra("playMusic", true);
+        if(!playMusicAtStart)
+            rgPlayMusic.check(R.id.rbMuteMusic);
+
+        useVideosAtStart = me.getBooleanExtra("useVideos", true);
+        if(!useVideosAtStart)
+            rgUseVideos.check(R.id.rbUseImages);
+
+        sendNotificationsAtStart = me.getBooleanExtra("sendNotifications", true);
+        if(!sendNotificationsAtStart)
+            rgSendNotifications.check(R.id.rbDisableNotifications);
+
+        useDigitalClockAtStart = me.getBooleanExtra("useDigitalClock", true);
+        if(!useDigitalClockAtStart)
+            rgChooseClock.check(R.id.rbAnalogClock);
+
+
+        btReturnToRecentActivity = (Button) findViewById(R.id.btReturnToRecentActivity);
+        btReturnToRecentActivity.setOnClickListener(this);
+        btChangeMusic = (Button) findViewById(R.id.btChangeMusic);
+        btChangeMusic.setOnClickListener(this);
 
         settingsSetterLinearLayout = (LinearLayout) findViewById(R.id.settingsSetterLinearLayout);
         videoView = (VideoView) findViewById(R.id.settingsSetterVideoView);
 
         tvCurrentSongName = (TextView) findViewById(R.id.tvCurrentSongName);
 
-        implementSettingsData();
+        fileAndDatabaseHelper.implementSettingsData();
         initiateVideoPlayer();
         initiateMediaPlayer();
     }
@@ -83,74 +98,8 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     public void saveSettings(){
         getRadioGroupsOptionsSelected();
 
-        fileAndDatabaseHelper.updateAppSettings(playMusic, useVideos, sendNotifications, );
-
-//        try {
-//            fos = openFileOutput(fileName, Context.MODE_PRIVATE);
-//            osw = new OutputStreamWriter(fos);
-//            bw = new BufferedWriter(osw);
-//
-//            bw.write("Play music ?: " + playMusic + "\n");
-//            bw.write("Use Videos ?: " + useVideos + "\n");
-//            bw.write("Use manually Save ?: " + useManuallySave + "\n");
-//            bw.write("Active song name: " + activeSong.getName() + "\n");
-//            bw.write("Use digital clock ?: " + useDigitalClock);
-//
-//            bw.close();
-//        }
-//        catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
-    }
-
-    public String getFileData(String fileName){
-        String currentLine = "", allData = "";
-        try{
-            is = openFileInput(fileName);
-            isr = new InputStreamReader(is);
-            br = new BufferedReader(isr);
-
-            currentLine = br.readLine();
-            while(currentLine != null){
-                allData += currentLine + "\n";
-                currentLine = br.readLine();
-            }
-            br.close();
-        }
-        catch (FileNotFoundException e) {
-            if(fileName.equals(me.getStringExtra("todayDate")))
-                Toast.makeText(this, "Today saved data not exists yet.", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        return allData;
-    }
-
-    public void implementSettingsData(){
-        if(getFileData("settings") != null){
-            String[] settingsParts = getFileData("settings").split("\n");
-
-            if(!Boolean.parseBoolean(settingsParts[0].split(": ")[1]))
-                rgPlayMusic.check(R.id.rbMuteMusic);
-            if(!Boolean.parseBoolean(settingsParts[1].split(": ")[1]))
-                rgUseVideos.check(R.id.rbUseImages);
-            if(!Boolean.parseBoolean(settingsParts[2].split(": ")[1]))
-                rgSendNotifications.check(R.id.rbDisableNotifications);
-            if(!Boolean.parseBoolean(settingsParts[4].split(": ")[1]))
-                rgChooseClock.check(R.id.rbAnalogClock);
-
-            getRadioGroupsOptionsSelected();
-            playMusicAtStart = playMusic;
-            useVideosAtStart = useVideos;
-            useManuallySaveAtStart = sendNotifications;
-            useDigitalClockAtStart = useDigitalClock;
-            tvCurrentSongName.setText("Current song: " + activeSong.getName().replaceAll("_", " "));
-        }
+        boolean[] settings = {playMusic, useVideos, sendNotifications, useDigitalClock};
+        fileAndDatabaseHelper.updateAppSettings(settings);
     }
 
     public void getRadioGroupsOptionsSelected(){
@@ -178,7 +127,7 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     public void returnToRecentActivity(){
         getRadioGroupsOptionsSelected();
         if(!chooseIfWantToSave || needSave){
-            if(((playMusicAtStart != playMusic) || (useVideosAtStart != useVideos) || (useManuallySaveAtStart != sendNotifications) || (useDigitalClockAtStart != useDigitalClock)) && !chooseIfWantToSave)
+            if(((playMusicAtStart != playMusic) || (useVideosAtStart != useVideos) || (sendNotificationsAtStart != sendNotifications) || (useDigitalClockAtStart != useDigitalClock)) && !chooseIfWantToSave)
                 checkIfWantToSave();
             else {
                 needSave = false;
@@ -247,11 +196,11 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
             rgUseVideos.check(R.id.rbUseImages);
 
         rgSendNotifications.check(R.id.rbEnableNotifications);
-        if(!useManuallySaveAtStart)
+        if(!sendNotificationsAtStart)
             rgSendNotifications.check(R.id.rbDisableNotifications);
 
         rgChooseClock.check(R.id.rbDigitalClock);
-        if(!useDigitalClock)
+        if(!useDigitalClockAtStart)
             rgChooseClock.check(R.id.rbAnalogClock);
     }
 
