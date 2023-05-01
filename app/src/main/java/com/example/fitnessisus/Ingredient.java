@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Ingredient extends Food {
     private static ArrayList<Ingredient> ingredients = new ArrayList<Ingredient>();
     private int imgId = R.drawable.image_not_available;
-    private static Context context;  // Handled.
+    private static Context context;  // Handled... needed for the database...
 
     public Ingredient(String name, double grams, double proteins, double fats, double calories, int imgId) {  // Full info ingredient, not for new ones.
         super(name, grams, proteins, fats, calories);

@@ -3,8 +3,8 @@ package com.example.fitnessisus;
 public class RecipeCode {
     final String allLettersAndDigits = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvxyz0123456789";
     final int codeMaximumLength = 8;
-    private String expirationTime;  // Show like not working...
-    private String code;
+    private final String expirationTime;
+    private final String code;
     private FirebaseMeal firebaseMeal;
 
     public RecipeCode(FirebaseMeal firebaseMeal, String expirationTime) {
@@ -25,16 +25,8 @@ public class RecipeCode {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public String getExpirationTime() {
         return expirationTime;
-    }
-
-    public void setExpirationTime(String expirationTime) {
-        this.expirationTime = expirationTime;
     }
 
     public FirebaseMeal getMeal() {

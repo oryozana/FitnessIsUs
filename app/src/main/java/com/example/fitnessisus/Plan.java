@@ -3,11 +3,11 @@ package com.example.fitnessisus;
 import java.io.Serializable;
 
 public class Plan implements Serializable {
-    private static String[] activeLevelOptions = new String[]{"Sedentary", "Lightly active", "Moderately active", "Very active", "Extra active"};
+    private static final String[] activeLevelOptions = new String[]{"Sedentary", "Lightly active", "Moderately active", "Very active", "Extra active"};
     private double targetCalories;
     private double targetProteins;
     private double targetFats;
-    private String goal;
+    private final String goal;
 
     public Plan(double targetCalories, double targetProteins, double targetFats){
         this.targetCalories = targetCalories;
