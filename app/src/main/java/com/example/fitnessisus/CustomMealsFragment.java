@@ -875,9 +875,6 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
                 saveCustomMealNameInsideFile();
             Toast.makeText(getActivity(), customMeal.getName() + " added.", Toast.LENGTH_SHORT).show();
         }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
         catch (IOException e) {
             e.printStackTrace();
         }
@@ -905,9 +902,6 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
             if(!alreadyThere)
                 saveCustomMealNameInsideFile();
             Toast.makeText(getActivity(), codeMeal.getName() + " added.", Toast.LENGTH_SHORT).show();
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -971,9 +965,6 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
 
             bw.close();
         }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
         catch (IOException e) {
             e.printStackTrace();
         }
@@ -1024,9 +1015,6 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
 
             bw.close();
         }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
         catch (IOException e) {
             e.printStackTrace();
         }
@@ -1042,9 +1030,6 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
             bw.write(codeMeal.getName() + "\n");
 
             bw.close();
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
         }
         catch (IOException e) {
             e.printStackTrace();
