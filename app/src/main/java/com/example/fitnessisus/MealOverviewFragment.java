@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 public class MealOverviewFragment extends Fragment implements View.OnClickListener {
 
-    MainActivity.MyAsyncClass mac;
+    MainActivity.UploadInfoTask uploadInfoTask;
 
     private String fromWhere;
     private Meal meal, tmpMeal;
@@ -243,8 +243,8 @@ public class MealOverviewFragment extends Fragment implements View.OnClickListen
             DailyMenu.getTodayMenu().addMealByMealName(selectedMeal, tmpMeal);
             DailyMenu.saveDailyMenuIntoFile(DailyMenu.getTodayMenu(), getActivity());
 
-            mac = new MainActivity.MyAsyncClass(getActivity());
-            mac.execute();
+            uploadInfoTask = new MainActivity.UploadInfoTask(getActivity());
+            uploadInfoTask.execute();
         }
     }
 
@@ -253,8 +253,8 @@ public class MealOverviewFragment extends Fragment implements View.OnClickListen
         DailyMenu.getTodayMenu().replaceMeal(tmpMeal, mealType);
         DailyMenu.saveDailyMenuIntoFile(DailyMenu.getTodayMenu(), getActivity());
 
-        mac = new MainActivity.MyAsyncClass(getActivity());
-        mac.execute();
+        uploadInfoTask = new MainActivity.UploadInfoTask(getActivity());
+        uploadInfoTask.execute();
     }
 
     public void updateCustomMeal(){

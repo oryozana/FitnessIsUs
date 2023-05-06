@@ -30,7 +30,7 @@ import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
 
-    MainActivity.MyAsyncClass mac;
+    MainActivity.UploadInfoTask uploadInfoTask;
 
     TextView tvTotalProteinsMain, tvTotalFatsMain, tvTotalCaloriesMain;
     LinearLayout mainActivityLinearLayout;
@@ -84,8 +84,8 @@ public class HomeFragment extends Fragment {
         todayMenu = DailyMenu.getTodayMenu();
         todayMenu.correctNutritiousValues();
 
-        mac = new MainActivity.MyAsyncClass(getActivity());
-        mac.execute();
+        uploadInfoTask = new MainActivity.UploadInfoTask(getActivity());
+        uploadInfoTask.execute();
 
         if(todayMenu.hasBreakfast()) {
             lvBreakfastMeals.setVisibility(View.VISIBLE);

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="125pt"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="16pt"
+        android:textStyle="bold"
+        android:layout_marginBottom="10pt"
+        android:layout_marginTop="10pt"
+        android:text="Weather info will be about..."/>
+
+    <EditText
+        android:id="@+id/etEnterCountryOrCapitalName"
+        android:layout_width="125pt"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="Country or Capital: " />
+
+    <ListView
+        android:id="@+id/lvCountiesAndCapitalsNames"
+        android:layout_width="125pt"
+        android:layout_height="150pt"
+        android:layout_marginBottom="6pt"
+        android:layout_marginTop="6pt"/>
+
+    <Button
+        android:id="@+id/btCancelCapitalSearch"
+        android:layout_width="125pt"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6pt"
+        android:layout_marginBottom="10pt"
+        android:text="Cancel" />
+</LinearLayout>

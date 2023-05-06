@@ -16,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 
 public class FileAndDatabaseHelper {
@@ -85,7 +87,7 @@ public class FileAndDatabaseHelper {
             me.putExtra("playMusic", getPlayMusicStatus());
             me.putExtra("useVideos", getUseVideosStatus());
             me.putExtra("sendNotifications", getSendNotificationsStatus());
-            me.putExtra("useDigitalClock", getUseDigitalClockStatus());
+            me.putExtra("showDigitalClock", getShowDigitalClockStatus());
             me.putExtra("activeSong", getCurrentActiveSong());
             me.putExtra("shuffle", getShuffleStatus());
 
@@ -100,7 +102,7 @@ public class FileAndDatabaseHelper {
         sharedPreferences.edit().putBoolean("PlayMusic ?: ", true).apply();
         sharedPreferences.edit().putBoolean("UseVideos ?: ", true).apply();
         sharedPreferences.edit().putBoolean("SendNotifications ?: ", true).apply();
-        sharedPreferences.edit().putBoolean("UseDigitalClock ?: ", true).apply();
+        sharedPreferences.edit().putBoolean("ShowDigitalClock ?: ", true).apply();
         sharedPreferences.edit().putString("ActiveSongName: ", Song.getSongs().get(0).getName()).apply();
         sharedPreferences.edit().putBoolean("Shuffle ?: ", false).apply();
     }
@@ -111,7 +113,7 @@ public class FileAndDatabaseHelper {
         sharedPreferences.edit().putBoolean("PlayMusic ?: ", newSettings[0]).apply();
         sharedPreferences.edit().putBoolean("UseVideos ?: ", newSettings[1]).apply();
         sharedPreferences.edit().putBoolean("SendNotifications ?: ", newSettings[2]).apply();
-        sharedPreferences.edit().putBoolean("UseDigitalClock ?: ", newSettings[3]).apply();
+        sharedPreferences.edit().putBoolean("ShowDigitalClock ?: ", newSettings[3]).apply();
     }
 
     public void updateSongSettings(String activeSongName, boolean shuffle){
@@ -146,9 +148,9 @@ public class FileAndDatabaseHelper {
         return sharedPreferences.getBoolean("SendNotifications ?: ", true);
     }
 
-    public boolean getUseDigitalClockStatus(){
+    public boolean getShowDigitalClockStatus(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
-        return sharedPreferences.getBoolean("UseDigitalClock ?: ", true);
+        return sharedPreferences.getBoolean("ShowDigitalClock ?: ", true);
     }
 
     public Song getActiveSongAndShuffleIfNeedTo(){
@@ -185,6 +187,67 @@ public class FileAndDatabaseHelper {
     public boolean getShuffleStatus(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean("Shuffle ?: ", false);
+    }
+
+    public void updateWeatherConditions(String cityName, String forecast, String temperature, String updatedAt, String dateOfUpdate){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
+
+        sharedPreferences.edit().putString("CityName: ", cityName).apply();
+        sharedPreferences.edit().putString("Forecast: ", forecast).apply();
+        sharedPreferences.edit().putString("Temperature: ", temperature).apply();
+        sharedPreferences.edit().putString("UpdatedAt: ", updatedAt).apply();
+        sharedPreferences.edit().putString("DateOfUpdate: ", dateOfUpdate).apply();
+    }
+
+    public void updateCityName(String cityName){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
+
+        sharedPreferences.edit().putString("CityName: ", cityName).apply();
+        sharedPreferences.edit().putString("Forecast: ", "").apply();
+        sharedPreferences.edit().putString("Temperature: ", "").apply();
+        sharedPreferences.edit().putString("UpdatedAt: ", "").apply();
+        sharedPreferences.edit().putString("DateOfUpdate: ", "").apply();
+    }
+
+    public boolean isNeedToUpdateWeather(){
+        LocalDateTime updatedAt = LocalDateTime.parse(String.valueOf(getDateOfUpdate()));
+        updatedAt.plusHours(1);
+        return LocalDateTime.now(ZoneId.of("Asia/Jerusalem")).isAfter(updatedAt);
+    }
+
+    public boolean hasWeatherConditions(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
+        return !sharedPreferences.getString("Forecast: ", "").equals("");
+    }
+
+    public String getCityName(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
+
+        return sharedPreferences.getString("CityName: ", "");
+    }
+
+    public String getForecast(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
+
+        return sharedPreferences.getString("Forecast: ", "");
+    }
+
+    public String getTemperature(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
+
+        return sharedPreferences.getString("Temperature: ", "");
+    }
+
+    public String getUpdatedAt(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
+
+        return sharedPreferences.getString("UpdatedAt: ", "");
+    }
+
+    public String getDateOfUpdate(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
+
+        return sharedPreferences.getString("DateOfUpdate: ", "");
     }
 
     public void setPrimaryUser(User user){

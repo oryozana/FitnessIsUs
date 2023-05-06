@@ -51,7 +51,7 @@ import java.util.ArrayList;
 public class CustomMealsFragment extends Fragment implements View.OnClickListener {
     NetworkConnectionReceiver networkConnectionReceiver;
 
-    MainActivity.MyAsyncClass mac;
+    MainActivity.UploadInfoTask uploadInfoTask;
 
     Button btSendToCustomSelection, btShowMealInfo, btSaveCustomMeal, btUseCodeAlertDialog;
     LinearLayout customMealsAdditionsLinearLayout;
@@ -754,8 +754,8 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
                     DailyMenu.getTodayMenu().addMealByMealName(selectedMeal, codeMeal);
                     DailyMenu.saveDailyMenuIntoFile(DailyMenu.getTodayMenu(), getActivity());
 
-                    mac = new MainActivity.MyAsyncClass(getActivity());
-                    mac.execute();
+                    uploadInfoTask = new MainActivity.UploadInfoTask(getActivity());
+                    uploadInfoTask.execute();
 
                     Toast.makeText(getActivity(), "Meal successfully added.", Toast.LENGTH_SHORT).show();
                 }

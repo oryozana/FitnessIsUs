@@ -17,55 +17,64 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true" />
 
-    <AnalogClock
-        android:id="@+id/mainActivityAnalogClock"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="15pt" />
-
     <TextClock
         android:id="@+id/mainActivityTextClock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="30pt"
-        android:format24Hour="hh:mm:ss a"
-        android:textSize="25pt" />
+        android:layout_marginTop="27pt"
+        android:format24Hour="HH:mm:ss"
+        android:visibility="invisible"
+        android:textSize="27pt" />
 
     <RelativeLayout
         android:id="@+id/weatherLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/black"
-        android:layout_margin="10pt">
+        android:visibility="invisible"
+        android:foregroundGravity="center"
+        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="14pt">
 
         <TextView
             android:id="@+id/tvCityName"
-            android:layout_width="75pt"
+            android:layout_width="100pt"
             android:layout_height="wrap_content"
-            android:text="City: " />
+            android:textSize="9pt"
+            android:textStyle="italic"
+            android:textColor="@color/white"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/tvForecast"
-            android:layout_width="75pt"
+            android:layout_width="100pt"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvCityName"
-            android:text="Forecast: " />
+            android:textSize="9pt"
+            android:textStyle="italic"
+            android:textColor="@color/white"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/tvCurrentTemperature"
-            android:layout_width="75pt"
+            android:layout_width="100pt"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvForecast"
-            android:text="Temperature: " />
+            android:textSize="9pt"
+            android:textStyle="italic"
+            android:textColor="@color/white"
+            android:gravity="center" />
 
         <TextView
             android:id="@+id/tvUpdatedAt"
-            android:layout_width="75pt"
+            android:layout_width="100pt"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvCurrentTemperature"
-            android:text="Updated at: " />
+            android:textSize="9pt"
+            android:textStyle="italic"
+            android:textColor="@color/white"
+            android:gravity="center" />
     </RelativeLayout>
 
     <FrameLayout

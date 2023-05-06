@@ -9,8 +9,11 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -59,6 +62,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -82,18 +86,15 @@ import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
     NetworkConnectionReceiver networkConnectionReceiver;
-    boolean isInternetConnectionAvailable = false;
+    boolean isInternetConnectionAvailable = true;
 
-    MyAsyncClass mac;
+    UploadInfoTask uploadInfoTask;
 
-    private AnalogClock analogClock;
     private TextClock textClock;
 
     RelativeLayout weatherLayout;
     TextView tvCityName, tvForecast, tvCurrentTemperature, tvUpdatedAt;
 
-    String city;
-    String weatherAPI = "7fd9239e91743947217f48e81e11c139";
     String response = "";
 
     BottomNavigationView bottomNavigationView;
@@ -104,8 +105,7 @@ public class MainActivity extends AppCompatActivity {
     private VideoView videoView;
     private MediaPlayer mediaPlayer;
 
-    int locationPermissionId = 42;
-
+    FileAndDatabaseHelper fADHelper = new FileAndDatabaseHelper(MainActivity.this);
     DailyMenu todayMenu;
     Song activeSong;  // In this activity he get a initial value at "createTheFirstIntent".
 
@@ -117,10 +117,6 @@ public class MainActivity extends AppCompatActivity {
 
     SQLiteDatabase sqdb;
     DBHelper my_db;
-
-    FileInputStream is;
-    InputStreamReader isr;
-    BufferedReader br;
 
     Intent me;
 
@@ -135,6 +131,10 @@ public class MainActivity extends AppCompatActivity {
             me.removeExtra("cameFromLogin");
         }
 
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);  // Set initial value.
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        isInternetConnectionAvailable = (networkInfo != null && networkInfo.isConnected());
+
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
         LocalDateTime today = LocalDateTime.now();
         currentDate = dtf.format(today);
@@ -142,8 +142,6 @@ public class MainActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         currentHour = calendar.get(Calendar.HOUR_OF_DAY);
 
-        analogClock = (AnalogClock) findViewById(R.id.mainActivityAnalogClock);
-        analogClock.setVisibility(View.INVISIBLE);
         textClock = (TextClock) findViewById(R.id.mainActivityTextClock);
 
         videoView = (VideoView) findViewById(R.id.mainActivityVideoView);
@@ -157,17 +155,21 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bnvMain);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
 
-                analogClock.setVisibility(View.INVISIBLE);
+                weatherLayout.setVisibility(View.INVISIBLE);
                 textClock.setVisibility(View.INVISIBLE);
 
                 if (itemId == R.id.sendToHome) {
                     getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, homeFragment).commit();
-                    // analogClock.setVisibility(View.VISIBLE);
-                    textClock.setVisibility(View.VISIBLE);
+
                     FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(MainActivity.this, me);
+                    if(fileAndDatabaseHelper.getShowDigitalClockStatus())
+                        textClock.setVisibility(View.VISIBLE);
+                    else
+                        weatherLayout.setVisibility(View.VISIBLE);
+
                     fileAndDatabaseHelper.implementSettingsData();
                     return true;
                 }
@@ -186,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        setCustomNetworkConnectionReceiver();
+
         me = createTheFirstIntent(me);
         if (me.hasExtra("activeSong"))
             activeSong = (Song) me.getSerializableExtra("activeSong");
@@ -193,7 +197,11 @@ public class MainActivity extends AppCompatActivity {
         FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(this, me);
         activeSong = fileAndDatabaseHelper.implementSettingsData();
 
-        setCustomNetworkConnectionReceiver();
+        if(fileAndDatabaseHelper.getShowDigitalClockStatus())
+            textClock.setVisibility(View.VISIBLE);
+        else
+            weatherLayout.setVisibility(View.VISIBLE);
+
         initiateMediaPlayer();
         initiateVideoPlayer();
     }
@@ -214,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
                 firstInitiateLocalUsersDatabase();
                 firstInitiateDailyMenusFile();
                 firstInitiatePrimaryUser();
+                firstInitiateWeather();
             }
 
             activeSong = fileAndDatabaseHelper.getActiveSongAndShuffleIfNeedTo();
@@ -247,36 +256,29 @@ public class MainActivity extends AppCompatActivity {
             DailyMenu.saveDailyMenuIntoFile(todayMenu, MainActivity.this);
             getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, homeFragment).commit();
 
-            CityTask cityTask = new CityTask(new CityTask.OnTaskCompleted() {
-                @Override
-                public void onTaskCompleted() {
-
+            if(!fADHelper.getShowDigitalClockStatus()){
+                if(fADHelper.hasWeatherConditions()){
+                    if(fADHelper.isNeedToUpdateWeather() && isInternetConnectionAvailable){
+                        WeatherTask weatherTask = new WeatherTask();
+                        weatherTask.execute();
+                    }
+                    else
+                        setAvailableWeatherInfo();
+                }
+                else{
                     WeatherTask weatherTask = new WeatherTask();
                     weatherTask.execute();
                 }
-            });
-            cityTask.execute();
+            }
         }
         return me;
     }
 
-    public String getFileData(String fileName) {
-        String currentLine = "", allData = "";
-        try {
-            is = openFileInput(fileName);
-            isr = new InputStreamReader(is);
-            br = new BufferedReader(isr);
-
-            currentLine = br.readLine();
-            while (currentLine != null) {
-                allData += currentLine + "\n";
-                currentLine = br.readLine();
-            }
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return allData;
+    public void setAvailableWeatherInfo(){
+        tvCityName.setText(fADHelper.getCityName());
+        tvForecast.setText(fADHelper.getForecast());
+        tvCurrentTemperature.setText(fADHelper.getTemperature());
+        tvUpdatedAt.setText(fADHelper.getUpdatedAt());
     }
 
     public void initiateVideoPlayer() {
@@ -319,8 +321,23 @@ public class MainActivity extends AppCompatActivity {
                 else {
                     isInternetConnectionAvailable = true;
 
-                    mac = new MyAsyncClass(MainActivity.this);
-                    mac.execute();
+                    if(!fADHelper.getShowDigitalClockStatus()){
+                        if(fADHelper.hasWeatherConditions()){
+                            if(fADHelper.isNeedToUpdateWeather()){
+                                WeatherTask weatherTask = new WeatherTask();
+                                weatherTask.execute();
+                            }
+                            else
+                                setAvailableWeatherInfo();
+                        }
+                        else{
+                            WeatherTask weatherTask = new WeatherTask();
+                            weatherTask.execute();
+                        }
+                    }
+
+                    uploadInfoTask = new UploadInfoTask(MainActivity.this);
+                    uploadInfoTask.execute();
                 }
             }
         };
@@ -453,20 +470,30 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences.edit().putString("DailyMenus: ", "").apply();
     }
 
+    public void firstInitiateWeather(){
+        SharedPreferences sharedPreferences = getSharedPreferences("weather", Context.MODE_PRIVATE);
+
+        sharedPreferences.edit().putString("CityName: ", "").apply();
+        sharedPreferences.edit().putString("Forecast: ", "").apply();
+        sharedPreferences.edit().putString("Temperature: ", "").apply();
+        sharedPreferences.edit().putString("UpdatedAt: ", "").apply();
+        sharedPreferences.edit().putString("DateOfUpdate: ", "").apply();
+    }
+
     public void firstInitiateLocalUsersDatabase() {
         my_db = new DBHelper(this);
         sqdb = my_db.getWritableDatabase();
         sqdb.close();
     }
 
-    public static class MyAsyncClass extends AsyncTask<Void, Void, Void> {
+    public static class UploadInfoTask extends AsyncTask<Void, Void, Void> {
         FirebaseDatabase usersDb;
         DatabaseReference userReference;
         Context context;
         boolean isAlreadyRunning = false;
         DailyMenu todayMenu;
 
-        public MyAsyncClass(Context context) {
+        public UploadInfoTask(Context context) {
             this.context = context;
         }
 
@@ -574,193 +601,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateWeatherInfo(){
-        if(city != null && !response.equals("")){
-            try {
-                JSONObject jsonObj = new JSONObject(response);
-                JSONObject main = jsonObj.getJSONObject("main");
-                JSONObject weather = jsonObj.getJSONArray("weather").getJSONObject(0);
-                JSONObject sys = jsonObj.getJSONObject("sys");
-
-                // CALL VALUE IN API :
-                String cityName = sys.getString("country") + ", " + jsonObj.getString("name");
-
-//                LocalDateTime currentTime = LocalDateTime.now(TimeZone.getDefault().toZoneId());
-//                String date = currentTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-//                String time = currentTime.format(DateTimeFormatter.ofPattern("HH:mm"));
-//                String updatedAtText = "Last Updated at: " + date + " " + time;
-                String temperature = main.getString("temp");
-                String forecast = weather.getString("description");
-
-                long updatedAt = jsonObj.getLong("dt");
-                String updatedAtText = "Last Updated at: " + new SimpleDateFormat("hh:mm a", Locale.ENGLISH).format(new Date(updatedAt * 1000));
-
-                // SET ALL VALUES IN TextViews :
-                tvCityName.setText(cityName);
-                tvCurrentTemperature.setText(temperature + "°C");
-                tvUpdatedAt.setText(updatedAtText);
-                tvForecast.setText(forecast);
-
-            }
-            catch (Exception e){
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void
-    onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        Log.d("bet", "hg9ert8u");
-
-        if (requestCode == locationPermissionId) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                CityTask cityTask = new CityTask(new CityTask.OnTaskCompleted() {
-                    @Override
-                    public void onTaskCompleted() {
-
-                        WeatherTask weatherTask = new WeatherTask();
-                        weatherTask.execute();
-                    }
-                });
-                cityTask.execute();
-            }
-        }
-    }
-
-//    private void requestNewLocationData() {
-//
-//        Log.d("LocationMainActivity", "Here1");
-//
-//        // Initializing LocationRequest object with appropriate methods
-//        LocationRequest locationRequest = new LocationRequest();
-//        locationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
-//        locationRequest.setInterval(5);
-//        locationRequest.setFastestInterval(0);
-//        locationRequest.setNumUpdates(1);
-//
-//        // setting LocationRequest on FusedLocationClient
-//        locationProvider = LocationServices.getFusedLocationProviderClient(this);
-//
-//        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-//            return;
-//
-//        Log.d("LocationMainActivity", "Here10");
-//        locationProvider.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-//        Log.d("LocationMainActivity", "Here11");
-//    }
-//
-//    // method to check for permissions
-//    private boolean checkPermissions() {
-//        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.Q)
-//            return ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-//
-//        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-//    }
-
-    // method to check if location is enabled
-
-    // If everything is alright then
-
-
-    public class CityTask extends AsyncTask<Void, Void, Void>{
-
-        private OnTaskCompleted listener;
-
-        public CityTask(OnTaskCompleted listener) {
-            this.listener = listener;
-        }
-
-        public interface OnTaskCompleted {
-            void onTaskCompleted();
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if(isInternetConnectionAvailable)
-                getUserCityName();
-
-            return null;
-        }
-
-        private void getUserCityName() {
-            // Get the user's current location
-            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, locationPermissionId);
-                return;
-            }
-
-            if(!isLocationEnabled()) {
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-            }
-
-            else{
-                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
-                fusedLocationClient.getLastLocation()
-                        .addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
-                            @Override
-                            public void onSuccess(Location location) {
-                                if (location != null) {
-                                    // Get the user's city name from the location
-                                    Geocoder geocoder = new Geocoder(MainActivity.this, Locale.ENGLISH);
-                                    List<Address> addresses;
-                                    try {
-                                        Log.d("CityName", location.getLatitude() + " , " + location.getLongitude());
-                                        addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                                        Log.d("CityName", " " + addresses.get(0));
-
-                                        if (!addresses.isEmpty()) {
-                                            String cityName = addresses.get(0).getLocality();
-                                            Log.d("CityName", "User's city name: " + cityName);
-
-                                            if(cityName != null){
-                                                city = cityName;
-
-                                                if (listener != null) {
-                                                    listener.onTaskCompleted();
-                                                }
-                                            }
-                                        }
-                                    }
-                                    catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        });
-            }
-        }
-
-        private boolean isLocationEnabled() {
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        }
-    }
-
     public class WeatherTask extends AsyncTask<Void, Void, Void>{
+        String weatherAPI = "7fd9239e91743947217f48e81e11c139";
+        String cityName = "";
+
+        public WeatherTask(){
+            int length = fADHelper.getCityName().split(", ").length;  // There, might be some ", " inside the country name
+            cityName = fADHelper.getCityName().split(", ")[length - 1];
+        }
 
         @Override
         protected Void doInBackground(Void... voids) {
             try {
-                if(isInternetConnectionAvailable)
+                if(isInternetConnectionAvailable && !fADHelper.getShowDigitalClockStatus() && !cityName.equals(""))
                     getWeatherData();
             }
             catch (IOException e) {
@@ -771,14 +624,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void getWeatherData() throws IOException {
-            String url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&appid=" + weatherAPI;
+            String url = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&units=metric&appid=" + weatherAPI;
 
             URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
             con.setRequestMethod("GET");
 
-            Log.d("LocationMainActivity", "CITY abc: " + city);
+            Log.d("LocationMainActivity", "CITY abc: " + cityName);
 
             int responseCode = con.getResponseCode();
             if (responseCode != 200) {
@@ -803,7 +656,38 @@ public class MainActivity extends AppCompatActivity {
                     updateWeatherInfo();
                 }
             });
+        }
+    }
 
+    public void updateWeatherInfo(){
+        if(!response.equals("")){
+            try {
+                JSONObject jsonObj = new JSONObject(response);
+                JSONObject main = jsonObj.getJSONObject("main");
+                JSONObject weather = jsonObj.getJSONArray("weather").getJSONObject(0);
+                JSONObject sys = jsonObj.getJSONObject("sys");
+
+                // CALL VALUE IN API :
+                String cityName = sys.getString("country") + ", " + jsonObj.getString("name");
+                String temperature = main.getString("temp") + "°C";
+                String forecast = weather.getString("description");
+
+                long updatedAt = jsonObj.getLong("dt");
+                String updatedAtText = "Last Updated at: " + new SimpleDateFormat("HH:mm", Locale.ENGLISH).format(new Date(updatedAt * 1000));
+
+                LocalDateTime currentTime = LocalDateTime.now(ZoneId.of("Asia/Jerusalem"));
+                fADHelper.updateWeatherConditions(cityName, forecast, temperature, updatedAtText, currentTime.toString());
+
+                // SET ALL VALUES IN TextViews :
+                tvCityName.setText(cityName);
+                tvCurrentTemperature.setText(temperature);
+                tvUpdatedAt.setText(updatedAtText);
+                tvForecast.setText(forecast);
+
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 

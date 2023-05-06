@@ -99,7 +99,7 @@
         </RadioGroup>
 
         <RadioGroup
-            android:id="@+id/rgChooseClock"
+            android:id="@+id/rgChooseClockOrWeather"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="5pt"
@@ -112,13 +112,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Use digital clock" />
+                android:text="Show digital clock" />
 
             <RadioButton
-                android:id="@+id/rbAnalogClock"
+                android:id="@+id/rbWeatherInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Use analog clock" />
+                android:text="Show weather info (click to update location)" />
         </RadioGroup>
 
         <TextView
