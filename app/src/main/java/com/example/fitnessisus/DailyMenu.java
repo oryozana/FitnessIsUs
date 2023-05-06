@@ -1,7 +1,6 @@
 package com.example.fitnessisus;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -12,9 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 

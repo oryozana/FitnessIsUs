@@ -1,7 +1,6 @@
 package com.example.fitnessisus;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.util.ArrayList;
 

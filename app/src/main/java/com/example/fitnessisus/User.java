@@ -2,7 +2,6 @@ package com.example.fitnessisus;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 
