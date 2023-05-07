@@ -134,6 +134,11 @@ public class FileAndDatabaseHelper {
         return sharedPreferences.getBoolean("UseVideos ?: ", true);
     }
 
+    public boolean setSendNotificationsStatus(boolean status){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("SendNotifications ?: ", status);
+    }
+
     public boolean getSendNotificationsStatus(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean("SendNotifications ?: ", true);
@@ -211,27 +216,28 @@ public class FileAndDatabaseHelper {
         return !sharedPreferences.getString("Forecast: ", "").equals("");
     }
 
-    public String getCityName(){
+    public boolean hasCityName(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
+        return !sharedPreferences.getString("CityName: ", "").equals("");
+    }
 
+    public String getCityName() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
         return sharedPreferences.getString("CityName: ", "");
     }
 
     public String getForecast(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
-
         return sharedPreferences.getString("Forecast: ", "");
     }
 
     public String getTemperature(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
-
         return sharedPreferences.getString("Temperature: ", "");
     }
 
     public String getUpdatedAt(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
-
         return sharedPreferences.getString("UpdatedAt: ", "");
     }
 

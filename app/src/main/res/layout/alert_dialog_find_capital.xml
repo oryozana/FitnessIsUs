@@ -12,7 +12,7 @@
         android:textSize="16pt"
         android:textStyle="bold"
         android:layout_marginBottom="10pt"
-        android:layout_marginTop="10pt"
+        android:layout_marginTop="12pt"
         android:text="Weather info will be about..."/>
 
     <EditText
@@ -27,14 +27,27 @@
         android:id="@+id/lvCountiesAndCapitalsNames"
         android:layout_width="125pt"
         android:layout_height="150pt"
-        android:layout_marginBottom="6pt"
+        android:layout_marginBottom="8pt"
         android:layout_marginTop="6pt"/>
+
+    <TextView
+        android:id="@+id/tvCurrentCityName"
+        android:layout_width="125pt"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3pt"
+        android:singleLine="true"
+        android:text="Current city: " />
+
+    <Button
+        android:id="@+id/btStayWithCurrentCapitalSearch"
+        android:layout_width="125pt"
+        android:layout_height="wrap_content"
+        android:text="Stay with current city" />
 
     <Button
         android:id="@+id/btCancelCapitalSearch"
         android:layout_width="125pt"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6pt"
-        android:layout_marginBottom="10pt"
+        android:layout_marginBottom="12pt"
         android:text="Cancel" />
 </LinearLayout>

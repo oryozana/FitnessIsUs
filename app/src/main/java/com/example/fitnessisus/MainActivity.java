@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -11,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 
 import android.content.Context;
 import android.content.Intent;
@@ -230,6 +232,11 @@ public class MainActivity extends AppCompatActivity {
             todayMenu = DailyMenu.getTodayMenu();
             DailyMenu.saveDailyMenuIntoFile(todayMenu, MainActivity.this);
             getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, homeFragment).commit();
+
+            if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                me.putExtra("sendNotifications", false);
+                fADHelper.setSendNotificationsStatus(false);
+            }
 
             if(!fADHelper.getShowDigitalClockStatus()){
                 if(fADHelper.hasWeatherConditions()){

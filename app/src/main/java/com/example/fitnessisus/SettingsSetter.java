@@ -9,6 +9,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -21,6 +22,7 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -52,8 +54,8 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     private MediaPlayer mediaPlayer;
 
     RadioGroup rgPlayMusic, rgUseVideos, rgSendNotifications, rgChooseClockOrWeather;
+    RadioButton rbWeatherInfo, rbEnableNotifications;
     Button btReturnToRecentActivity, btChangeMusic;
-    RadioButton rbWeatherInfo;
 
     boolean playMusic, useVideos, sendNotifications, showDigitalClock;
     boolean wantToSave = false, chooseIfWantToSave = false, needSave = true;
@@ -63,7 +65,6 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     TextView tvCurrentSongName;
 
     Calendar calendar;
-    NotificationManagerCompat nmc;
 
     FileAndDatabaseHelper fileAndDatabaseHelper;
     Intent me;
@@ -81,6 +82,8 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
 
         fileAndDatabaseHelper = new FileAndDatabaseHelper(SettingsSetter.this, me);
 
+        calendar = Calendar.getInstance();
+
         rgPlayMusic = (RadioGroup) findViewById(R.id.rgPlayMusic);
         rgUseVideos = (RadioGroup) findViewById(R.id.rgUseVideos);
         rgSendNotifications = (RadioGroup) findViewById(R.id.rgSendNotifications);
@@ -91,6 +94,17 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onClick(View v) {
                 getCapitalAlertDialog();
+            }
+        });
+
+        rbEnableNotifications = (RadioButton) findViewById(R.id.rbEnableNotifications);
+        rbEnableNotifications.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ActivityCompat.checkSelfPermission(SettingsSetter.this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    rgSendNotifications.check(R.id.rbDisableNotifications);
+                    notificationPermissionNotGranted();
+                }
             }
         });
 
@@ -108,10 +122,35 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         setInitialChoices();
         initiateVideoPlayer();
         initiateMediaPlayer();
+    }
 
-        calendar = Calendar.getInstance();
-        createNotificationChannels();
-        initiateAlarms();
+    public void notificationPermissionNotGranted(){
+        AlertDialog ad;
+        AlertDialog.Builder adb;
+        adb = new AlertDialog.Builder(this);
+        adb.setTitle("Permission to send notifications");
+        adb.setMessage("If you want to get notifications please grant us permission to do so from settings...");
+
+        adb.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        adb.setNeutralButton("Settings", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                intent.setData(uri);
+                startActivity(intent);
+            }
+        });
+
+        ad = adb.create();
+        ad.show();
     }
 
     private void createNotificationChannels() {
@@ -122,6 +161,8 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     }
 
     public void initiateAlarms(){
+        createNotificationChannels();
+
         Intent after = new Intent(SettingsSetter.this, SendNotificationReceiver.class);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
@@ -142,8 +183,18 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND,0);
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent3);
+    }
 
-        Toast.makeText(SettingsSetter.this, "Alarms are now active!", Toast.LENGTH_LONG).show();
+    public void cancelAlarms(){
+        Intent after = new Intent(SettingsSetter.this, SendNotificationReceiver.class);
+        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(SettingsSetter.this, 17, after, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent2 = PendingIntent.getBroadcast(SettingsSetter.this, 18, after, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent3 = PendingIntent.getBroadcast(SettingsSetter.this, 19, after, PendingIntent.FLAG_IMMUTABLE);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent1);
+        alarmManager.cancel(pendingIntent2);
+        alarmManager.cancel(pendingIntent3);
     }
 
     public void setInitialChoices(){
@@ -156,8 +207,16 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
             rgUseVideos.check(R.id.rbUseImages);
 
         sendNotificationsAtStart = me.getBooleanExtra("sendNotifications", true);
-        if(!sendNotificationsAtStart)
+        if (ActivityCompat.checkSelfPermission(SettingsSetter.this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            fileAndDatabaseHelper.setSendNotificationsStatus(false);
             rgSendNotifications.check(R.id.rbDisableNotifications);
+            me.putExtra("sendNotifications", false);
+            sendNotificationsAtStart = false;
+        }
+        else{
+            if(!sendNotificationsAtStart)
+                rgSendNotifications.check(R.id.rbDisableNotifications);
+        }
 
         showDigitalClockAtStart = me.getBooleanExtra("showDigitalClock", true);
         if(!showDigitalClockAtStart)
@@ -249,6 +308,12 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
             public void onClick(DialogInterface dialogInterface, int i) {
                 chooseIfWantToSave = true;
                 wantToSave = true;
+
+                if(sendNotifications)
+                    initiateAlarms();
+                else
+                    cancelAlarms();
+
                 returnToRecentActivity();
             }
         });
@@ -285,7 +350,18 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
 
         EditText etEnterCountryOrCapitalName = (EditText) customAlertDialog.findViewById(R.id.etEnterCountryOrCapitalName);
         ListView lvCountiesAndCapitalsNames = (ListView) customAlertDialog.findViewById(R.id.lvCountiesAndCapitalsNames);
+
+        Button btStayWithCurrentCapitalSearch = (Button) customAlertDialog.findViewById(R.id.btStayWithCurrentCapitalSearch);
         Button btCancelCapitalSearch = (Button) customAlertDialog.findViewById(R.id.btCancelCapitalSearch);
+
+        TextView tvCurrentCityName = (TextView) customAlertDialog.findViewById(R.id.tvCurrentCityName);
+
+        if(!fileAndDatabaseHelper.hasCityName()) {
+            btStayWithCurrentCapitalSearch.setVisibility(View.GONE);
+            tvCurrentCityName.setVisibility(View.GONE);
+        }
+        else
+            tvCurrentCityName.setText("Current city: " + fileAndDatabaseHelper.getCityName());
 
         ArrayList<String[]> countryCapitalList = new ArrayList<>();
         countryCapitalList.add(new String[]{"Afghanistan", "Kabul"});
@@ -397,7 +473,7 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         countryCapitalList.add(new String[]{"Turkmenistan", "Ashgabat"});
         countryCapitalList.add(new String[]{"Uganda", "Kampala"});
         countryCapitalList.add(new String[]{"United Arab Emirates", "Abu Dhabi"});
-        countryCapitalList.add(new String[]{"United States of America", "Washington, D.C."});
+        countryCapitalList.add(new String[]{"United States of America", "Washington D.C."});
         countryCapitalList.add(new String[]{"Uruguay", "Montevideo"});
         countryCapitalList.add(new String[]{"Uzbekistan", "Tashkent"});
         countryCapitalList.add(new String[]{"Zambia", "Lusaka"});
@@ -432,6 +508,13 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
                 String countryAndCapital = (String) parent.getItemAtPosition(position);
                 fileAndDatabaseHelper.updateCityName(countryAndCapital);
                 Toast.makeText(SettingsSetter.this, countryAndCapital + " chosen successfully.", Toast.LENGTH_SHORT).show();
+                ad.cancel();
+            }
+        });
+
+        btStayWithCurrentCapitalSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 ad.cancel();
             }
         });

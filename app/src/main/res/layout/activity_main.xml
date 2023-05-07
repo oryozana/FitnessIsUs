@@ -39,7 +39,7 @@
 
         <TextView
             android:id="@+id/tvCityName"
-            android:layout_width="100pt"
+            android:layout_width="150pt"
             android:layout_height="wrap_content"
             android:textSize="9pt"
             android:textStyle="italic"
@@ -48,7 +48,7 @@
 
         <TextView
             android:id="@+id/tvForecast"
-            android:layout_width="100pt"
+            android:layout_width="150pt"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvCityName"
             android:textSize="9pt"
@@ -58,7 +58,7 @@
 
         <TextView
             android:id="@+id/tvCurrentTemperature"
-            android:layout_width="100pt"
+            android:layout_width="150pt"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvForecast"
             android:textSize="9pt"
@@ -68,7 +68,7 @@
 
         <TextView
             android:id="@+id/tvUpdatedAt"
-            android:layout_width="100pt"
+            android:layout_width="150pt"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tvCurrentTemperature"
             android:textSize="9pt"
