@@ -1,11 +1,23 @@
 package com.example.fitnessisus;
 
+import static com.example.fitnessisus.SendNotificationReceiver.CHANNEL_1_ID;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,8 +41,12 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class SettingsSetter extends AppCompatActivity implements View.OnClickListener {
+
+    public static final String CHANNEL_1_ID = "Lens_app_channel_1";
+    int notificationsPermissionId = 152;
 
     private VideoView videoView;
     private MediaPlayer mediaPlayer;
@@ -46,6 +62,9 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     Song activeSong = Song.getSongs().get(0);
     TextView tvCurrentSongName;
 
+    Calendar calendar;
+    NotificationManagerCompat nmc;
+
     FileAndDatabaseHelper fileAndDatabaseHelper;
     Intent me;
 
@@ -53,6 +72,8 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_setter);
+
+        ActivityCompat.requestPermissions(SettingsSetter.this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, notificationsPermissionId);
 
         me = getIntent();
         if(me.hasExtra("activeSong"))
@@ -87,6 +108,42 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         setInitialChoices();
         initiateVideoPlayer();
         initiateMediaPlayer();
+
+        calendar = Calendar.getInstance();
+        createNotificationChannels();
+        initiateAlarms();
+    }
+
+    private void createNotificationChannels() {
+        android.app.NotificationChannel channel1 = new android.app.NotificationChannel(CHANNEL_1_ID, "Channel 1", NotificationManager.IMPORTANCE_DEFAULT);
+        channel1.setDescription("This is Channel for the FitnessIsUs app");
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        manager.createNotificationChannel(channel1);
+    }
+
+    public void initiateAlarms(){
+        Intent after = new Intent(SettingsSetter.this, SendNotificationReceiver.class);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(SettingsSetter.this, 17, after, PendingIntent.FLAG_IMMUTABLE);
+        calendar.set(Calendar.HOUR_OF_DAY, 10);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND,0);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent1);
+
+        PendingIntent pendingIntent2 = PendingIntent.getBroadcast(SettingsSetter.this, 18, after, PendingIntent.FLAG_IMMUTABLE);
+        calendar.set(Calendar.HOUR_OF_DAY, 16);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND,0);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent2);
+
+        PendingIntent pendingIntent3 = PendingIntent.getBroadcast(SettingsSetter.this, 19, after, PendingIntent.FLAG_IMMUTABLE);
+        calendar.set(Calendar.HOUR_OF_DAY, 22);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND,0);
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent3);
+
+        Toast.makeText(SettingsSetter.this, "Alarms are now active!", Toast.LENGTH_LONG).show();
     }
 
     public void setInitialChoices(){
