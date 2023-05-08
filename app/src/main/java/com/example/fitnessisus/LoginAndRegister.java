@@ -1,9 +1,11 @@
 package com.example.fitnessisus;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.Uri;
@@ -19,6 +21,8 @@ public class LoginAndRegister extends AppCompatActivity {
 
     private NetworkConnectionReceiver networkConnectionReceiver;
     BottomNavigationView bottomNavigationView;
+
+    int notificationsPermissionId = 152;  // Not really needed for now...
 
     private MediaPlayer mediaPlayer;
     private VideoView videoView;
@@ -62,7 +66,10 @@ public class LoginAndRegister extends AppCompatActivity {
 
         videoView = (VideoView) findViewById(R.id.loginAndRegisterVideoView);
         networkConnectionReceiver = new NetworkConnectionReceiver();
-        
+
+        if(ActivityCompat.checkSelfPermission(LoginAndRegister.this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+            ActivityCompat.requestPermissions(LoginAndRegister.this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, notificationsPermissionId);
+
         initiateVideoPlayer();
         initiateMediaPlayer();
     }

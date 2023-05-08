@@ -48,7 +48,6 @@ import java.util.Calendar;
 public class SettingsSetter extends AppCompatActivity implements View.OnClickListener {
 
     public static final String CHANNEL_1_ID = "Lens_app_channel_1";
-    int notificationsPermissionId = 152;
 
     private VideoView videoView;
     private MediaPlayer mediaPlayer;
@@ -73,8 +72,6 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_setter);
-
-        ActivityCompat.requestPermissions(SettingsSetter.this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, notificationsPermissionId);
 
         me = getIntent();
         if(me.hasExtra("activeSong"))
