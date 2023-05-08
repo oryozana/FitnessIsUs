@@ -25,7 +25,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -86,6 +90,10 @@ public class MainActivity extends AppCompatActivity {
     DailyMenu todayMenu;
     Song activeSong;  // In this activity he get a initial value at "createTheFirstIntent".
 
+    RelativeLayout changeTodayMenuLayout;
+    TextView tvDailyMenusDates;
+    Spinner sDailyMenusDates;
+
     FileOutputStream fos;
     OutputStreamWriter osw;
     BufferedWriter bw;
@@ -129,12 +137,17 @@ public class MainActivity extends AppCompatActivity {
         tvCurrentTemperature = (TextView) findViewById(R.id.tvCurrentTemperature);
         tvUpdatedAt = (TextView) findViewById(R.id.tvUpdatedAt);
 
+        changeTodayMenuLayout = (RelativeLayout) findViewById(R.id.changeTodayMenuLayout);
+        tvDailyMenusDates = (TextView) findViewById(R.id.tvDailyMenusDates);
+        sDailyMenusDates = (Spinner) findViewById(R.id.sDailyMenusDates);
+
         bottomNavigationView = findViewById(R.id.bnvMain);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
 
+                changeTodayMenuLayout.setVisibility(View.INVISIBLE);
                 weatherLayout.setVisibility(View.INVISIBLE);
                 textClock.setVisibility(View.INVISIBLE);
 
@@ -146,6 +159,8 @@ public class MainActivity extends AppCompatActivity {
                         textClock.setVisibility(View.VISIBLE);
                     else
                         weatherLayout.setVisibility(View.VISIBLE);
+
+                    changeTodayMenuLayout.setVisibility(View.VISIBLE);
 
                     fileAndDatabaseHelper.implementSettingsData();
                     return true;
@@ -178,6 +193,8 @@ public class MainActivity extends AppCompatActivity {
             textClock.setVisibility(View.VISIBLE);
         else
             weatherLayout.setVisibility(View.VISIBLE);
+
+        // DailyMenu.hasTodayMenuInsideAllDailyMenus();
 
         initiateMediaPlayer();
         initiateVideoPlayer();
@@ -232,6 +249,18 @@ public class MainActivity extends AppCompatActivity {
             todayMenu = DailyMenu.getTodayMenu();
             DailyMenu.saveDailyMenuIntoFile(todayMenu, MainActivity.this);
             getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, homeFragment).commit();
+
+            ArrayList<String> dailyMenusDates = DailyMenu.getDailyMenusDatesFromFile(MainActivity.this);
+            ArrayAdapter<String> datesAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, dailyMenusDates);
+            sDailyMenusDates.setAdapter(datesAdapter);
+
+            sDailyMenusDates.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    String targetDate = (String) adapterView.getItemAtPosition(i);
+                    DailyMenu.setTodayMenu(DailyMenu.getTodayMenuFromAllDailyMenus(targetDate));
+                }
+            });
 
             if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 me.putExtra("sendNotifications", false);
@@ -363,7 +392,8 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             unregisterReceiver(networkConnectionReceiver);
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             e.getStackTrace();
         }
 
@@ -448,6 +478,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences.edit().putString("TargetCalories: ", "").apply();
         sharedPreferences.edit().putString("TargetProteins: ", "").apply();
         sharedPreferences.edit().putString("TargetFats: ", "").apply();
+        sharedPreferences.edit().putString("Goal: ", "").apply();
         sharedPreferences.edit().putString("ProfilePictureId: ", "").apply();
         sharedPreferences.edit().putString("DailyMenus: ", "").apply();
     }

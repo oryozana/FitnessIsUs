@@ -691,10 +691,18 @@ public class DailyMenu {
         String[] dataParts = getFileData("dailyMenusFile", context).split("\n");
         ArrayList<DailyMenu> dailyMenus = new ArrayList<DailyMenu>();
 
-
         for(int i = 1; i < dataParts.length; i++)
             dailyMenus.add(DailyMenu.generateDailyMenuObjectFromFile(dataParts[i]));
         return dailyMenus;
+    }
+
+    public static ArrayList<String> getDailyMenusDatesFromFile(Context context){
+        String[] dataParts = getFileData("dailyMenusFile", context).split("\n");
+        ArrayList<String> dailyMenusDates = new ArrayList<String>();
+
+        for(int i = 1; i < dataParts.length; i++)
+            dailyMenusDates.add(DailyMenu.generateDailyMenuObjectFromFile(dataParts[i]).getDate());
+        return dailyMenusDates;
     }
 
     private static String getFileData(String fileName, Context context){

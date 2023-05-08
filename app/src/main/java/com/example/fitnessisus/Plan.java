@@ -1,5 +1,7 @@
 package com.example.fitnessisus;
 
+import com.google.firebase.database.DataSnapshot;
+
 import java.io.Serializable;
 
 public class Plan implements Serializable {
@@ -7,13 +9,13 @@ public class Plan implements Serializable {
     private double targetCalories;
     private double targetProteins;
     private double targetFats;
-    private final String goal;
+    private String goal;
 
-    public Plan(double targetCalories, double targetProteins, double targetFats){
-        this.targetCalories = targetCalories;
-        this.targetProteins = targetProteins;
-        this.targetFats = targetFats;
-        this.goal = "Custom";
+    public Plan(DataSnapshot dataSnapshot) {
+        this.targetCalories = Double.parseDouble(String.valueOf(dataSnapshot.child("targetCalories").getValue()));
+        this.targetProteins = Double.parseDouble(String.valueOf(dataSnapshot.child("targetProteins").getValue()));
+        this.targetFats = Double.parseDouble(String.valueOf(dataSnapshot.child("targetFats").getValue()));
+        this.goal = String.valueOf(dataSnapshot.child("goal").getValue());
     }
 
     public Plan(String targetCalories, String targetProteins, String targetFats) {
@@ -21,6 +23,13 @@ public class Plan implements Serializable {
         this.targetProteins = Double.parseDouble(targetProteins);
         this.targetFats = Double.parseDouble(targetFats);
         this.goal = "Custom";
+    }
+
+    public Plan(String targetCalories, String targetProteins, String targetFats, String goal) {
+        this.targetCalories = Double.parseDouble(targetCalories);
+        this.targetProteins = Double.parseDouble(targetProteins);
+        this.targetFats = Double.parseDouble(targetFats);
+        this.goal = goal;
     }
 
     public Plan(String goal, String sex, double weight, double height, int age, String activeLevel){
@@ -68,6 +77,24 @@ public class Plan implements Serializable {
         roundValues();
     }
 
+    public static boolean isTheSamePlan(Plan plan1, Plan plan2){
+        if(plan1 == null || plan2 == null)
+            return false;
+
+        boolean isTheSame = true;
+
+        if(plan1.getTargetCalories() != plan2.getTargetCalories())
+            isTheSame = false;
+
+        if(plan1.getTargetProteins() != plan2.getTargetProteins())
+            isTheSame = false;
+
+        if(plan1.getTargetFats() != plan2.getTargetFats())
+            isTheSame = false;
+
+        return isTheSame;
+    }
+
     public void roundValues(){
         this.targetCalories = Math.round(this.targetCalories * 1000.0) / 1000.0;
         this.targetProteins = Math.round(this.targetProteins * 1000.0) / 1000.0;
@@ -100,6 +127,10 @@ public class Plan implements Serializable {
 
     public String getGoal() {
         return goal;
+    }
+
+    public void setGoal(String goal){
+        this.goal = goal;
     }
 
     public static String[] getActiveLevelOptions() {

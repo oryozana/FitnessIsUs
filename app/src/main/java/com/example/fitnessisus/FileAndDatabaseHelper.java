@@ -243,7 +243,6 @@ public class FileAndDatabaseHelper {
 
     public String getDateOfUpdate(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("weather", Context.MODE_PRIVATE);
-
         return sharedPreferences.getString("DateOfUpdate: ", "");
     }
 
@@ -260,6 +259,7 @@ public class FileAndDatabaseHelper {
             sharedPreferences.edit().putString("TargetCalories: ", user.getCurrentPlan().getTargetCalories() + "").apply();
             sharedPreferences.edit().putString("TargetProteins: ", user.getCurrentPlan().getTargetProteins() + "").apply();
             sharedPreferences.edit().putString("TargetFats: ", user.getCurrentPlan().getTargetFats() + "").apply();
+            sharedPreferences.edit().putString("Goal: ", user.getCurrentPlan().getGoal() + "").apply();
             sharedPreferences.edit().putString("ProfilePictureId: ", user.getProfilePictureId() + "").apply();
             sharedPreferences.edit().putString("DailyMenus: ", user.getUserDailyMenus()).apply();
         }
@@ -275,6 +275,7 @@ public class FileAndDatabaseHelper {
         sharedPreferences.edit().putString("TargetCalories: ", plan.getTargetCalories() + "").apply();
         sharedPreferences.edit().putString("TargetProteins: ", plan.getTargetProteins() + "").apply();
         sharedPreferences.edit().putString("TargetFats: ", plan.getTargetFats() + "").apply();
+        sharedPreferences.edit().putString("Goal: ", plan.getGoal() + "").apply();
     }
 
     public void updatePrimaryUserDailyMenus(String dailyMenus){
@@ -288,7 +289,7 @@ public class FileAndDatabaseHelper {
     }
 
     public User getPrimaryUser(){
-        String[] info = new String[10];
+        String[] info = new String[11];
         User user = null;
 
         if(checkIfPrimaryUserExist()){
@@ -301,10 +302,11 @@ public class FileAndDatabaseHelper {
             info[5] = sharedPreferences.getString("TargetCalories: ", "");
             info[6] = sharedPreferences.getString("TargetProteins: ", "");
             info[7] = sharedPreferences.getString("TargetFats: ", "");
-            info[8] = sharedPreferences.getString("ProfilePictureId: ", "");
-            info[9] = sharedPreferences.getString("DailyMenus: ", "");
+            info[8] = sharedPreferences.getString("Goal: ", "");
+            info[9] = sharedPreferences.getString("ProfilePictureId: ", "");
+            info[10] = sharedPreferences.getString("DailyMenus: ", "");
 
-            user = new User(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7], info[8], info[9]);
+            user = new User(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7], info[8], info[9], info[10]);
         }
         return user;
     }
@@ -334,6 +336,7 @@ public class FileAndDatabaseHelper {
         sharedPreferences.edit().putString("TargetCalories: ", "").apply();
         sharedPreferences.edit().putString("TargetProteins: ", "").apply();
         sharedPreferences.edit().putString("TargetFats: ", "").apply();
+        sharedPreferences.edit().putString("Goal: ", "").apply();
         sharedPreferences.edit().putString("ProfilePictureId: ", "").apply();
         sharedPreferences.edit().putString("DailyMenus: ", "").apply();
     }

@@ -54,6 +54,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
 
     Plan currentGeneratedPlan, maintainWeightPlan, loseWeightPlan, gainWeightPlan;
     int currentPlanIndex = 1, maxPlansAmount = 3;
+    String chosenGoal = "Custom";
 
     TextView tvPictureNumberOutOf, tvNoInternetConnectionToChangePictureMessage;
     Button btChoseProfilePicture, btCancelProfilePictureSelection;
@@ -290,8 +291,16 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
                 String targetProteins = etGetNewTargetProteins.getText().toString();
                 String targetFats = etGetNewTargetFats.getText().toString();
                 Plan tmpPlan = new Plan(targetCalories, targetProteins, targetFats);
-                User.getCurrentUser().setCurrentPlan(tmpPlan);
-                updateUserPlanInFirebaseAndInPrimaryUser(User.getCurrentUser());
+
+                if(Plan.isTheSamePlan(tmpPlan, currentGeneratedPlan))
+                    tmpPlan.setGoal(chosenGoal);
+                else{
+                    if(Plan.isTheSamePlan(tmpPlan, user.getCurrentPlan()))
+                        tmpPlan.setGoal(user.getCurrentPlan().getGoal());
+                }
+
+                user.setCurrentPlan(tmpPlan);
+                updateUserPlanInFirebaseAndInPrimaryUser(user);
             }
             else
                 Toast.makeText(this, "No internet connection, can't change password.", Toast.LENGTH_SHORT).show();
@@ -367,7 +376,6 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
                 if(task.isSuccessful()){
                     if(task.getResult().exists()){
                         DataSnapshot dataSnapshot = task.getResult();
-                        String username = dataSnapshot.getKey();
                         String password = String.valueOf(dataSnapshot.child("password").getValue());
 
                         if(entered_password.equals(password)){
@@ -515,6 +523,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
                 etGetNewTargetCalories.setText(currentGeneratedPlan.getTargetCalories() + "");
                 etGetNewTargetProteins.setText(currentGeneratedPlan.getTargetProteins() + "");
                 etGetNewTargetFats.setText(currentGeneratedPlan.getTargetFats() + "");
+                chosenGoal = currentGeneratedPlan.getGoal();
                 ad.cancel();
             }
         });

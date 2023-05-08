@@ -26,10 +26,7 @@ public class User implements Serializable {
         this.username = dataSnapshot.getKey();
         this.password = String.valueOf(dataSnapshot.child("password").getValue());
 
-        double targetCalories = Double.parseDouble(String.valueOf(dataSnapshot.child("currentPlan").child("targetCalories").getValue()));
-        double targetProteins = Double.parseDouble(String.valueOf(dataSnapshot.child("currentPlan").child("targetProteins").getValue()));
-        double targetFats = Double.parseDouble(String.valueOf(dataSnapshot.child("currentPlan").child("targetFats").getValue()));
-        this.currentPlan = new Plan(targetCalories, targetProteins, targetFats);
+        this.currentPlan = new Plan(dataSnapshot.child("currentPlan"));
 
         this.email = String.valueOf(dataSnapshot.child("email").getValue());
         this.startingWeight = Double.parseDouble(String.valueOf(dataSnapshot.child("startingWeight").getValue()));
@@ -50,13 +47,13 @@ public class User implements Serializable {
         this.userDailyMenus = dailyMenus;
     }
 
-    public User(String username, String password, String email, String startingWeight, String weight, String targetCalories, String targetProteins, String targetFats, String profilePictureId, String dailyMenus){
+    public User(String username, String password, String email, String startingWeight, String weight, String targetCalories, String targetProteins, String targetFats, String goal, String profilePictureId, String dailyMenus){
         this.username = username;
         this.password = password;
         this.email = email;
         this.startingWeight = Double.parseDouble(startingWeight);
         this.weight = Double.parseDouble(weight);
-        this.currentPlan = new Plan(targetCalories, targetProteins, targetFats);
+        this.currentPlan = new Plan(targetCalories, targetProteins, targetFats, goal);
         this.profilePictureId = Integer.parseInt(profilePictureId);
         this.userDailyMenus = dailyMenus;
     }

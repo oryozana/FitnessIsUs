@@ -42,6 +42,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
 
     Plan currentGeneratedPlan, maintainWeightPlan, loseWeightPlan, gainWeightPlan;
     int currentPlanIndex = 1, maxPlansAmount = 3;
+    String chosenGoal = "Custom";
 
     ArrayList<String> usernamesList = new ArrayList<String>();
     int userPicturesAmount = 10;
@@ -98,10 +99,13 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
 
     public void createUserAndUserPlan(){
         if(passUserInfoTests()){  // Not to be included in the User(dataSnapshot) builder.
-            double targetCalories = Double.parseDouble(etGetTargetCalories.getText().toString());
-            double targetProteins = Double.parseDouble(etGetTargetProteins.getText().toString());
-            double targetFats = Double.parseDouble(etGetTargetFats.getText().toString());
+            String targetCalories = etGetTargetCalories.getText().toString();
+            String targetProteins = etGetTargetProteins.getText().toString();
+            String targetFats = etGetTargetFats.getText().toString();
             Plan userPlan = new Plan(targetCalories, targetProteins, targetFats);
+
+            if(Plan.isTheSamePlan(userPlan, currentGeneratedPlan))
+                userPlan.setGoal(chosenGoal);
 
             String username = etGetUsername.getText().toString();
             String password = etGetPassword.getText().toString();
@@ -387,6 +391,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                 etGetTargetCalories.setText(currentGeneratedPlan.getTargetCalories() + "");
                 etGetTargetProteins.setText(currentGeneratedPlan.getTargetProteins() + "");
                 etGetTargetFats.setText(currentGeneratedPlan.getTargetFats() + "");
+                chosenGoal = currentGeneratedPlan.getGoal();
                 ad.cancel();
             }
         });
