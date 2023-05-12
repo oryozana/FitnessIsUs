@@ -90,10 +90,6 @@ public class MainActivity extends AppCompatActivity {
     DailyMenu todayMenu;
     Song activeSong;  // In this activity he get a initial value at "createTheFirstIntent".
 
-    RelativeLayout changeTodayMenuLayout;
-    TextView tvDailyMenusDates;
-    Spinner sDailyMenusDates;
-
     FileOutputStream fos;
     OutputStreamWriter osw;
     BufferedWriter bw;
@@ -137,17 +133,12 @@ public class MainActivity extends AppCompatActivity {
         tvCurrentTemperature = (TextView) findViewById(R.id.tvCurrentTemperature);
         tvUpdatedAt = (TextView) findViewById(R.id.tvUpdatedAt);
 
-        changeTodayMenuLayout = (RelativeLayout) findViewById(R.id.changeTodayMenuLayout);
-        tvDailyMenusDates = (TextView) findViewById(R.id.tvDailyMenusDates);
-        sDailyMenusDates = (Spinner) findViewById(R.id.sDailyMenusDates);
-
         bottomNavigationView = findViewById(R.id.bnvMain);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
 
-                changeTodayMenuLayout.setVisibility(View.INVISIBLE);
                 weatherLayout.setVisibility(View.INVISIBLE);
                 textClock.setVisibility(View.INVISIBLE);
 
@@ -159,8 +150,6 @@ public class MainActivity extends AppCompatActivity {
                         textClock.setVisibility(View.VISIBLE);
                     else
                         weatherLayout.setVisibility(View.VISIBLE);
-
-                    changeTodayMenuLayout.setVisibility(View.VISIBLE);
 
                     fileAndDatabaseHelper.implementSettingsData();
                     return true;
@@ -249,18 +238,6 @@ public class MainActivity extends AppCompatActivity {
             todayMenu = DailyMenu.getTodayMenu();
             DailyMenu.saveDailyMenuIntoFile(todayMenu, MainActivity.this);
             getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, homeFragment).commit();
-
-            ArrayList<String> dailyMenusDates = DailyMenu.getDailyMenusDatesFromFile(MainActivity.this);
-            ArrayAdapter<String> datesAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, dailyMenusDates);
-            sDailyMenusDates.setAdapter(datesAdapter);
-
-            sDailyMenusDates.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    String targetDate = (String) adapterView.getItemAtPosition(i);
-                    DailyMenu.setTodayMenu(DailyMenu.getTodayMenuFromAllDailyMenus(targetDate));
-                }
-            });
 
             if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 me.putExtra("sendNotifications", false);
@@ -575,9 +552,11 @@ public class MainActivity extends AppCompatActivity {
                                 userDailyMenus += dailyMenu;
 
                             updateDailyMenusInFirebase(userDailyMenus, 0);
-                        } else
+                        }
+                        else
                             isAlreadyRunning = false;
-                    } else {
+                    }
+                    else {
                         if (counter < 2)
                             startUpdateDailyMenusPreparations(counter + 1);
                         else

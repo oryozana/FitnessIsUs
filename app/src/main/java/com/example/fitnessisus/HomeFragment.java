@@ -1,5 +1,6 @@
 package com.example.fitnessisus;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,11 +11,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class HomeFragment extends Fragment {
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Calendar;
+
+public class HomeFragment extends Fragment implements View.OnClickListener {
 
     MainActivity.UploadInfoTask uploadInfoTask;
 
@@ -25,6 +37,10 @@ public class HomeFragment extends Fragment {
 
     MealCirclesListAdapter breakfastMealListAdapter, lunchMealListAdapter, dinnerMealListAdapter;
     ListView lvBreakfastMeals, lvLunchMeals, lvDinnerMeals;
+
+    RelativeLayout changeTodayMenuLayout;
+    Button btSelectDailyMenuDate;
+    TextView tvDailyMenusDates;
 
     DailyMenu todayMenu = DailyMenu.getTodayMenu();
 
@@ -53,9 +69,70 @@ public class HomeFragment extends Fragment {
         lvLunchMeals = (ListView) view.findViewById(R.id.lvLunchMeals);
         lvDinnerMeals = (ListView) view.findViewById(R.id.lvDinnerMeals);
 
+        changeTodayMenuLayout = (RelativeLayout) view.findViewById(R.id.changeTodayMenuLayout);
+        tvDailyMenusDates = (TextView) view.findViewById(R.id.tvDailyMenusDates);
+
+        btSelectDailyMenuDate = (Button) view.findViewById(R.id.btSelectDailyMenuDate);
+        btSelectDailyMenuDate.setOnClickListener(this);
+
+//        ArrayList<String> dailyMenusDates = DailyMenu.getDailyMenusDatesFromFile(getActivity());
+//        ArrayAdapter<String> datesAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, dailyMenusDates);
+//        sDailyMenusDates.setAdapter(datesAdapter);
+
+//        sDailyMenusDates.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                showDatePickerForChoosingTodayMenu();
+//
+////                String targetDate = (String) parent.getItemAtPosition(position);
+////                DailyMenu.setTodayMenu(DailyMenu.getTodayMenuFromAllDailyMenus(targetDate));
+////                updateMealsIfNeeded();
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//
+//            }
+//        });
+
         updateMealsIfNeeded();
     }
 
+    public void showDatePickerForChoosingTodayMenu(){
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+
+        // Create a DatePickerDialog with the current date as the default
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
+                        LocalDateTime tmp =  LocalDateTime.of(year, (month + 1), dayOfMonth, 0, 0);
+                        String targetDate = tmp.format(dtf);
+
+                        DailyMenu.setTodayMenu(DailyMenu.getTodayMenuFromAllDailyMenus(targetDate));
+                        updateMealsIfNeeded();
+                    }
+                }, year, month, dayOfMonth);
+
+        // Set the minimum date to today
+        datePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
+
+        // Set the maximum date to a custom date (e.g. 31/12/2023)
+        String[] oldestDailyMenu = DailyMenu.getTheOldestDailyMenuDate().split("_");
+        int oldestDay = Integer.parseInt(oldestDailyMenu[0]);
+        int oldestMonth = Integer.parseInt(oldestDailyMenu[1]);
+        int oldestYear = Integer.parseInt(oldestDailyMenu[2]);
+
+        calendar.set(oldestYear, (oldestMonth - 1), oldestDay);
+        datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+
+        // Show the dialog
+        datePickerDialog.show();
+    }
 
     @Override
     public void onResume() {
@@ -69,6 +146,15 @@ public class HomeFragment extends Fragment {
 
         todayMenu = DailyMenu.getTodayMenu();
         todayMenu.correctNutritiousValues();
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
+        LocalDateTime today = LocalDateTime.now();
+        String currentDate = dtf.format(today);
+
+        if(todayMenu.getDate().equals(currentDate))
+            tvDailyMenusDates.setText("Today menu is about: Today");
+        else
+            tvDailyMenusDates.setText("Today menu is about: " + todayMenu.getDate());
 
         uploadInfoTask = new MainActivity.UploadInfoTask(getActivity());
         uploadInfoTask.execute();
@@ -196,5 +282,13 @@ public class HomeFragment extends Fragment {
         tvTotalProteinsMain.setText("Total Proteins: " + todayMenu.getTotalProteins() + " .");
         tvTotalFatsMain.setText("Total Fats: " + todayMenu.getTotalFats() + " .");
         tvTotalCaloriesMain.setText("Total calories: " + todayMenu.getTotalCalories() + " .");
+    }
+
+    @Override
+    public void onClick(View v) {
+        int viewId = v.getId();
+
+        if(viewId == btSelectDailyMenuDate.getId())
+            showDatePickerForChoosingTodayMenu();
     }
 }

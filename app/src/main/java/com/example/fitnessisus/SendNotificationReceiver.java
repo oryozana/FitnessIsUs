@@ -8,9 +8,6 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -22,21 +19,26 @@ public class SendNotificationReceiver extends BroadcastReceiver {
 
     public static final String CHANNEL_1_ID = "Lens_app_channel_1";
 
-
     @Override
     public void onReceive(Context context, Intent intent) {
+        FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(context);
         int currentHour = LocalDateTime.now().getHour();
 
         DailyMenu todayMenu = DailyMenu.getTodayMenu();
+        boolean isPrimaryUserExist = fileAndDatabaseHelper.hasPrimaryUser();
 
-        if (6 <= currentHour && currentHour < 12 && !todayMenu.hasBreakfast())
-            buildAndSendNotification(context, 1, "FitnessIsUs - Breakfast!", "Someone forgot about their breakfast today");
+        if(isPrimaryUserExist){
+            if (6 <= currentHour && currentHour < 12 && !todayMenu.hasBreakfast())
+                buildAndSendNotification(context, 1, "FitnessIsUs - Breakfast!", "Someone forgot about their breakfast today");
 
-        if (12 <= currentHour && currentHour < 18 && !todayMenu.hasLunch())
-            buildAndSendNotification(context, 2, "FitnessIsUs - Lunch!", "Someone forgot about their lunch today");
+            if (12 <= currentHour && currentHour < 18 && !todayMenu.hasLunch())
+                buildAndSendNotification(context, 2, "FitnessIsUs - Lunch!", "Someone forgot about their lunch today");
 
-        if (((18 <= currentHour && currentHour <= 23) || (0 <= currentHour && currentHour < 6)) && !todayMenu.hasDinner())
-            buildAndSendNotification(context, 3, "FitnessIsUs - Dinner!", "Someone forgot about their dinner today");
+            if (((18 <= currentHour && currentHour <= 23) || (0 <= currentHour && currentHour < 6)) && !todayMenu.hasDinner())
+                buildAndSendNotification(context, 3, "FitnessIsUs - Dinner!", "Someone forgot about their dinner today");
+        }
+        else
+            buildAndSendNotification(context, 4, "FitnessIsUs!", "Let us remember your user, you won't regret it ;)");
     }
 
     private void buildAndSendNotification(Context context, int id, String title, String message) {
@@ -51,7 +53,7 @@ public class SendNotificationReceiver extends BroadcastReceiver {
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE)
-                .addAction(R.drawable.ic_home_icon, "Go to info part", go)
+                .addAction(R.drawable.ic_home_icon, "Enter the app now", go)
                 .setColor(Color.CYAN)
                 .setAutoCancel(true)
                 .build();

@@ -77,35 +77,6 @@
             android:gravity="center" />
     </RelativeLayout>
 
-
-    <RelativeLayout
-        android:id="@+id/changeTodayMenuLayout"
-        android:layout_width="150pt"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="40pt"
-        android:gravity="center"
-        android:layoutDirection="ltr"
-        android:layout_above="@id/bnvMain">
-
-        <TextView
-            android:id="@+id/tvDailyMenusDates"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="8pt"
-            android:layout_centerHorizontal="true"
-            android:gravity="center|bottom"
-            android:text="Today daily menu is shown about: "/>
-
-        <Spinner
-            android:id="@+id/sDailyMenusDates"
-            android:layout_width="150pt"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/tvDailyMenusDates"
-            android:layout_centerHorizontal="true" />
-    </RelativeLayout>
-
     <FrameLayout
         android:id="@+id/mainActivityFrameLayout"
         android:layout_width="match_parent"

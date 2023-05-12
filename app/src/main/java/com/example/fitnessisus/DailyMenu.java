@@ -697,12 +697,31 @@ public class DailyMenu {
     }
 
     public static ArrayList<String> getDailyMenusDatesFromFile(Context context){
+        fillMissingDailyMenusDates(context);
+
         String[] dataParts = getFileData("dailyMenusFile", context).split("\n");
         ArrayList<String> dailyMenusDates = new ArrayList<String>();
 
         for(int i = 1; i < dataParts.length; i++)
             dailyMenusDates.add(DailyMenu.generateDailyMenuObjectFromFile(dataParts[i]).getDate());
         return dailyMenusDates;
+    }
+
+    public static String getTheOldestDailyMenuDate(){
+        LocalDateTime oldestDailyMenu = LocalDateTime.now();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
+
+        for(int i = 0; i < dailyMenus.size(); i++){
+            String date = dailyMenus.get(i).getDate();
+            int day = Integer.parseInt(date.split("_")[0]);
+            int month = Integer.parseInt(date.split("_")[1]);
+            int year = Integer.parseInt(date.split("_")[2]);
+
+            if(oldestDailyMenu.isAfter(LocalDateTime.of(year, month, day, 23, 59)))
+                oldestDailyMenu = LocalDateTime.of(year, month, day, 23, 59);
+        }
+
+        return dtf.format(oldestDailyMenu);
     }
 
     private static String getFileData(String fileName, Context context){

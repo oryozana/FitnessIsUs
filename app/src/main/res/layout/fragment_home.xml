@@ -14,7 +14,9 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/mainSpace">
+        android:layout_below="@id/mainSpace"
+        android:layout_marginBottom="15pt"
+        android:layout_above="@+id/changeTodayMenuLayout">
 
         <LinearLayout
             android:id="@+id/mainActivityLinearLayout"
@@ -160,4 +162,34 @@
                 android:textColor="@color/white" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <RelativeLayout
+        android:id="@+id/changeTodayMenuLayout"
+        android:layout_width="150pt"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="10pt"
+        android:gravity="center"
+        android:layoutDirection="ltr">
+<!--        android:layout_below="@+id/mainSpace">-->
+
+        <TextView
+            android:id="@+id/tvDailyMenusDates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="8pt"
+            android:layout_centerHorizontal="true"
+            android:gravity="start"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btSelectDailyMenuDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/tvDailyMenusDates"
+            android:text="Change menu date" />
+    </RelativeLayout>
 </RelativeLayout>

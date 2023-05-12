@@ -6,19 +6,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
-import android.Manifest;
 import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -47,8 +42,6 @@ import java.util.Calendar;
 
 public class SettingsSetter extends AppCompatActivity implements View.OnClickListener {
 
-    public static final String CHANNEL_1_ID = "Lens_app_channel_1";
-
     private VideoView videoView;
     private MediaPlayer mediaPlayer;
 
@@ -64,6 +57,8 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     TextView tvCurrentSongName;
 
     Calendar calendar;
+
+    static int[] requestsCodes = {17, 18, 19};
 
     FileAndDatabaseHelper fileAndDatabaseHelper;
     Intent me;
@@ -119,6 +114,36 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         setInitialChoices();
         initiateVideoPlayer();
         initiateMediaPlayer();
+
+        rgPlayMusic.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(checkedId == R.id.rbPlayMusic) {
+                    mediaPlayer = MediaPlayer.create(SettingsSetter.this, activeSong.getId());
+                    mediaPlayer.setLooping(true);
+                    mediaPlayer.start();
+                }
+
+                if(checkedId == R.id.rbMuteMusic)
+                    mediaPlayer.pause();
+            }
+        });
+
+        rgUseVideos.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(checkedId == R.id.rbUseVideos) {
+                    settingsSetterLinearLayout.setBackground(null);
+                    videoView.resume();
+                    videoView.start();
+                }
+
+                if(checkedId == R.id.rbUseImages) {
+                    settingsSetterLinearLayout.setBackground(getDrawable(R.drawable.settings_setter_background));
+                    videoView.stopPlayback();
+                }
+            }
+        });
     }
 
     public void notificationPermissionNotGranted(){
@@ -163,30 +188,36 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         Intent after = new Intent(SettingsSetter.this, SendNotificationReceiver.class);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(SettingsSetter.this, 17, after, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(SettingsSetter.this, requestsCodes[0], after, PendingIntent.FLAG_IMMUTABLE);
         calendar.set(Calendar.HOUR_OF_DAY, 10);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND,0);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent1);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent1);
 
-        PendingIntent pendingIntent2 = PendingIntent.getBroadcast(SettingsSetter.this, 18, after, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent2 = PendingIntent.getBroadcast(SettingsSetter.this, requestsCodes[1], after, PendingIntent.FLAG_IMMUTABLE);
         calendar.set(Calendar.HOUR_OF_DAY, 16);
-        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.MINUTE, 30);
         calendar.set(Calendar.SECOND,0);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent2);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent2);
 
-        PendingIntent pendingIntent3 = PendingIntent.getBroadcast(SettingsSetter.this, 19, after, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent3 = PendingIntent.getBroadcast(SettingsSetter.this, requestsCodes[2], after, PendingIntent.FLAG_IMMUTABLE);
         calendar.set(Calendar.HOUR_OF_DAY, 22);
-        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.MINUTE, 30);
         calendar.set(Calendar.SECOND,0);
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent3);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent3);
+    }
+
+    public boolean isAlarmSet(int requestCode) {
+        Intent intent = new Intent(SettingsSetter.this, SendNotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(SettingsSetter.this, requestCode, intent, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
+        return pendingIntent != null;
     }
 
     public void cancelAlarms(){
         Intent after = new Intent(SettingsSetter.this, SendNotificationReceiver.class);
-        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(SettingsSetter.this, 17, after, PendingIntent.FLAG_IMMUTABLE);
-        PendingIntent pendingIntent2 = PendingIntent.getBroadcast(SettingsSetter.this, 18, after, PendingIntent.FLAG_IMMUTABLE);
-        PendingIntent pendingIntent3 = PendingIntent.getBroadcast(SettingsSetter.this, 19, after, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(SettingsSetter.this, requestsCodes[0], after, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent2 = PendingIntent.getBroadcast(SettingsSetter.this, requestsCodes[1], after, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent3 = PendingIntent.getBroadcast(SettingsSetter.this, requestsCodes[2], after, PendingIntent.FLAG_IMMUTABLE);
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(pendingIntent1);
@@ -213,6 +244,11 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         else{
             if(!sendNotificationsAtStart)
                 rgSendNotifications.check(R.id.rbDisableNotifications);
+        }
+
+        if(sendNotificationsAtStart){
+            if(!(isAlarmSet(requestsCodes[0]) && isAlarmSet(requestsCodes[1]) && isAlarmSet(requestsCodes[2])))
+                initiateAlarms();
         }
 
         showDigitalClockAtStart = me.getBooleanExtra("showDigitalClock", true);

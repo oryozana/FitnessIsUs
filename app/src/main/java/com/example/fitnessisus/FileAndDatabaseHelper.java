@@ -265,6 +265,11 @@ public class FileAndDatabaseHelper {
         }
     }
 
+    public boolean hasPrimaryUser(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
+        return !sharedPreferences.getString("Username: ", "").equals("");
+    }
+
     public void updatePrimaryUserPassword(String newPassword){
         SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
         sharedPreferences.edit().putString("Password: ", newPassword).apply();
