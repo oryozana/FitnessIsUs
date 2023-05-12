@@ -16,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import java.util.ArrayList;
@@ -27,13 +28,11 @@ public class MusicMaster extends AppCompatActivity implements View.OnClickListen
 
     Button btFinishMusicMaster, btShuffleMusicMaster;
     LinearLayout musicMasterLinearLayout;
-    ImageButton ibtPauseOrPlayMusic;
     RadioGroup rgMusicChose;
 
     FileAndDatabaseHelper fileAndDatabaseHelper;
     ArrayList<Song> songs = Song.getSongs();
 
-    boolean isPlaying = true;
     Song activeSong;
 
     Intent me;
@@ -95,23 +94,13 @@ public class MusicMaster extends AppCompatActivity implements View.OnClickListen
         rgMusicChose.check(rbSelected.getId());
     }
 
-    public void startOrPauseMusic(){
-        if(!isPlaying) {
-            ibtPauseOrPlayMusic.setImageResource(R.drawable.ic_pause_music_icon);
-            mediaPlayer.start();
-            isPlaying = true;
-        }
-        else{
-            ibtPauseOrPlayMusic.setImageResource(R.drawable.ic_play_music_icon);
-            mediaPlayer.pause();
-            isPlaying = false;
-        }
-    }
-
     public void shuffleStatusChange() {
         if(btShuffleMusicMaster.getText().toString().equals("Enable shuffle")){
             btShuffleMusicMaster.setText("Disable shuffle");
-            activeSong = fileAndDatabaseHelper.getActiveSongAndShuffleIfNeedTo();
+            // activeSong = fileAndDatabaseHelper.getActiveSongAndShuffleIfNeedTo();
+
+            Song.getSongs().get(((int)(Math.random() * Song.getSongs().size()))).playSong();
+            activeSong = Song.getActiveSong();
 
             RadioButton rbSelected = (RadioButton) rgMusicChose.getChildAt(Song.getActiveSongIndex());
             rgMusicChose.check(rbSelected.getId());
@@ -234,13 +223,15 @@ public class MusicMaster extends AppCompatActivity implements View.OnClickListen
     public void onClick(View v) {
         int viewId = v.getId();
 
-//        if(viewId == ibtPauseOrPlayMusic.getId())
-//            startOrPauseMusic();
-
         if(viewId == btShuffleMusicMaster.getId())
             shuffleStatusChange();
 
         if(viewId == btFinishMusicMaster.getId())
             finishMusicMaster();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Toast.makeText(this, "Press finish to exit!", Toast.LENGTH_SHORT).show();
     }
 }

@@ -45,10 +45,11 @@
 
             <TextView
                 android:id="@+id/tvUsernameDisplay"
-                android:layout_width="wrap_content"
+                android:layout_width="150pt"
                 android:layout_height="wrap_content"
                 android:layout_margin="2pt"
                 android:textSize="10pt"
+                android:textStyle="bold"
                 android:gravity="center" />
 
             <TextView
