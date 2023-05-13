@@ -16,7 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 public class DailyMenu {
-    private static ArrayList<DailyMenu> dailyMenus;
+    private static ArrayList<DailyMenu> dailyMenus = new ArrayList<DailyMenu>();
     private boolean isNeedToBeSaved = false;
     private static DailyMenu todayMenu;
     private static Meal newCustomMeal;

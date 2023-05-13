@@ -11,14 +11,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class User implements Serializable {
-    private static ArrayList<User> localUsers;
     private static User currentUser;
-    private String username;
+    private final String username;
     private String password;
-    private String email;
+    private final String email;
     private final double startingWeight;
     private double weight;
     private Plan currentPlan;
+    private ArrayList<Plan> previousPlans = new ArrayList<Plan>();
     private String userDailyMenus;
     private int profilePictureId;
 
@@ -26,17 +26,19 @@ public class User implements Serializable {
         this.username = dataSnapshot.getKey();
         this.password = String.valueOf(dataSnapshot.child("password").getValue());
 
-        this.currentPlan = new Plan(dataSnapshot.child("currentPlan"));
+        this.currentPlan = new Plan(dataSnapshot.child("currentPlan"), Plan.CURRENT_PLAN);
+        for(DataSnapshot planInfo : dataSnapshot.child("previousPlans").getChildren())
+            previousPlans.add(new Plan(planInfo, Plan.PREVIOUS_PLANS));
 
         this.email = String.valueOf(dataSnapshot.child("email").getValue());
         this.startingWeight = Double.parseDouble(String.valueOf(dataSnapshot.child("startingWeight").getValue()));
-        this.weight = startingWeight;
+        this.weight = Double.parseDouble(String.valueOf(dataSnapshot.child("weight").getValue()));
 
         this.profilePictureId = Integer.parseInt(String.valueOf(dataSnapshot.child("profilePictureId").getValue()));
         this.userDailyMenus = String.valueOf(dataSnapshot.child("userDailyMenus").getValue());
     }
 
-    public User(String username, String password, String email, double startingWeight, Plan currentPlan, int profilePictureId, String dailyMenus){
+    public User(String username, String password, String email, double startingWeight, Plan currentPlan, int profilePictureId, String dailyMenus){  // New User contracture so weight = startingWeight
         this.username = username;
         this.password = password;
         this.email = email;
@@ -47,23 +49,28 @@ public class User implements Serializable {
         this.userDailyMenus = dailyMenus;
     }
 
-    public User(String username, String password, String email, String startingWeight, String weight, String targetCalories, String targetProteins, String targetFats, String goal, String profilePictureId, String dailyMenus){
+    public User(String username, String password, String email, String startingWeight, String weight, String planFromDate, String planUntilDate, String targetCalories, String targetProteins, String targetFats, String goal, String profilePictureId, String dailyMenus){
         this.username = username;
         this.password = password;
         this.email = email;
         this.startingWeight = Double.parseDouble(startingWeight);
         this.weight = Double.parseDouble(weight);
-        this.currentPlan = new Plan(targetCalories, targetProteins, targetFats, goal);
+        this.currentPlan = new Plan(planFromDate, planUntilDate, targetCalories, targetProteins, targetFats, goal);
         this.profilePictureId = Integer.parseInt(profilePictureId);
         this.userDailyMenus = dailyMenus;
     }
 
-    public String getUsername() {
-        return username;
+    public void generatePreviousPlans(DataSnapshot dataSnapshot) {
+        for(DataSnapshot planInfo : dataSnapshot.getChildren())
+            this.previousPlans.add(new Plan(planInfo, Plan.PREVIOUS_PLANS));
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public ArrayList<Plan> receivePreviousPlans(){
+        return this.previousPlans;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public String getPassword() {
@@ -76,10 +83,6 @@ public class User implements Serializable {
 
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public double getStartingWeight() {
@@ -110,14 +113,6 @@ public class User implements Serializable {
         this.profilePictureId = profilePictureId;
     }
 
-    public static ArrayList<User> obtainLocalUsers() {
-        return localUsers;
-    }
-
-    public static void setLocalUsers(ArrayList<User> localUsers) {
-        User.localUsers = localUsers;
-    }
-
     public static User getCurrentUser() {
         return currentUser;
     }
@@ -128,10 +123,6 @@ public class User implements Serializable {
 
     public String getUserDailyMenus() {
         return userDailyMenus;
-    }
-
-    public void setUserDailyMenus(String userDailyMenus) {
-        this.userDailyMenus = userDailyMenus;
     }
 
     public void downloadUserDailyMenusFromTemporaryFile(Context context){
@@ -234,78 +225,6 @@ public class User implements Serializable {
 
         return dailyMenu;
     }
-
-//    public static void saveDailyMenuIntoUser(Context context) {
-//        FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(context, null);
-//        String[] dataParts = fileAndDatabaseHelper.getFileData("")
-//    }
-
-//    public ArrayList<DailyMenu> transferStringIntoDailyMenus(String dailyMenus){
-//        DailyMenu.generateDailyMenuObjectFromFile(dailyMenus);
-//    }
-//
-//    public static void saveDailyMenuIntoUser() {
-//
-//    }
-
-//    public static void removeDailyMenuDuplicationsAndAddAnotherOne(DailyMenu dailyMenu){
-//        ArrayList<DailyMenu> tmpDailyMenus = new ArrayList<DailyMenu>();
-//        boolean found;
-//
-//        for(int i = 0; i < dailyMenus.size(); i++){
-//            found = false;
-//            for(int j = i + 1; j < dailyMenus.size(); j++){
-//                if(dailyMenus.get(i).date.equals(dailyMenus.get(j).date) || dailyMenus.get(i).date.equals(dailyMenu.date))
-//                    found = true;
-//            }
-//
-//            if(!found)
-//                tmpDailyMenus.add(dailyMenus.get(i));
-//        }
-//
-//        tmpDailyMenus.add(dailyMenu);
-//        dailyMenus = tmpDailyMenus;
-//    }
-//
-//    public boolean hasTodayMenu(String currentDate){
-//        for(int i = 0; i < this.userDailyMenus.size(); i++){
-//            if(this.userDailyMenus.get(i).getDate().equals(currentDate))
-//                return true;
-//        }
-//        return false;
-//    }
-//
-//    public DailyMenu getTodayMenu(String currentDate){
-//        if(hasTodayMenu(currentDate)){
-//            for(int i = 0; i < this.userDailyMenus.size(); i++){
-//                if(this.userDailyMenus.get(i).getDate().equals(currentDate))
-//                    return this.userDailyMenus.get(i);
-//            }
-//        }
-//        return null;
-//    }
-//
-//    public void addDailyMenu(DailyMenu dailyMenu, Context context) {
-//        boolean found = false;
-//
-//        for(int i = 0; i < this.userDailyMenus.size(); i++){
-//            if(this.userDailyMenus.get(i).getDate().equals(dailyMenu.getDate()) && !found){
-//                this.userDailyMenus.remove(i);
-//                this.userDailyMenus.add(dailyMenu);
-//                found = true;
-//            }
-//        }
-//
-//        if(this.userDailyMenus.size() == 0)
-//            this.userDailyMenus.add(dailyMenu);
-//
-//        String dailyMenus = "";
-//        for(int i = 0; i < this.userDailyMenus.size(); i++)
-//            dailyMenus += this.userDailyMenus.get(i).generateDailyMenuDescriptionForFiles();
-//
-//        FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(context, null);
-//        fileAndDatabaseHelper.updateUserDailyMenusInLocalDatabase(dailyMenus);
-//    }
 
     @Override
     public String toString() {

@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
     HomeFragment homeFragment = new HomeFragment();
     FoodSelectionFragment foodSelectionFragment = new FoodSelectionFragment();
     CustomMealsFragment customMealsFragment = new CustomMealsFragment();
+    StatisticsFragment statisticsFragment = new StatisticsFragment();
 
     private VideoView videoView;
     private MediaPlayer mediaPlayer;
@@ -165,6 +166,11 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
 
+                if (itemId == R.id.sendToStatistics) {
+                    getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, statisticsFragment).commit();
+                    return true;
+                }
+
                 return false;
             }
         });
@@ -182,8 +188,6 @@ public class MainActivity extends AppCompatActivity {
             textClock.setVisibility(View.VISIBLE);
         else
             weatherLayout.setVisibility(View.VISIBLE);
-
-        // DailyMenu.hasTodayMenuInsideAllDailyMenus();
 
         initiateMediaPlayer();
         initiateVideoPlayer();
@@ -238,6 +242,8 @@ public class MainActivity extends AppCompatActivity {
             todayMenu = DailyMenu.getTodayMenu();
             DailyMenu.saveDailyMenuIntoFile(todayMenu, MainActivity.this);
             getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, homeFragment).commit();
+
+            Song.initiateSongs();
 
             if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 me.putExtra("sendNotifications", false);
@@ -452,6 +458,8 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences.edit().putString("Email: ", "").apply();
         sharedPreferences.edit().putString("StartingWeight: ", "").apply();
         sharedPreferences.edit().putString("Weight: ", "").apply();
+        sharedPreferences.edit().putString("FromDate: ", "").apply();
+        sharedPreferences.edit().putString("UntilDate: ", "").apply();
         sharedPreferences.edit().putString("TargetCalories: ", "").apply();
         sharedPreferences.edit().putString("TargetProteins: ", "").apply();
         sharedPreferences.edit().putString("TargetFats: ", "").apply();

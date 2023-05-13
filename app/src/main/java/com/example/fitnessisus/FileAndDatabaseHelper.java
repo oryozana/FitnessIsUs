@@ -256,6 +256,8 @@ public class FileAndDatabaseHelper {
             sharedPreferences.edit().putString("Email: ", user.getEmail()).apply();
             sharedPreferences.edit().putString("StartingWeight: ", user.getStartingWeight() + "").apply();
             sharedPreferences.edit().putString("Weight: ", user.getWeight() + "").apply();
+            sharedPreferences.edit().putString("FromDate: ", user.getCurrentPlan().getFromDate() + "").apply();
+            sharedPreferences.edit().putString("UntilDate: ", user.getCurrentPlan().getUntilDate() + "").apply();
             sharedPreferences.edit().putString("TargetCalories: ", user.getCurrentPlan().getTargetCalories() + "").apply();
             sharedPreferences.edit().putString("TargetProteins: ", user.getCurrentPlan().getTargetProteins() + "").apply();
             sharedPreferences.edit().putString("TargetFats: ", user.getCurrentPlan().getTargetFats() + "").apply();
@@ -277,6 +279,8 @@ public class FileAndDatabaseHelper {
 
     public void updatePrimaryUserPlan(Plan plan){
         SharedPreferences sharedPreferences = context.getSharedPreferences("primary_user", Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString("FromDate: ", plan.getFromDate() + "").apply();
+        sharedPreferences.edit().putString("UntilDate: ", plan.getUntilDate() + "").apply();
         sharedPreferences.edit().putString("TargetCalories: ", plan.getTargetCalories() + "").apply();
         sharedPreferences.edit().putString("TargetProteins: ", plan.getTargetProteins() + "").apply();
         sharedPreferences.edit().putString("TargetFats: ", plan.getTargetFats() + "").apply();
@@ -294,7 +298,7 @@ public class FileAndDatabaseHelper {
     }
 
     public User getPrimaryUser(){
-        String[] info = new String[11];
+        String[] info = new String[13];
         User user = null;
 
         if(checkIfPrimaryUserExist()){
@@ -304,14 +308,16 @@ public class FileAndDatabaseHelper {
             info[2] = sharedPreferences.getString("Email: ", "");
             info[3] = sharedPreferences.getString("StartingWeight: ", "");
             info[4] = sharedPreferences.getString("Weight: ", "");
-            info[5] = sharedPreferences.getString("TargetCalories: ", "");
-            info[6] = sharedPreferences.getString("TargetProteins: ", "");
-            info[7] = sharedPreferences.getString("TargetFats: ", "");
-            info[8] = sharedPreferences.getString("Goal: ", "");
-            info[9] = sharedPreferences.getString("ProfilePictureId: ", "");
-            info[10] = sharedPreferences.getString("DailyMenus: ", "");
+            info[5] = sharedPreferences.getString("FromDate: ", "");
+            info[6] = sharedPreferences.getString("UntilDate: ", "");
+            info[7] = sharedPreferences.getString("TargetCalories: ", "");
+            info[8] = sharedPreferences.getString("TargetProteins: ", "");
+            info[9] = sharedPreferences.getString("TargetFats: ", "");
+            info[10] = sharedPreferences.getString("Goal: ", "");
+            info[11] = sharedPreferences.getString("ProfilePictureId: ", "");
+            info[12] = sharedPreferences.getString("DailyMenus: ", "");
 
-            user = new User(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7], info[8], info[9], info[10]);
+            user = new User(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7], info[8], info[9], info[10], info[11], info[12]);
         }
         return user;
     }

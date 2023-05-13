@@ -15,4 +15,9 @@
         android:id="@+id/sendToCustomMeals"
         android:icon="@drawable/ic_add_custom_meal"
         android:title="Custom meals" />
+
+    <item
+        android:id="@+id/sendToStatistics"
+        android:icon="@drawable/ic_statistics_icon"
+        android:title="Statistics" />
 </menu>

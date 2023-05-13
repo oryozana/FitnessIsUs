@@ -31,10 +31,14 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.time.format.DateTimeFormatter;
 
 
 public class UserInfoScreen extends AppCompatActivity implements View.OnClickListener {
@@ -213,7 +217,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
     public void updateUserProfilePictureIdInFirebaseAndPrimaryUser(User user){
         usersDb = FirebaseDatabase.getInstance();
         databaseReference = usersDb.getReference("users");
-        databaseReference.child(user.getUsername()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+        databaseReference.child(user.getUsername()).child("profilePictureId").setValue(user.getProfilePictureId()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(fileAndDatabaseHelper.getPrimaryUsername().equals(user.getUsername()))
@@ -271,7 +275,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
     public void updateUserPasswordInFirebaseAndInPrimaryUser(User user){
         usersDb = FirebaseDatabase.getInstance();
         databaseReference = usersDb.getReference("users");
-        databaseReference.child(user.getUsername()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+        databaseReference.child(user.getUsername()).child("password").setValue(user.getPassword()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 Toast.makeText(UserInfoScreen.this, "Password successfully changed.", Toast.LENGTH_SHORT).show();
@@ -299,11 +303,12 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
                         tmpPlan.setGoal(user.getCurrentPlan().getGoal());
                 }
 
-                user.setCurrentPlan(tmpPlan);
-                updateUserPlanInFirebaseAndInPrimaryUser(user);
+                Plan oldPlan = user.getCurrentPlan();
+                oldPlan.setUntilDateAsToday();
+                updateUserPlanInFirebaseAndInPrimaryUser(user.getUsername(), oldPlan, tmpPlan);
             }
             else
-                Toast.makeText(this, "No internet connection, can't change password.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "No internet connection, can't change plan.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -353,41 +358,120 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         return passTests;
     }
 
-    public void updateUserPlanInFirebaseAndInPrimaryUser(User user){
+    public void updateUserPlanInFirebaseAndInPrimaryUser(String userName, Plan oldPlan, Plan newPlan){
         usersDb = FirebaseDatabase.getInstance();
-        databaseReference = usersDb.getReference("users");
-        databaseReference.child(user.getUsername()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+        databaseReference = usersDb.getReference("users").child(userName);
+        databaseReference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Toast.makeText(UserInfoScreen.this, "Plan successfully updated.", Toast.LENGTH_SHORT).show();
-                fileAndDatabaseHelper.updatePrimaryUserPlan(user.getCurrentPlan());
-                etGetNewTargetCalories.setText("");
-                etGetNewTargetProteins.setText("");
-                etGetNewTargetFats.setText("");
-            }
-        });
-    }
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                long amount = dataSnapshot.child("previousPlans").getChildrenCount();
 
-    public void getUserFromFirebaseDatabase(String username, String entered_password){
-        databaseReference = FirebaseDatabase.getInstance().getReference("users");
-        databaseReference.child(username).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if(task.isSuccessful()){
-                    if(task.getResult().exists()){
-                        DataSnapshot dataSnapshot = task.getResult();
-                        String password = String.valueOf(dataSnapshot.child("password").getValue());
-
-                        if(entered_password.equals(password)){
-                            User.setCurrentUser(new User(dataSnapshot));
+                if(amount == 0){
+                    databaseReference.child("previousPlans").child("0").setValue(oldPlan).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            databaseReference.child("currentPlan").setValue(newPlan).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    user.setCurrentPlan(newPlan);
+                                    Toast.makeText(UserInfoScreen.this, "Plan successfully updated.", Toast.LENGTH_SHORT).show();
+                                    fileAndDatabaseHelper.updatePrimaryUserPlan(user.getCurrentPlan());
+                                    etGetNewTargetCalories.setText("");
+                                    etGetNewTargetProteins.setText("");
+                                    etGetNewTargetFats.setText("");
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(UserInfoScreen.this, "Failed to update plan.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(UserInfoScreen.this, "Failed to update plan.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                else{
+                    Plan previousPlan = new Plan(dataSnapshot.child("previousPlans").child((amount - 1) + ""), Plan.PREVIOUS_PLANS);
+                    if(previousPlan.getFromDate().equals(oldPlan.getFromDate())){
+                        databaseReference.child("currentPlan").setValue(newPlan).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                user.setCurrentPlan(newPlan);
+                                Toast.makeText(UserInfoScreen.this, "Plan successfully updated.", Toast.LENGTH_SHORT).show();
+                                fileAndDatabaseHelper.updatePrimaryUserPlan(user.getCurrentPlan());
+                                etGetNewTargetCalories.setText("");
+                                etGetNewTargetProteins.setText("");
+                                etGetNewTargetFats.setText("");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(UserInfoScreen.this, "Failed to update plan.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
-                    else
-                        Toast.makeText(UserInfoScreen.this, "Not the correct password.", Toast.LENGTH_SHORT).show();
+                    else{
+                        databaseReference.child("previousPlans").child(amount + "").setValue(oldPlan).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                databaseReference.child("currentPlan").setValue(newPlan).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        user.setCurrentPlan(newPlan);
+                                        Toast.makeText(UserInfoScreen.this, "Plan successfully updated.", Toast.LENGTH_SHORT).show();
+                                        fileAndDatabaseHelper.updatePrimaryUserPlan(user.getCurrentPlan());
+                                        etGetNewTargetCalories.setText("");
+                                        etGetNewTargetProteins.setText("");
+                                        etGetNewTargetFats.setText("");
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(UserInfoScreen.this, "Failed to update plan.", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(UserInfoScreen.this, "Failed to update plan.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 }
             }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(UserInfoScreen.this, "Failed to update plan.", Toast.LENGTH_SHORT).show();
+            }
         });
     }
+
+//    public void getUserFromFirebaseDatabase(String username, String entered_password){
+//        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+//        databaseReference.child(username).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<DataSnapshot> task) {
+//                if(task.isSuccessful()){
+//                    if(task.getResult().exists()){
+//                        DataSnapshot dataSnapshot = task.getResult();
+//                        String password = String.valueOf(dataSnapshot.child("password").getValue());
+//
+//                        if(entered_password.equals(password)){
+//                            User.setCurrentUser(new User(dataSnapshot));
+//                        }
+//                    }
+//                    else
+//                        Toast.makeText(UserInfoScreen.this, "Not the correct password.", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//    }
 
     public void generatePlanAlertDialog(){
         AlertDialog ad;

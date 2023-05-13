@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Song extends AppCompatActivity implements Serializable {
-    private static ArrayList<Song> songs = new ArrayList<Song>(); // Contain every song basic info.
+    private static ArrayList<Song> songs; // Contain every song basic info.
     private final String name;
     private boolean isPlaying;
     private final int id;
@@ -69,6 +69,7 @@ public class Song extends AppCompatActivity implements Serializable {
     }
 
     public static void initiateSongs(){
+        songs = new ArrayList<Song>();
         new Song("happy_clappy_ukulele", R.raw.happy_clappy_ukulele).playSong();
         new Song("best_prank", R.raw.best_time);
         new Song("childish_prank", R.raw.childish_prank);
