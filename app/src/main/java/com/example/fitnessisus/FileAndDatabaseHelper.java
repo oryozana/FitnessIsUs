@@ -53,26 +53,6 @@ public class FileAndDatabaseHelper {
         return allData;
     }
 
-//    public Song implementSettingsData(){
-//        Song activeSong = Song.getActiveSong();
-//        if(getFileData("settings") != null){
-//            String[] settingsParts = getFileData("settings").split("\n");
-//            boolean playMusic, useVideos, useManuallySave;
-//
-//            playMusic = Boolean.parseBoolean(settingsParts[0].split(": ")[1]);
-//            useVideos = Boolean.parseBoolean(settingsParts[1].split(": ")[1]);
-//            useManuallySave = Boolean.parseBoolean(settingsParts[2].split(": ")[1]);
-//            activeSong = Song.getSongByName(settingsParts[3].split(": ")[1]);
-//
-//            me.putExtra("playMusic", playMusic);
-//            me.putExtra("useVideos", useVideos);
-//            me.putExtra("useManuallySave", useManuallySave);
-//            me.putExtra("activeSong", activeSong);
-//            return activeSong;
-//        }
-//        return activeSong;
-//    }
-
     public Song implementSettingsData(){
         if(isSettingsExist() && me != null){
             me.putExtra("playMusic", getPlayMusicStatus());
@@ -134,9 +114,9 @@ public class FileAndDatabaseHelper {
         return sharedPreferences.getBoolean("UseVideos ?: ", true);
     }
 
-    public boolean setSendNotificationsStatus(boolean status){
+    public void setSendNotificationsStatus(boolean status){
         SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
-        return sharedPreferences.getBoolean("SendNotifications ?: ", status);
+        sharedPreferences.edit().putBoolean("SendNotifications ?: ", status).apply();
     }
 
     public boolean getSendNotificationsStatus(){
@@ -166,8 +146,16 @@ public class FileAndDatabaseHelper {
         return tmp;
     }
 
+    public boolean hasCurrentActiveSong(){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        return !sharedPreferences.getString("ActiveSongName: ", "").equals("");
+    }
+
     public Song getCurrentActiveSong(){
         SharedPreferences sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        if(Song.getSongs() == null)
+            Song.initiateSongs();
 
         String songName = sharedPreferences.getString("ActiveSongName: ", Song.getSongs().get(0).getName());
         Song tmp = Song.getSongByName(songName);
@@ -344,6 +332,8 @@ public class FileAndDatabaseHelper {
         sharedPreferences.edit().putString("Email: ", "").apply();
         sharedPreferences.edit().putString("StartingWeight: ", "").apply();
         sharedPreferences.edit().putString("Weight: ", "").apply();
+        sharedPreferences.edit().putString("FromDate: ", "").apply();
+        sharedPreferences.edit().putString("UntilDate: ", "").apply();
         sharedPreferences.edit().putString("TargetCalories: ", "").apply();
         sharedPreferences.edit().putString("TargetProteins: ", "").apply();
         sharedPreferences.edit().putString("TargetFats: ", "").apply();

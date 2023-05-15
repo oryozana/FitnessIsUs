@@ -49,6 +49,7 @@ public class DailyMenu {
     }
 
     public static void setDailyMenus(Context context) {
+        DailyMenu.dailyMenus = new ArrayList<DailyMenu>();
         DailyMenu.dailyMenus = getDailyMenusFromFile(context);
     }
 

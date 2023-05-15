@@ -41,7 +41,7 @@ public class LoginAndRegister extends AppCompatActivity {
     RegisterFragment registerFragment = new RegisterFragment();
     LoginFragment loginFragment = new LoginFragment();
 
-    Song activeSong = Song.getSongs().get(0);
+    Song activeSong;
 
     Intent me;
 
@@ -53,6 +53,15 @@ public class LoginAndRegister extends AppCompatActivity {
         me = getIntent();
         if(me.hasExtra("activeSong"))
             activeSong = (Song) me.getSerializableExtra("activeSong");
+        else {
+            FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(LoginAndRegister.this);
+            if(fileAndDatabaseHelper.hasCurrentActiveSong())
+                activeSong = fileAndDatabaseHelper.getCurrentActiveSong();
+            else{
+                Song.initiateSongs();
+                activeSong = Song.getActiveSong();
+            }
+        }
 
         bottomNavigationView = findViewById(R.id.bnvLoginAndRegister);
         getSupportFragmentManager().beginTransaction().replace(R.id.loginAndRegisterFragmentHolder, loginFragment).commit();
@@ -85,31 +94,39 @@ public class LoginAndRegister extends AppCompatActivity {
         initiateMediaPlayer();
     }
 
+    public boolean isAlarmSet(int requestCode) {
+        Intent intent = new Intent(LoginAndRegister.this, SendNotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(LoginAndRegister.this, requestCode, intent, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
+        return pendingIntent != null;
+    }
+
     public void initiateAlarms(){
-        createNotificationChannels();
+        if(!(isAlarmSet(requestsCodes[0]) && isAlarmSet(requestsCodes[1]) && isAlarmSet(requestsCodes[2]))){
+            createNotificationChannels();
 
-        calendar = Calendar.getInstance();
+            calendar = Calendar.getInstance();
 
-        Intent after = new Intent(LoginAndRegister.this, SendNotificationReceiver.class);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent after = new Intent(LoginAndRegister.this, SendNotificationReceiver.class);
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(LoginAndRegister.this, requestsCodes[0], after, PendingIntent.FLAG_IMMUTABLE);
-        calendar.set(Calendar.HOUR_OF_DAY, 10);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND,0);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent1);
+            PendingIntent pendingIntent1 = PendingIntent.getBroadcast(LoginAndRegister.this, requestsCodes[0], after, PendingIntent.FLAG_IMMUTABLE);
+            calendar.set(Calendar.HOUR_OF_DAY, 10);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND,0);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent1);
 
-        PendingIntent pendingIntent2 = PendingIntent.getBroadcast(LoginAndRegister.this, requestsCodes[1], after, PendingIntent.FLAG_IMMUTABLE);
-        calendar.set(Calendar.HOUR_OF_DAY, 16);
-        calendar.set(Calendar.MINUTE, 30);
-        calendar.set(Calendar.SECOND,0);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent2);
+            PendingIntent pendingIntent2 = PendingIntent.getBroadcast(LoginAndRegister.this, requestsCodes[1], after, PendingIntent.FLAG_IMMUTABLE);
+            calendar.set(Calendar.HOUR_OF_DAY, 16);
+            calendar.set(Calendar.MINUTE, 30);
+            calendar.set(Calendar.SECOND,0);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent2);
 
-        PendingIntent pendingIntent3 = PendingIntent.getBroadcast(LoginAndRegister.this, requestsCodes[2], after, PendingIntent.FLAG_IMMUTABLE);
-        calendar.set(Calendar.HOUR_OF_DAY, 22);
-        calendar.set(Calendar.MINUTE, 30);
-        calendar.set(Calendar.SECOND,0);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent3);
+            PendingIntent pendingIntent3 = PendingIntent.getBroadcast(LoginAndRegister.this, requestsCodes[2], after, PendingIntent.FLAG_IMMUTABLE);
+            calendar.set(Calendar.HOUR_OF_DAY, 22);
+            calendar.set(Calendar.MINUTE, 30);
+            calendar.set(Calendar.SECOND,0);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent3);
+        }
     }
 
     private void createNotificationChannels() {

@@ -39,6 +39,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 
 public class UserInfoScreen extends AppCompatActivity implements View.OnClickListener {
@@ -87,6 +88,11 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         me = getIntent();
         if(me.hasExtra("activeSong"))
             activeSong = (Song) me.getSerializableExtra("activeSong");
+        else {
+            FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(UserInfoScreen.this);
+            if(fileAndDatabaseHelper.hasCurrentActiveSong())
+                activeSong = fileAndDatabaseHelper.getCurrentActiveSong();
+        }
 
         profilePictureSelectionLinearLayout = (LinearLayout) findViewById(R.id.profilePictureSelectionLinearLayout);
         linearLayout = (LinearLayout) findViewById(R.id.userInfoScreenLinearLayout);
@@ -272,7 +278,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         return passTests;
     }
 
-    public void updateUserPasswordInFirebaseAndInPrimaryUser(User user){
+    public void updateUserPasswordInFirebaseAndInPrimaryUser(User user){  // No need to check if password changed in this one...
         usersDb = FirebaseDatabase.getInstance();
         databaseReference = usersDb.getReference("users");
         databaseReference.child(user.getUsername()).child("password").setValue(user.getPassword()).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -358,91 +364,57 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         return passTests;
     }
 
-    public void updateUserPlanInFirebaseAndInPrimaryUser(String userName, Plan oldPlan, Plan newPlan){
+    public void updateUserPlanInFirebaseAndInPrimaryUser(String userName, Plan oldPlan, Plan newPlan) {
         usersDb = FirebaseDatabase.getInstance();
         databaseReference = usersDb.getReference("users").child(userName);
+
         databaseReference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
-                long amount = dataSnapshot.child("previousPlans").getChildrenCount();
-
-                if(amount == 0){
-                    databaseReference.child("previousPlans").child("0").setValue(oldPlan).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-                            databaseReference.child("currentPlan").setValue(newPlan).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void unused) {
-                                    user.setCurrentPlan(newPlan);
-                                    Toast.makeText(UserInfoScreen.this, "Plan successfully updated.", Toast.LENGTH_SHORT).show();
-                                    fileAndDatabaseHelper.updatePrimaryUserPlan(user.getCurrentPlan());
-                                    etGetNewTargetCalories.setText("");
-                                    etGetNewTargetProteins.setText("");
-                                    etGetNewTargetFats.setText("");
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(UserInfoScreen.this, "Failed to update plan.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(UserInfoScreen.this, "Failed to update plan.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                User user = new User(dataSnapshot);
+                if(!user.getPassword().equals(User.getCurrentUser().getPassword())) {
+                    Toast.makeText(UserInfoScreen.this, "Password has changed from another device.", Toast.LENGTH_SHORT).show();
+                    logoutUser();
+                    return;
                 }
-                else{
-                    Plan previousPlan = new Plan(dataSnapshot.child("previousPlans").child((amount - 1) + ""), Plan.PREVIOUS_PLANS);
-                    if(previousPlan.getFromDate().equals(oldPlan.getFromDate())){
-                        databaseReference.child("currentPlan").setValue(newPlan).addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                ArrayList<Plan> previousPlans = user.receivePreviousPlans();
+
+                if (previousPlans.size() == 0)
+                    previousPlans.add(oldPlan);
+                else {
+                    int length = Math.toIntExact(dataSnapshot.child("previousPlans").getChildrenCount());
+                    Plan oldestPlan = previousPlans.get(length - 1);
+
+                    if (oldestPlan.getFromDate().equals(newPlan.getUntilDate()))
+                        previousPlans.set((length - 1), oldPlan);
+                    else
+                        previousPlans.add(oldPlan);
+                }
+
+                databaseReference.child("currentPlan").setValue(newPlan).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+
+                        databaseReference.child("previousPlans").setValue(previousPlans).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
-                                user.setCurrentPlan(newPlan);
                                 Toast.makeText(UserInfoScreen.this, "Plan successfully updated.", Toast.LENGTH_SHORT).show();
-                                fileAndDatabaseHelper.updatePrimaryUserPlan(user.getCurrentPlan());
+
+                                user.setCurrentPlan(newPlan);
+                                user.setPreviousPlans(previousPlans);
+
+                                if (fileAndDatabaseHelper.getPrimaryUsername().equals(user.getUsername()))
+                                    fileAndDatabaseHelper.updatePrimaryUserPlan(user.getCurrentPlan());
+
                                 etGetNewTargetCalories.setText("");
                                 etGetNewTargetProteins.setText("");
                                 etGetNewTargetFats.setText("");
                             }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(UserInfoScreen.this, "Failed to update plan.", Toast.LENGTH_SHORT).show();
-                            }
                         });
+
                     }
-                    else{
-                        databaseReference.child("previousPlans").child(amount + "").setValue(oldPlan).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                databaseReference.child("currentPlan").setValue(newPlan).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        user.setCurrentPlan(newPlan);
-                                        Toast.makeText(UserInfoScreen.this, "Plan successfully updated.", Toast.LENGTH_SHORT).show();
-                                        fileAndDatabaseHelper.updatePrimaryUserPlan(user.getCurrentPlan());
-                                        etGetNewTargetCalories.setText("");
-                                        etGetNewTargetProteins.setText("");
-                                        etGetNewTargetFats.setText("");
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(UserInfoScreen.this, "Failed to update plan.", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(UserInfoScreen.this, "Failed to update plan.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                }
+                });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

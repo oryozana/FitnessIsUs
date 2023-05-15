@@ -85,7 +85,7 @@
             android:layout_height="wrap_content"
             android:textSize="6pt"
             android:gravity="center"
-            android:textColor="#Ff0005"
+            android:textColor="@color/normal_red_color_for_warnings"
             android:text="Custom meals only be saved locally and will appear to all of this phone users!"/>
     </LinearLayout>
 </RelativeLayout>

@@ -71,6 +71,11 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
         me = getIntent();
         if(me.hasExtra("activeSong"))
             activeSong = (Song) me.getSerializableExtra("activeSong");
+        else {
+            FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(SettingsSetter.this);
+            if(fileAndDatabaseHelper.hasCurrentActiveSong())
+                activeSong = fileAndDatabaseHelper.getCurrentActiveSong();
+        }
 
         fileAndDatabaseHelper = new FileAndDatabaseHelper(SettingsSetter.this, me);
 
@@ -183,28 +188,30 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     }
 
     public void initiateAlarms(){
-        createNotificationChannels();
+        if(!(isAlarmSet(requestsCodes[0]) && isAlarmSet(requestsCodes[1]) && isAlarmSet(requestsCodes[2]))){
+            createNotificationChannels();
 
-        Intent after = new Intent(SettingsSetter.this, SendNotificationReceiver.class);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent after = new Intent(SettingsSetter.this, SendNotificationReceiver.class);
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        PendingIntent pendingIntent1 = PendingIntent.getBroadcast(SettingsSetter.this, requestsCodes[0], after, PendingIntent.FLAG_IMMUTABLE);
-        calendar.set(Calendar.HOUR_OF_DAY, 10);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND,0);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent1);
+            PendingIntent pendingIntent1 = PendingIntent.getBroadcast(SettingsSetter.this, requestsCodes[0], after, PendingIntent.FLAG_IMMUTABLE);
+            calendar.set(Calendar.HOUR_OF_DAY, 10);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND,0);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent1);
 
-        PendingIntent pendingIntent2 = PendingIntent.getBroadcast(SettingsSetter.this, requestsCodes[1], after, PendingIntent.FLAG_IMMUTABLE);
-        calendar.set(Calendar.HOUR_OF_DAY, 16);
-        calendar.set(Calendar.MINUTE, 30);
-        calendar.set(Calendar.SECOND,0);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent2);
+            PendingIntent pendingIntent2 = PendingIntent.getBroadcast(SettingsSetter.this, requestsCodes[1], after, PendingIntent.FLAG_IMMUTABLE);
+            calendar.set(Calendar.HOUR_OF_DAY, 16);
+            calendar.set(Calendar.MINUTE, 30);
+            calendar.set(Calendar.SECOND,0);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent2);
 
-        PendingIntent pendingIntent3 = PendingIntent.getBroadcast(SettingsSetter.this, requestsCodes[2], after, PendingIntent.FLAG_IMMUTABLE);
-        calendar.set(Calendar.HOUR_OF_DAY, 22);
-        calendar.set(Calendar.MINUTE, 30);
-        calendar.set(Calendar.SECOND,0);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent3);
+            PendingIntent pendingIntent3 = PendingIntent.getBroadcast(SettingsSetter.this, requestsCodes[2], after, PendingIntent.FLAG_IMMUTABLE);
+            calendar.set(Calendar.HOUR_OF_DAY, 22);
+            calendar.set(Calendar.MINUTE, 30);
+            calendar.set(Calendar.SECOND,0);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent3);
+        }
     }
 
     public boolean isAlarmSet(int requestCode) {
@@ -246,10 +253,8 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
                 rgSendNotifications.check(R.id.rbDisableNotifications);
         }
 
-        if(sendNotificationsAtStart){
-            if(!(isAlarmSet(requestsCodes[0]) && isAlarmSet(requestsCodes[1]) && isAlarmSet(requestsCodes[2])))
-                initiateAlarms();
-        }
+        if(sendNotificationsAtStart)
+            initiateAlarms();
 
         showDigitalClockAtStart = me.getBooleanExtra("showDigitalClock", true);
         if(!showDigitalClockAtStart)

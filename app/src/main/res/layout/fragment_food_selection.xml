@@ -37,11 +37,15 @@
         android:gravity="center">
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:padding="10pt"
+            android:layout_width="150pt"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6pt"
+            android:layout_marginBottom="12pt"
             android:text="Choose your food, from the options below:"
-            android:textSize="10pt" />
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textSize="12pt" />
 
         <EditText
             android:id="@+id/etFilterFood"

@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class SendNotificationReceiver extends BroadcastReceiver {
 
@@ -24,7 +25,12 @@ public class SendNotificationReceiver extends BroadcastReceiver {
         FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(context);
         int currentHour = LocalDateTime.now().getHour();
 
-        DailyMenu todayMenu = DailyMenu.getTodayMenu();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
+        LocalDateTime today = LocalDateTime.now();
+        String todayDate = dtf.format(today);
+
+        DailyMenu.setDailyMenus(context);
+        DailyMenu todayMenu = DailyMenu.getTodayMenuFromAllDailyMenus(todayDate);
         boolean isPrimaryUserExist = fileAndDatabaseHelper.hasPrimaryUser();
 
         if(isPrimaryUserExist){

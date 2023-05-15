@@ -159,37 +159,6 @@
                 android:textSize="9pt" />
 
             <Button
-                android:id="@+id/btShareUserByCode"
-                android:layout_width="125pt"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2pt"
-                android:text="Share user" />
-
-            <LinearLayout
-                android:id="@+id/shareUserByCodeLinearLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:visibility="gone"
-                android:layoutDirection="ltr">
-
-                <TextView
-                    android:id="@+id/tvShowGeneratedCode"
-                    android:layout_width="100pt"
-                    android:layout_height="wrap_content"
-                    android:textSize="14pt" />
-
-                <ImageButton
-                    android:id="@+id/ibtShowCopyCodeOption"
-                    android:layout_width="25pt"
-                    android:layout_height="fill_parent"
-                    android:background="@null"
-                    app:srcCompat="@drawable/ic_copy_icon" />
-
-            </LinearLayout>
-
-            <Button
                 android:id="@+id/btSetPrimaryUser"
                 android:layout_width="125pt"
                 android:layout_height="wrap_content"
@@ -215,7 +184,7 @@
                 android:id="@+id/btDeleteUser"
                 android:layout_width="125pt"
                 android:layout_height="wrap_content"
-                android:textColor="#Ff0005"
+                android:textColor="@color/normal_red_color_for_warnings"
                 android:text="Delete user" />
 
         </LinearLayout>
@@ -233,6 +202,8 @@
             android:layout_width="150pt"
             android:layout_height="wrap_content"
             android:textSize="10pt"
+            android:textStyle="bold"
+            android:gravity="center"
             android:text="You can choose a profile picture from the selection below: " />
 
         <ImageView
@@ -291,7 +262,7 @@
             android:layout_height="wrap_content"
             android:textSize="6pt"
             android:layout_marginTop="6pt"
-            android:textColor="#Ff0005"
+            android:textColor="@color/normal_red_color_for_warnings"
             android:gravity="center" />
     </LinearLayout>
 </RelativeLayout>

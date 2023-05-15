@@ -45,6 +45,11 @@ public class MusicMaster extends AppCompatActivity implements View.OnClickListen
         me = getIntent();
         if(me.hasExtra("activeSong"))
             activeSong = (Song) me.getSerializableExtra("activeSong");
+        else {
+            FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(MusicMaster.this);
+            if(fileAndDatabaseHelper.hasCurrentActiveSong())
+                activeSong = fileAndDatabaseHelper.getCurrentActiveSong();
+        }
 
         videoView = (VideoView) findViewById(R.id.musicMasterVideoView);
         musicMasterLinearLayout = (LinearLayout) findViewById(R.id.musicMasterLinearLayout);

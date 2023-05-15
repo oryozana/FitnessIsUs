@@ -105,6 +105,10 @@ public class User implements Serializable {
         this.currentPlan = currentPlan;
     }
 
+    public void setPreviousPlans(ArrayList<Plan> previousPlans) {
+        this.previousPlans = previousPlans;
+    }
+
     public int getProfilePictureId() {
         return profilePictureId;
     }

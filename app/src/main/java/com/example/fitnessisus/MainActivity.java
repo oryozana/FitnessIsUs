@@ -532,34 +532,49 @@ public class MainActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         if (task.getResult().exists()) {
                             DataSnapshot dataSnapshot = task.getResult();
-                            String[] fbDailyMenus = String.valueOf(dataSnapshot.child("userDailyMenus").getValue()).split("       ");
+                            if(!user.getPassword().equals(dataSnapshot.child("password").getValue())){
+                                Toast.makeText(context, "Password has changed from another device.", Toast.LENGTH_SHORT).show();
 
-                            ArrayList<String> dailyMenus = new ArrayList<String>();
-                            for (String dailyMenu : fbDailyMenus) {
-                                if (dailyMenu.contains(" { ") && dailyMenu.contains(" }"))
-                                    dailyMenus.add(dailyMenu);
+                                FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(context);
+                                if(fileAndDatabaseHelper.getPrimaryUsername().equals(user.getUsername()))
+                                    fileAndDatabaseHelper.removePrimaryUser();
+
+                                Intent intent = new Intent(context, LoginAndRegister.class);
+                                DailyMenu.restartDailyMenusFile(context);
+                                DailyMenu.setTodayMenu(null);
+                                User.setCurrentUser(null);
+                                context.startActivity(intent);
                             }
+                            else{
+                                String[] fbDailyMenus = String.valueOf(dataSnapshot.child("userDailyMenus").getValue()).split("       ");
 
-                            int firebaseTodayMenuIndex = 0;
-                            boolean found = false;
-                            for (int i = 0; i < dailyMenus.size() && !found; i++) {
-                                DailyMenu tmp = DailyMenu.generateDailyMenuObjectFromFile(dailyMenus.get(i));
-                                if (tmp.getDate().equals(todayMenu.getDate())) {
-                                    firebaseTodayMenuIndex = i;
-                                    found = true;
+                                ArrayList<String> dailyMenus = new ArrayList<String>();
+                                for (String dailyMenu : fbDailyMenus) {
+                                    if (dailyMenu.contains(" { ") && dailyMenu.contains(" }"))
+                                        dailyMenus.add(dailyMenu);
                                 }
+
+                                int firebaseTodayMenuIndex = 0;
+                                boolean found = false;
+                                for (int i = 0; i < dailyMenus.size() && !found; i++) {
+                                    DailyMenu tmp = DailyMenu.generateDailyMenuObjectFromFile(dailyMenus.get(i));
+                                    if (tmp.getDate().equals(todayMenu.getDate())) {
+                                        firebaseTodayMenuIndex = i;
+                                        found = true;
+                                    }
+                                }
+
+                                String info = DailyMenu.getTodayMenu().generateDailyMenuDescriptionForFiles();
+                                if (found)
+                                    dailyMenus.remove(firebaseTodayMenuIndex);
+                                dailyMenus.add(info);
+
+                                String userDailyMenus = "";
+                                for (String dailyMenu : dailyMenus)
+                                    userDailyMenus += dailyMenu;
+
+                                updateDailyMenusInFirebase(userDailyMenus, 0);
                             }
-
-                            String info = DailyMenu.getTodayMenu().generateDailyMenuDescriptionForFiles();
-                            if (found)
-                                dailyMenus.remove(firebaseTodayMenuIndex);
-                            dailyMenus.add(info);
-
-                            String userDailyMenus = "";
-                            for (String dailyMenu : dailyMenus)
-                                userDailyMenus += dailyMenu;
-
-                            updateDailyMenusInFirebase(userDailyMenus, 0);
                         }
                         else
                             isAlreadyRunning = false;
