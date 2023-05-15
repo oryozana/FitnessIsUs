@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textStyle="bold"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="10pt"
         android:text="Your statistics are shown here: " />
 
@@ -21,7 +21,7 @@
         android:id="@+id/tvShowGoal"
         android:layout_width="125pt"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="10pt"
         android:text="Goal: " />
 
@@ -29,26 +29,58 @@
         android:id="@+id/tvShowTargetCalories"
         android:layout_width="125pt"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="10pt"
         android:text="Goal: " />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardViewGraph"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginTop="15dp"
-        android:elevation="10dp"
-        app:cardCornerRadius="10dp">
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
 
-            <!--Pie chart to display the data-->
+            <LinearLayout
+                android:layout_width="75pt"
+                android:layout_height="75pt"
+                android:layout_marginTop="5pt"
+                android:layout_marginEnd="5pt"
+                android:layout_marginBottom="5pt"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="70pt"
+                    android:layout_height="wrap_content"
+                    android:textSize="12pt"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:layout_marginBottom="8pt"
+                    android:gravity="center"
+                    android:text="Calories" />
+
+                <TextView
+                    android:id="@+id/tvTargetCaloriesAtPlan"
+                    android:layout_width="70pt"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="1pt"
+                    android:textColor="@color/white"
+                    android:text="Target: " />
+
+                <TextView
+                    android:id="@+id/tvTargetCaloriesAtDailyMenu"
+                    android:layout_width="70pt"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="1pt"
+                    android:textColor="@color/white"
+                    android:text="You ate: " />
+
+                <TextView
+                    android:id="@+id/tvCaloriesLeft"
+                    android:layout_width="70pt"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="Have left: " />
+            </LinearLayout>
 
             <org.eazegraph.lib.charts.PieChart
                 android:id="@+id/pcCalories"
@@ -57,110 +89,9 @@
                 android:padding="2pt"
                 android:layout_marginTop="5pt"
                 android:layout_marginStart="5pt"
-                android:layout_marginBottom="5pt" />
-
-<!--            &lt;!&ndash;Creating another linear layout -&ndash;&gt;-->
-<!--            &lt;!&ndash; to display pie chart details &ndash;&gt;-->
-<!--            <LinearLayout-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_weight="1"-->
-<!--                android:layout_marginLeft="20dp"-->
-<!--                android:orientation="vertical"-->
-<!--                android:gravity="center_vertical"-->
-<!--                >-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="15dp"-->
-<!--                    android:layout_gravity="center_vertical">-->
-
-<!--                    &lt;!&ndash;View to display the yellow color icon&ndash;&gt;-->
-<!--                    <View-->
-<!--                        android:layout_width="15dp"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:background="@color/R"/>-->
-
-<!--                    &lt;!&ndash;Text view to display R &ndash;&gt;-->
-<!--                    <TextView-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="R"-->
-<!--                        android:paddingLeft="10dp"/>-->
-
-<!--                </LinearLayout>-->
-
-<!--                &lt;!&ndash;Linear layout to display Python&ndash;&gt;-->
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="15dp"-->
-<!--                    android:layout_gravity="center_vertical"-->
-<!--                    android:layout_marginTop="5dp">-->
-
-<!--                    &lt;!&ndash;View to display the green color icon&ndash;&gt;-->
-<!--                    <View-->
-<!--                        android:layout_width="15dp"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:background="@color/Python"/>-->
-
-<!--                    &lt;!&ndash;Text view to display python text &ndash;&gt;-->
-<!--                    <TextView-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="Python"-->
-<!--                        android:paddingLeft="10dp"/>-->
-
-<!--                </LinearLayout>-->
-
-<!--                &lt;!&ndash;Linear layout to display C++&ndash;&gt;-->
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="15dp"-->
-<!--                    android:layout_gravity="center_vertical"-->
-<!--                    android:layout_marginTop="5dp">-->
-
-<!--                    &lt;!&ndash;View to display the red color icon&ndash;&gt;-->
-<!--                    <View-->
-<!--                        android:layout_width="15dp"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:background="@color/CPP"/>-->
-
-<!--                    &lt;!&ndash;Text view to display C++ text &ndash;&gt;-->
-<!--                    <TextView-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="C++"-->
-<!--                        android:paddingLeft="10dp"/>-->
-
-<!--                </LinearLayout>-->
-
-<!--                &lt;!&ndash;Linear layout to display Java&ndash;&gt;-->
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="15dp"-->
-<!--                    android:layout_gravity="center_vertical"-->
-<!--                    android:layout_marginTop="5dp">-->
-
-<!--                    &lt;!&ndash;View to display the blue color icon&ndash;&gt;-->
-<!--                    <View-->
-<!--                        android:layout_width="15dp"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        android:background="@color/Java"/>-->
-
-<!--                    &lt;!&ndash;Text view to display Java text &ndash;&gt;-->
-<!--                    <TextView-->
-<!--                        android:layout_width="wrap_content"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:text="Java"-->
-<!--                        android:paddingLeft="10dp"/>-->
-
-<!--                </LinearLayout>-->
-
-<!--            </LinearLayout>-->
-
+                android:layout_marginBottom="5pt"
+                android:visibility="visible"/>
         </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
 
 
 
