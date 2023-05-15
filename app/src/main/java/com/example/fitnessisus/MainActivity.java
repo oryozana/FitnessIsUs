@@ -546,6 +546,15 @@ public class MainActivity extends AppCompatActivity {
                                 context.startActivity(intent);
                             }
                             else{
+                                if(!user.hasPreviousPlans()){
+                                    ArrayList<Plan> previousPlans = new ArrayList<>();
+
+                                    for(DataSnapshot previousPlan : dataSnapshot.child("previousPlans").getChildren())
+                                        previousPlans.add(new Plan(previousPlan, Plan.PREVIOUS_PLANS));
+
+                                    User.getCurrentUser().setPreviousPlans(previousPlans);
+                                }
+
                                 String[] fbDailyMenus = String.valueOf(dataSnapshot.child("userDailyMenus").getValue()).split("       ");
 
                                 ArrayList<String> dailyMenus = new ArrayList<String>();

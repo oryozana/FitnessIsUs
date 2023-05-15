@@ -282,6 +282,7 @@ public class MealOverviewFragment extends Fragment implements View.OnClickListen
         if(viewId == btMealOverviewConfirmMeal.getId()){
             if(fromWhere.equals("HomeFragment"))
                 updateMeal();
+
             if(fromWhere.equals("FoodSelectionFragment"))
                 addMealIntoTodayMenu();
 

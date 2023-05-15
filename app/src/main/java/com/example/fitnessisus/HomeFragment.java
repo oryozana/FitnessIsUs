@@ -1,10 +1,12 @@
 package com.example.fitnessisus;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -75,26 +77,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         btSelectDailyMenuDate = (Button) view.findViewById(R.id.btSelectDailyMenuDate);
         btSelectDailyMenuDate.setOnClickListener(this);
 
-//        ArrayList<String> dailyMenusDates = DailyMenu.getDailyMenusDatesFromFile(getActivity());
-//        ArrayAdapter<String> datesAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, dailyMenusDates);
-//        sDailyMenusDates.setAdapter(datesAdapter);
-
-//        sDailyMenusDates.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                showDatePickerForChoosingTodayMenu();
-//
-////                String targetDate = (String) parent.getItemAtPosition(position);
-////                DailyMenu.setTodayMenu(DailyMenu.getTodayMenuFromAllDailyMenus(targetDate));
-////                updateMealsIfNeeded();
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
-
         updateMealsIfNeeded();
     }
 
@@ -121,7 +103,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         // Set the minimum date to today
         datePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
 
-        // Set the maximum date to a custom date (e.g. 31/12/2023)
+        // Set the maximum date to a custom date
         String[] oldestDailyMenu = DailyMenu.getTheOldestDailyMenuDate().split("_");
         int oldestDay = Integer.parseInt(oldestDailyMenu[0]);
         int oldestMonth = Integer.parseInt(oldestDailyMenu[1]);
@@ -132,6 +114,35 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         // Show the dialog
         datePickerDialog.show();
+    }
+
+    public void removeMealFromDailyMenuAlertDialog(Meal meal, String mealType){
+        AlertDialog ad;
+        AlertDialog.Builder adb;
+        adb = new AlertDialog.Builder(getActivity());
+        adb.setTitle("What do you want to do?");
+        adb.setMessage("You choose the meal or ingredient: " + meal.getName());
+        adb.setIcon(R.drawable.ic_delete_icon);
+        adb.setCancelable(true);
+
+        adb.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast.makeText(getActivity(), meal.getName() + " deleted successfully.", Toast.LENGTH_SHORT).show();
+                todayMenu.removeMeal(meal, mealType);
+                updateMealsIfNeeded();
+            }
+        });
+
+        adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        ad = adb.create();
+        ad.show();
     }
 
     @Override
@@ -146,6 +157,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         todayMenu = DailyMenu.getTodayMenu();
         todayMenu.correctNutritiousValues();
+        DailyMenu.saveDailyMenuIntoFile(todayMenu, getActivity());
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
         LocalDateTime today = LocalDateTime.now();
@@ -171,6 +183,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
                     mealOverviewFragment = new MealOverviewFragment(selectedItem, "Breakfast");
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, mealOverviewFragment).commit();
+                }
+            });
+
+            lvBreakfastMeals.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    Meal selectedItem = (Meal) parent.getItemAtPosition(position);
+
+                    removeMealFromDailyMenuAlertDialog(selectedItem, "Breakfast");
+                    return true;
                 }
             });
 
@@ -214,6 +236,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 }
             });
 
+            lvLunchMeals.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    Meal selectedItem = (Meal) parent.getItemAtPosition(position);
+
+                    removeMealFromDailyMenuAlertDialog(selectedItem, "Lunch");
+                    return true;
+                }
+            });
+
             totalHeight = 0;
             mealsAmount = todayMenu.getLunch().size();
 
@@ -251,6 +283,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
                     mealOverviewFragment = new MealOverviewFragment(selectedItem, "Dinner");
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, mealOverviewFragment).commit();
+                }
+            });
+
+            lvDinnerMeals.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    Meal selectedItem = (Meal) parent.getItemAtPosition(position);
+
+                    removeMealFromDailyMenuAlertDialog(selectedItem, "Dinner");
+                    return true;
                 }
             });
 

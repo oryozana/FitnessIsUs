@@ -265,13 +265,17 @@ public class DailyMenu {
         addFoodNutritionalValues(breakfast);
     }
 
-    public void removeBreakfast(String breakfastName) {
+    public void removeBreakfast(Food food) {
         boolean removed = false;
         for(int i = 0; i < this.breakfast.size(); i++){
-            if(breakfastName.equals(this.breakfast.get(i).name) && !removed) {
-                subtractFoodNutritionalValues(this.breakfast.get(i));
-                this.breakfast.remove(i);
-                removed = true;
+            Food current = this.breakfast.get(i);
+
+            if(!removed){
+                if(food.getCalories() == current.getCalories() && food.getProteins() == current.getProteins() && food.getFats() == current.getFats()) {
+                    subtractFoodNutritionalValues(this.breakfast.get(i));
+                    this.breakfast.remove(i);
+                    removed = true;
+                }
             }
         }
     }
@@ -280,7 +284,7 @@ public class DailyMenu {
         if(hasBreakfast()){
             ArrayList<Food> tmpBreakfast = new ArrayList<Food>(this.breakfast);
             for(int i = 0; i < tmpBreakfast.size(); i++)
-                removeBreakfast(tmpBreakfast.get(i).name);
+                removeBreakfast(tmpBreakfast.get(i));
 
             saveDailyMenuIntoFile(this, context);
             Toast.makeText(context, "Breakfast successfully deleted.", Toast.LENGTH_SHORT).show();
@@ -321,13 +325,17 @@ public class DailyMenu {
         addFoodNutritionalValues(lunch);
     }
 
-    public void removeLunch(String lunchName) {
+    public void removeLunch(Food food) {
         boolean removed = false;
         for(int i = 0; i < this.lunch.size(); i++){
-            if(lunchName.equals(this.lunch.get(i).getName()) && !removed) {
-                subtractFoodNutritionalValues(this.lunch.get(i));
-                this.lunch.remove(i);
-                removed = true;
+            Food current = this.lunch.get(i);
+
+            if(!removed){
+                if(food.getCalories() == current.getCalories() && food.getProteins() == current.getProteins() && food.getFats() == current.getFats()) {
+                    subtractFoodNutritionalValues(this.lunch.get(i));
+                    this.lunch.remove(i);
+                    removed = true;
+                }
             }
         }
     }
@@ -336,7 +344,7 @@ public class DailyMenu {
         if(hasLunch()){
             ArrayList<Food> tmpLunch = new ArrayList<Food>(this.lunch);
             for(int i = 0; i < tmpLunch.size(); i++)
-                removeLunch(tmpLunch.get(i).name);
+                removeLunch(tmpLunch.get(i));
 
             saveDailyMenuIntoFile(this, context);
             Toast.makeText(context, "Lunch successfully deleted.", Toast.LENGTH_SHORT).show();
@@ -377,13 +385,17 @@ public class DailyMenu {
         addFoodNutritionalValues(dinner);
     }
 
-    public void removeDinner(String dinnerName) {
+    public void removeDinner(Food food) {
         boolean removed = false;
         for(int i = 0; i < this.dinner.size(); i++){
-            if(dinnerName.equals(this.dinner.get(i).getName()) && !removed) {
-                subtractFoodNutritionalValues(this.dinner.get(i));
-                this.dinner.remove(i);
-                removed = true;
+            Food current = this.dinner.get(i);
+
+            if(!removed){
+                if(food.getCalories() == current.getCalories() && food.getProteins() == current.getProteins() && food.getFats() == current.getFats()) {
+                    subtractFoodNutritionalValues(this.dinner.get(i));
+                    this.dinner.remove(i);
+                    removed = true;
+                }
             }
         }
     }
@@ -392,7 +404,7 @@ public class DailyMenu {
         if(hasDinner()){
             ArrayList<Food> tmpDinner = new ArrayList<Food>(this.dinner);
             for(int i = 0; i < tmpDinner.size(); i++)
-                removeDinner(tmpDinner.get(i).name);
+                removeDinner(tmpDinner.get(i));
 
             saveDailyMenuIntoFile(this, context);
             Toast.makeText(context, "Dinner successfully deleted.", Toast.LENGTH_SHORT).show();
@@ -554,19 +566,30 @@ public class DailyMenu {
 
     public void replaceMeal(Meal meal, String mealType){
         if(mealType.equals("Breakfast")){
-            removeBreakfast(meal.getName());
+            removeBreakfast(meal);
             addBreakfast(meal);
         }
 
         if(mealType.equals("Lunch")){
-            removeLunch(meal.getName());
+            removeLunch(meal);
             addLunch(meal);
         }
 
         if(mealType.equals("Dinner")){
-            removeDinner(meal.getName());
+            removeDinner(meal);
             addDinner(meal);
         }
+    }
+
+    public void removeMeal(Meal meal, String mealType){
+        if(mealType.equals("Breakfast"))
+            removeBreakfast(meal);
+
+        if(mealType.equals("Lunch"))
+            removeLunch(meal);
+
+        if(mealType.equals("Dinner"))
+            removeDinner(meal);
     }
 
     public void correctNutritiousValues(){

@@ -109,6 +109,10 @@ public class User implements Serializable {
         this.previousPlans = previousPlans;
     }
 
+    public boolean hasPreviousPlans(){
+        return previousPlans.size() != 0;
+    }
+
     public int getProfilePictureId() {
         return profilePictureId;
     }
