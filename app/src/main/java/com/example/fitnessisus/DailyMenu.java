@@ -493,8 +493,8 @@ public class DailyMenu {
             int month = Integer.parseInt(date.split("_")[1]);
             int year = Integer.parseInt(date.split("_")[2]);
 
-            if(oldestDailyMenu.isAfter(LocalDateTime.of(year, month, day, 23, 59)))
-                oldestDailyMenu = LocalDateTime.of(year, month, day, 23, 59);
+            if(oldestDailyMenu.isAfter(LocalDateTime.of(year, month, day, 23, 59, 59, 59)))
+                oldestDailyMenu = LocalDateTime.of(year, month, day, 23, 59, 59, 59);
         }
 
         int daysUntilToday = (int) oldestDailyMenu.until(today, ChronoUnit.DAYS);

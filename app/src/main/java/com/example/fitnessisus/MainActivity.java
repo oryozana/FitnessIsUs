@@ -637,6 +637,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             try {
+                if(!fADHelper.getShowDigitalClockStatus() && fADHelper.hasWeatherConditions()){  // Set info inorder to avoid blank while loading...
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            setAvailableWeatherInfo();
+                        }
+                    });
+                }
+
                 if(isInternetConnectionAvailable && !fADHelper.getShowDigitalClockStatus() && !cityName.equals(""))
                     getWeatherData();
             }

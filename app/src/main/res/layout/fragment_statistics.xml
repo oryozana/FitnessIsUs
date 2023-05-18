@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".StatisticsFragment"
     android:gravity="center">
@@ -15,100 +14,284 @@
         android:textStyle="bold"
         android:textColor="@color/white"
         android:textSize="10pt"
+        android:layout_marginEnd="20pt"
+        android:layout_marginStart="20pt"
         android:text="Your statistics are shown here: " />
 
     <TextView
         android:id="@+id/tvShowGoal"
-        android:layout_width="125pt"
+        android:layout_width="150pt"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
         android:textSize="10pt"
-        android:text="Goal: " />
+        android:layout_marginBottom="18pt"
+        android:gravity="center"
+        android:text="Your goal is: " />
 
-    <TextView
-        android:id="@+id/tvShowTargetCalories"
-        android:layout_width="125pt"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:textSize="10pt"
-        android:text="Goal: " />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="225pt">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="75pt"
-                android:layout_height="75pt"
-                android:layout_marginTop="5pt"
-                android:layout_marginEnd="5pt"
-                android:layout_marginBottom="5pt"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="3pt"
+                android:layout_marginTop="3pt"
+                android:gravity="center">
 
-                <TextView
-                    android:layout_width="70pt"
-                    android:layout_height="wrap_content"
-                    android:textSize="12pt"
-                    android:textStyle="bold"
-                    android:textColor="@color/white"
-                    android:layout_marginBottom="8pt"
+                <LinearLayout
+                    android:layout_width="75pt"
+                    android:layout_height="75pt"
+                    android:layout_marginTop="5pt"
+                    android:layout_marginEnd="5pt"
+                    android:layout_marginBottom="5pt"
                     android:gravity="center"
-                    android:text="Calories" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvTargetCaloriesAtPlan"
-                    android:layout_width="70pt"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="1pt"
-                    android:textColor="@color/white"
-                    android:text="Target: " />
+                    <TextView
+                        android:layout_width="70pt"
+                        android:layout_height="wrap_content"
+                        android:textSize="12pt"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:layout_marginBottom="8pt"
+                        android:text="Calories: " />
 
-                <TextView
-                    android:id="@+id/tvTargetCaloriesAtDailyMenu"
-                    android:layout_width="70pt"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="1pt"
-                    android:textColor="@color/white"
-                    android:text="You ate: " />
+                    <TextView
+                        android:id="@+id/tvTargetCaloriesAtPlan"
+                        android:layout_width="70pt"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="1pt"
+                        android:textColor="@color/white"
+                        android:text="Target: " />
 
-                <TextView
-                    android:id="@+id/tvCaloriesLeft"
-                    android:layout_width="70pt"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:text="Have left: " />
+                    <TextView
+                        android:id="@+id/tvTargetCaloriesAtDailyMenu"
+                        android:layout_width="70pt"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="1pt"
+                        android:textColor="@color/white"
+                        android:text="You ate: " />
+
+                    <TextView
+                        android:id="@+id/tvCaloriesLeft"
+                        android:layout_width="70pt"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:text="Have left: " />
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <org.eazegraph.lib.charts.PieChart
+                        android:id="@+id/pcCalories"
+                        android:layout_width="75pt"
+                        android:layout_height="75pt"
+                        android:layout_centerInParent="true"
+                        android:layout_marginStart="5pt"
+                        android:layout_marginTop="5pt"
+                        android:layout_marginBottom="5pt"
+                        android:padding="2pt"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/tvCaloriesMultiplication"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:textStyle="bold"
+                        android:textSize="12pt"
+                        android:textColor="@color/black" />
+                </RelativeLayout>
             </LinearLayout>
 
-            <org.eazegraph.lib.charts.PieChart
-                android:id="@+id/pcCalories"
-                android:layout_width="75pt"
-                android:layout_height="75pt"
-                android:padding="2pt"
-                android:layout_marginTop="5pt"
-                android:layout_marginStart="5pt"
-                android:layout_marginBottom="5pt"
-                android:visibility="visible"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="3pt"
+                android:layout_marginTop="3pt"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="75pt"
+                    android:layout_height="75pt"
+                    android:layout_marginTop="5pt"
+                    android:layout_marginEnd="5pt"
+                    android:layout_marginBottom="5pt"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="70pt"
+                        android:layout_height="wrap_content"
+                        android:textSize="12pt"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:layout_marginBottom="8pt"
+                        android:text="Proteins: " />
+
+                    <TextView
+                        android:id="@+id/tvTargetProteinsAtPlan"
+                        android:layout_width="70pt"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="1pt"
+                        android:textColor="@color/white"
+                        android:text="Target: " />
+
+                    <TextView
+                        android:id="@+id/tvTargetProteinsAtDailyMenu"
+                        android:layout_width="70pt"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="1pt"
+                        android:textColor="@color/white"
+                        android:text="You ate: " />
+
+                    <TextView
+                        android:id="@+id/tvProteinsLeft"
+                        android:layout_width="70pt"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:text="Have left: " />
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <org.eazegraph.lib.charts.PieChart
+                        android:id="@+id/pcProteins"
+                        android:layout_width="75pt"
+                        android:layout_height="75pt"
+                        android:layout_marginStart="5pt"
+                        android:layout_marginTop="5pt"
+                        android:layout_marginBottom="5pt"
+                        android:padding="2pt"
+                        android:layout_centerInParent="true"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/tvProteinsMultiplication"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:textStyle="bold"
+                        android:textSize="12pt"
+                        android:textColor="@color/black" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="3pt"
+                android:layout_marginTop="3pt"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="75pt"
+                    android:layout_height="75pt"
+                    android:layout_marginTop="5pt"
+                    android:layout_marginEnd="5pt"
+                    android:layout_marginBottom="5pt"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="70pt"
+                        android:layout_height="wrap_content"
+                        android:textSize="12pt"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:layout_marginBottom="8pt"
+                        android:text="Fats: " />
+
+                    <TextView
+                        android:id="@+id/tvTargetFatsAtPlan"
+                        android:layout_width="70pt"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="1pt"
+                        android:textColor="@color/white"
+                        android:text="Target: " />
+
+                    <TextView
+                        android:id="@+id/tvTargetFatsAtDailyMenu"
+                        android:layout_width="70pt"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="1pt"
+                        android:textColor="@color/white"
+                        android:text="You ate: " />
+
+                    <TextView
+                        android:id="@+id/tvFatsLeft"
+                        android:layout_width="70pt"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:text="Have left: " />
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <org.eazegraph.lib.charts.PieChart
+                        android:id="@+id/pcFats"
+                        android:layout_width="75pt"
+                        android:layout_height="75pt"
+                        android:layout_centerInParent="true"
+                        android:layout_marginStart="5pt"
+                        android:layout_marginTop="5pt"
+                        android:layout_marginBottom="5pt"
+                        android:padding="2pt"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/tvFatsMultiplication"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:textStyle="bold"
+                        android:textSize="12pt"
+                        android:textColor="@color/black" />
+                </RelativeLayout>
+            </LinearLayout>
         </LinearLayout>
+    </ScrollView>
 
+    <TextView
+        android:id="@+id/tvPlanDates"
+        android:layout_width="150pt"
+        android:layout_height="wrap_content"
+        android:textSize="8pt"
+        android:gravity="start"
+        android:textColor="@color/white"
+        android:layout_marginTop="18pt"
+        android:textStyle="bold" />
 
+    <Button
+        android:id="@+id/btChangeAccordingToPlanType"
+        android:layout_width="150pt"
+        android:layout_height="wrap_content"
+        android:text="According to current plan" />
 
-    <!--    <TextView-->
-<!--        android:id="@+id/tvShowGoal"-->
-<!--        android:layout_width="125pt"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textColor="@color/black"-->
-<!--        android:textSize="10pt"-->
-<!--        android:text="Goal: " />-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/tvShowGoal"-->
-<!--        android:layout_width="125pt"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textColor="@color/black"-->
-<!--        android:textSize="10pt"-->
-<!--        android:text="Goal: " />-->
-
+    <TextView
+        android:id="@+id/tvNoInternetMessage"
+        android:layout_width="125pt"
+        android:layout_height="wrap_content"
+        android:textSize="6pt"
+        android:gravity="center"
+        android:textColor="@color/normal_red_color_for_warnings"
+        android:layout_marginTop="18pt"
+        android:visibility="gone"
+        android:text="Connect to the internet inorder to see more details about other days!"/>
 </LinearLayout>

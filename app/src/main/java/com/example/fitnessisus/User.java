@@ -98,6 +98,7 @@ public class User implements Serializable {
     }
 
     public Plan getCurrentPlan() {
+        this.currentPlan.setUntilDateAsToday();
         return currentPlan;
     }
 
