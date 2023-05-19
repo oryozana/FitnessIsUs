@@ -1,20 +1,16 @@
 package com.example.fitnessisus;
 
+import android.content.Context;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class Meal extends Food {
-    private final ArrayList<Ingredient> ingredients = Ingredient.getIngredientsList();
     private final ArrayList<Ingredient> neededIngredientsForMeal = new ArrayList<Ingredient>();
 
     public Meal(String name){
         super(name);
-    }
-
-    public Meal(String name, int grams) {  // Single ingredient meal.
-        super(name);
-        initiateNeededIngredientsForMeal(name, grams);
-        updateMealInfo();
     }
 
     public Meal(String name, ArrayList<Ingredient> ingredientsNeeded){
@@ -58,21 +54,30 @@ public class Meal extends Food {
         return new Meal(name, ingredients);
     }
 
-    public void initiateNeededIngredientsForMeal(String name, int grams){
-        String[] mealParts = name.split(" and | with | include ");
-        for(String mealPart : mealParts){
-            mealPart = mealPart.toLowerCase(Locale.ROOT);
-            if(ingredients.contains(Ingredient.getIngredientByName(mealPart)))
-                addIfNeeded(Ingredient.getIngredientByName(mealPart, grams));
-        }
-    }
+    public boolean canAddIngredient(Context context, Ingredient ingredient){
+        boolean passTests = true;
 
-    private void addIfNeeded(Ingredient ingredient) {
-        if(this.neededIngredientsForMeal.contains(ingredient)){
-            this.neededIngredientsForMeal.get(this.neededIngredientsForMeal.indexOf(ingredient)).addGrams(ingredient.getGrams());
+        if((this.neededIngredientsForMeal.size() + 1) > 25) {
+            Toast.makeText(context, "Exceeded ingredients amount limit, ingredient not added.", Toast.LENGTH_SHORT).show();
+            passTests = false;
         }
-        else
-            this.neededIngredientsForMeal.add(ingredient);
+
+        if((ingredient.getCalories() + this.calories) > 12500 && passTests){
+            Toast.makeText(context, "Exceeded calories limit, ingredient not added.", Toast.LENGTH_SHORT).show();
+            passTests = false;
+        }
+
+        if((ingredient.getProteins() + this.proteins) > 1250 && passTests) {
+            Toast.makeText(context, "Exceeded proteins limit, ingredient not added.", Toast.LENGTH_SHORT).show();
+            passTests = false;
+        }
+
+        if((ingredient.getFats() + this.fats) > 1250 && passTests) {
+            Toast.makeText(context, "Exceeded fats limit, ingredient not added.", Toast.LENGTH_SHORT).show();
+            passTests = false;
+        }
+
+        return passTests;
     }
 
     public void updateMealInfo(){
@@ -104,15 +109,20 @@ public class Meal extends Food {
         return tmpIngredients;
     }
 
-    public void addNeededIngredientForMeal(Ingredient ingredient){
-        this.neededIngredientsForMeal.add(ingredient);
-        updateMealInfo();
+    public void addNeededIngredientForMeal(Context context, Ingredient ingredient, String toastMassage){
+        if(canAddIngredient(context, ingredient)){
+            this.neededIngredientsForMeal.add(ingredient);
+            updateMealInfo();
+
+            if(!toastMassage.equals(""))
+                Toast.makeText(context, toastMassage, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void removeNeededIngredientForMeal(Ingredient ingredient){
         boolean found = false;
-        for(int i = 0; i < this.neededIngredientsForMeal.size(); i++){
-            if(neededIngredientsForMeal.get(i).getName().equals(ingredient.getName()) && neededIngredientsForMeal.get(i).getGrams() == ingredient.getGrams() && !found){
+        for(int i = 0; i < this.neededIngredientsForMeal.size() && !found; i++){
+            if(neededIngredientsForMeal.get(i).getName().equals(ingredient.getName()) && neededIngredientsForMeal.get(i).getGrams() == ingredient.getGrams()){
                 this.neededIngredientsForMeal.remove(i);
                 found = true;
             }

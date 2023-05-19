@@ -1,6 +1,7 @@
 package com.example.fitnessisus;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
@@ -456,28 +457,57 @@ public class DailyMenu {
         }
     }
 
-    public void addMealByMealName(String selectedMeal, Meal meal){
-        if(selectedMeal.equals("Breakfast"))
-            todayMenu.addBreakfast(meal);
+    public boolean canAddFood(Context context, Food food){
+        boolean passTests = true;
 
-        if(selectedMeal.equals("Lunch"))
-            todayMenu.addLunch(meal);
+        if((food.getCalories() + this.totalCalories) > 25000){
+            Toast.makeText(context, "Exceeded calories limit, food not added.", Toast.LENGTH_SHORT).show();
+            passTests = false;
+        }
 
-        if(selectedMeal.equals("Dinner"))
-            todayMenu.addDinner(meal);
+        if((food.getProteins() + this.totalProteins) > 2500 && passTests) {
+            Toast.makeText(context, "Exceeded proteins limit, food not added.", Toast.LENGTH_SHORT).show();
+            passTests = false;
+        }
+
+        if((food.getFats() + this.totalFats) > 2500 && passTests) {
+            Toast.makeText(context, "Exceeded fats limit, food not added.", Toast.LENGTH_SHORT).show();
+            passTests = false;
+        }
+
+        return passTests;
     }
 
-    public void addIngredientByMealName(String selectedMeal, Ingredient ingredient, int grams){
-        Ingredient tmpIngredient = Ingredient.getIngredientByName(ingredient.getName(), grams);
+    public void addMealByMealName(Context context, String selectedMeal, Meal meal){
+        if(canAddFood(context, meal)){
+            if(selectedMeal.equals("Breakfast"))
+                todayMenu.addBreakfast(meal);
 
-        if(selectedMeal.equals("Breakfast"))
-            todayMenu.addBreakfast(tmpIngredient);
+            if(selectedMeal.equals("Lunch"))
+                todayMenu.addLunch(meal);
 
-        if(selectedMeal.equals("Lunch"))
-            todayMenu.addLunch(tmpIngredient);
+            if(selectedMeal.equals("Dinner"))
+                todayMenu.addDinner(meal);
 
-        if(selectedMeal.equals("Dinner"))
-            todayMenu.addDinner(tmpIngredient);
+            Toast.makeText(context, "Meal successfully added.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void addIngredientByMealName(Context context, String selectedMeal, Ingredient ingredient, int grams){
+        if(canAddFood(context, ingredient)){
+            Ingredient tmpIngredient = Ingredient.getIngredientByName(ingredient.getName(), grams);
+
+            if(selectedMeal.equals("Breakfast"))
+                todayMenu.addBreakfast(tmpIngredient);
+
+            if(selectedMeal.equals("Lunch"))
+                todayMenu.addLunch(tmpIngredient);
+
+            if(selectedMeal.equals("Dinner"))
+                todayMenu.addDinner(tmpIngredient);
+
+            Toast.makeText(context, "Ingredient successfully added.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public ArrayList<Ingredient> generateAllIngredientsNeededArrayList(){

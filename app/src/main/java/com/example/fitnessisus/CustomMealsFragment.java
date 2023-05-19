@@ -84,6 +84,7 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
     OutputStreamWriter osw;
     BufferedWriter bw;
     String fileName = "customMealsNames";
+    String pattern = "^[a-zA-Z0-9 ]+$"; // Only allows letters and numbers
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -364,12 +365,16 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
                 }
 
                 if(passTests){
-                    Toast.makeText(getActivity(), "Ingredient successfully changed.", Toast.LENGTH_SHORT).show();
-
                     int grams = Integer.parseInt(etAlertDialogIngredientGrams.getText().toString());
                     Ingredient tmpIngredient2 = new Ingredient(Ingredient.getIngredientByName(ingredient.getName()), grams);
-                    DailyMenu.getCustomMeal().removeNeededIngredientForMeal(ingredient);
-                    DailyMenu.getCustomMeal().addNeededIngredientForMeal(tmpIngredient2);
+
+                    Meal tmpMeal = new Meal(DailyMenu.getCustomMeal().getName(), DailyMenu.getCustomMeal().getNeededIngredientsForMeal2());
+                    tmpMeal.removeNeededIngredientForMeal(ingredient);
+
+                    if(tmpMeal.canAddIngredient(getActivity(), tmpIngredient2)) {
+                        DailyMenu.getCustomMeal().removeNeededIngredientForMeal(ingredient);
+                        DailyMenu.getCustomMeal().addNeededIngredientForMeal(getActivity(), tmpIngredient2, "Ingredient successfully changed.");
+                    }
 
                     customMealIngredientsAdapter.notifyDataSetChanged();
                     ad.cancel();
@@ -671,7 +676,7 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
                                                     ingredientGrams = Integer.parseInt((customMealIngredients.child(i + "").child("grams").getValue().toString()));
 
                                                     tmpIngredient = new Ingredient(Ingredient.getIngredientByName(ingredientName), ingredientGrams);
-                                                    codeMeal.addNeededIngredientForMeal(tmpIngredient);
+                                                    codeMeal.addNeededIngredientForMeal(getActivity(), tmpIngredient, "");
                                                 }
 
                                                 showCodeMealLinearLayout.setVisibility(View.VISIBLE);
@@ -745,13 +750,11 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
                 if(sCodeMealSelectMealType.getSelectedItem() != null) {
                     ad.cancel();
                     String selectedMeal = sCodeMealSelectMealType.getSelectedItem().toString();
-                    DailyMenu.getTodayMenu().addMealByMealName(selectedMeal, codeMeal);
+                    DailyMenu.getTodayMenu().addMealByMealName(getActivity(), selectedMeal, codeMeal);
                     DailyMenu.saveDailyMenuIntoFile(DailyMenu.getTodayMenu(), getActivity());
 
                     uploadInfoTask = new MainActivity.UploadInfoTask(getActivity());
                     uploadInfoTask.execute();
-
-                    Toast.makeText(getActivity(), "Meal successfully added.", Toast.LENGTH_SHORT).show();
                 }
                 else
                     Toast.makeText(getActivity(), "Choose breakfast, lunch or dinner.", Toast.LENGTH_SHORT).show();
@@ -993,6 +996,12 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
                 if(customMeal.getNeededIngredientsForMeal().size() == 0){
                     Toast.makeText(getActivity(), "You need to add at least one ingredient.", Toast.LENGTH_SHORT).show();
                     return false;
+                }
+                else{
+                    if(!customMeal.getName().matches(pattern)){
+                        Toast.makeText(getActivity(), "Use letters and numbers only.", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
                 }
             }
         }

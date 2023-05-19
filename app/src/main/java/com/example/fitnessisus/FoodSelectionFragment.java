@@ -329,17 +329,15 @@ public class FoodSelectionFragment extends Fragment implements View.OnClickListe
                 }
 
                 if(passTests){
-                    Toast.makeText(getActivity(), "Ingredient successfully added.", Toast.LENGTH_SHORT).show();
-
                     String selectedMeal = sAlertDialogSelectMeal.getSelectedItem().toString();
                     int grams = Integer.parseInt(etAlertDialogIngredientGrams.getText().toString());
 
                     if(cameFrom.equals("CustomMealsFragment")) {
-                        DailyMenu.getCustomMeal().addNeededIngredientForMeal(new Ingredient(Ingredient.getIngredientByName(ingredient.getName()), grams));
+                        DailyMenu.getCustomMeal().addNeededIngredientForMeal(getActivity(), new Ingredient(Ingredient.getIngredientByName(ingredient.getName()), grams), "");
                         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mainActivityFrameLayout, customMealsFragment).commit();
                     }
                     else
-                        todayMenu.addIngredientByMealName(selectedMeal, ingredient, grams);
+                        todayMenu.addIngredientByMealName(getActivity(), selectedMeal, ingredient, grams);
 
                     uploadInfoTask = new MainActivity.UploadInfoTask(getActivity());
                     uploadInfoTask.execute();

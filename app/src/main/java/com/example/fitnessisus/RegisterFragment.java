@@ -50,6 +50,8 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     FirebaseDatabase usersDb;
     DatabaseReference databaseReference;
 
+    String pattern = "^[a-zA-Z0-9 ]+$"; // Only allows letters and numbers
+
     Intent me;
 
     public RegisterFragment() {
@@ -150,6 +152,11 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         else{
             if(isUserAlreadyExistsInFirebase(etGetUsername.getText().toString())){
                 Toast.makeText(getActivity(), "Username already exists.", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
+
+            if(!etGetUsername.getText().toString().matches(pattern) && passTests){
+                Toast.makeText(getActivity(), "Username can contain letters and numbers only.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }
         }

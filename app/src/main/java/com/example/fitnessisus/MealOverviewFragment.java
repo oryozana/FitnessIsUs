@@ -200,13 +200,18 @@ public class MealOverviewFragment extends Fragment implements View.OnClickListen
                 }
 
                 if(passTests){
-                    Toast.makeText(getActivity(), "Ingredient successfully changed.", Toast.LENGTH_SHORT).show();
 
-                    ingredient.setGrams(tmpIngredient.getGrams());
-                    int grams = Integer.parseInt(etAlertDialogIngredientGrams.getText().toString());
-                    Ingredient tmpIngredient = new Ingredient(Ingredient.getIngredientByName(ingredient.getName()), grams);
-                    tmpMeal.removeNeededIngredientForMeal(ingredient);
-                    tmpMeal.addNeededIngredientForMeal(tmpIngredient);
+                    Meal tmpMealForCheck = new Meal(tmpMeal.getName(), tmpMeal.getNeededIngredientsForMeal2());
+                    tmpMealForCheck.removeNeededIngredientForMeal(ingredient);
+
+                    if(tmpMealForCheck.canAddIngredient(getActivity(), tmpIngredient)) {
+                        ingredient.setGrams(tmpIngredient.getGrams());
+                        int grams = Integer.parseInt(etAlertDialogIngredientGrams.getText().toString());
+                        Ingredient tmpIngredient = new Ingredient(Ingredient.getIngredientByName(ingredient.getName()), grams);
+
+                        tmpMeal.removeNeededIngredientForMeal(ingredient);
+                        tmpMeal.addNeededIngredientForMeal(getActivity(), tmpIngredient, "Ingredient successfully changed.");
+                    }
 
                     tvMealOverviewMealGrams.setText("Grams: " + tmpMeal.getGrams());
                     tvMealOverviewMealCalories.setText("Calories: " + tmpMeal.getCalories());
@@ -239,9 +244,8 @@ public class MealOverviewFragment extends Fragment implements View.OnClickListen
         }
 
         if(passTests){
-            Toast.makeText(getActivity(), "Meal successfully added.", Toast.LENGTH_SHORT).show();
             String selectedMeal = sMealOverviewSelectMeal.getSelectedItem().toString();
-            DailyMenu.getTodayMenu().addMealByMealName(selectedMeal, tmpMeal);
+            DailyMenu.getTodayMenu().addMealByMealName(getActivity(), selectedMeal, tmpMeal);
             DailyMenu.saveDailyMenuIntoFile(DailyMenu.getTodayMenu(), getActivity());
 
             uploadInfoTask = new MainActivity.UploadInfoTask(getActivity());
