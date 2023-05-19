@@ -144,6 +144,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8pt"
                 android:text="Total proteins: "
+                android:textStyle="bold"
                 android:textColor="@color/white" />
 
             <TextView
@@ -151,6 +152,7 @@
                 android:layout_width="125pt"
                 android:layout_height="wrap_content"
                 android:text="Total fats: "
+                android:textStyle="bold"
                 android:textColor="@color/white" />
 
             <TextView
@@ -159,6 +161,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8pt"
                 android:text="Total calories: "
+                android:textStyle="bold"
                 android:textColor="@color/white" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -172,7 +175,6 @@
         android:layout_marginBottom="10pt"
         android:gravity="center"
         android:layoutDirection="ltr">
-<!--        android:layout_below="@+id/mainSpace">-->
 
         <TextView
             android:id="@+id/tvDailyMenusDates"
