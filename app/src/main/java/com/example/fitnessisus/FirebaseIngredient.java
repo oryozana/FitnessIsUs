@@ -4,11 +4,6 @@ public class FirebaseIngredient {
     private String name;
     private double grams;
 
-    public FirebaseIngredient(String name, double grams){
-        this.name = name;
-        this.grams = grams;
-    }
-
     public FirebaseIngredient(Ingredient ingredient){
         this.name = ingredient.getName();
         this.grams = ingredient.getGrams();

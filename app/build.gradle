@@ -31,8 +31,8 @@ android {
 
 dependencies {
 
-    implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.github.blackfizz:eazegraph:1.2.5l@aar'
+    implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'com.nineoldandroids:library:2.4.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation 'com.google.firebase:firebase-database:20.2.1'

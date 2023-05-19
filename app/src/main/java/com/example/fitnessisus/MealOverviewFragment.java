@@ -27,8 +27,9 @@ public class MealOverviewFragment extends Fragment implements View.OnClickListen
 
     MainActivity.UploadInfoTask uploadInfoTask;
 
-    private String fromWhere;
-    private Meal meal, tmpMeal;
+    private final String fromWhere;
+    private final Meal meal;
+    private final Meal tmpMeal;
 
     LinearLayout mealOverviewMealSelectorLinearLayout;
 

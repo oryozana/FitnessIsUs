@@ -1,7 +1,6 @@
 package com.example.fitnessisus;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
 
@@ -156,7 +155,6 @@ public class User implements Serializable {
         String currentDate = dtf.format(today);
 
         for(int i = 0; i < dataParts.length; i++) {
-            Log.d("User", dataParts[i]);
             if(!dataParts[i].replaceAll(" ", "").equals("")) {
                 dataParts[i] = "       DailyMenu " + dataParts[i];
                 if(dataParts[i].split(" date: ")[1].split(" \\}")[0].equals(currentDate))

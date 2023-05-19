@@ -17,7 +17,6 @@ import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.VideoView;
@@ -32,7 +31,7 @@ public class LoginAndRegister extends AppCompatActivity {
     private NetworkConnectionReceiver networkConnectionReceiver;
     BottomNavigationView bottomNavigationView;
 
-    int notificationsPermissionId = 152;  // Not really needed for now...
+    int notificationsPermissionId = 152;
     Calendar calendar;
 
     private MediaPlayer mediaPlayer;
@@ -67,7 +66,7 @@ public class LoginAndRegister extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().replace(R.id.loginAndRegisterFragmentHolder, loginFragment).commit();
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
 
                 if(itemId == R.id.sendToHome) {
@@ -152,7 +151,7 @@ public class LoginAndRegister extends AppCompatActivity {
     }
 
     public void initiateVideoPlayer(){
-        Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.world_saved_custom_meals_background_video);
+        Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.login_and_register_background_video);
         videoView.setVideoURI(uri);
 
         if(me.getBooleanExtra("useVideos", true))
@@ -197,12 +196,7 @@ public class LoginAndRegister extends AppCompatActivity {
         super.onResume();
 
         IntentFilter networkConnectionFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            registerReceiver(networkConnectionReceiver, networkConnectionFilter);
-        }
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            registerReceiver(networkConnectionReceiver, networkConnectionFilter);
-        }
+        registerReceiver(networkConnectionReceiver, networkConnectionFilter);
 
         mediaPlayer.start();
         if(!me.getBooleanExtra("playMusic", true)){

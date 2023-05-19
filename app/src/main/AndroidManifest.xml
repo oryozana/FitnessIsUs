@@ -11,7 +11,7 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher_foreground"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.FitnessIsUs"
@@ -22,24 +22,27 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity
-            android:name=".SettingsSetter"
-            android:exported="false" />
-        <activity
-            android:name=".MusicMaster"
-            android:exported="false" />
-        <activity
-            android:name=".UserInfoScreen"
-            android:exported="false" />
-
         <receiver
             android:name=".NetworkConnectionReceiver"
             android:enabled="true"
             android:exported="true" />
 
         <activity
+            android:name=".SettingsSetter"
+            android:exported="false" />
+
+        <activity
+            android:name=".MusicMaster"
+            android:exported="false" />
+
+        <activity
+            android:name=".UserInfoScreen"
+            android:exported="false" />
+
+        <activity
             android:name=".LoginAndRegister"
             android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -41,14 +41,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
     Intent me;
 
-    public LoginFragment() {
-
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -255,8 +250,13 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public boolean passChangePasswordTests(String newPassword){
         boolean passTests = true;
 
-        if(newPassword.length() < 4 && passTests){
+        if(newPassword.length() < 4){
             Toast.makeText(getActivity(), "Password should be at least 4 characters wide!", Toast.LENGTH_SHORT).show();
+            passTests = false;
+        }
+
+        if(newPassword.length() > 16){
+            Toast.makeText(getActivity(), "Password should be at most 16 characters wide!", Toast.LENGTH_SHORT).show();
             passTests = false;
         }
 

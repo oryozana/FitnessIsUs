@@ -18,10 +18,10 @@ public class MealListAdapter extends ArrayAdapter<Meal> {
 
     @NonNull
     @Override
-    public View getView(int position, @NonNull View convertView, @NonNull ViewGroup parent){
+    public View getView(int position, View convertView, @NonNull ViewGroup parent){
         Meal meal = getItem(position);
-        if(convertView == null)
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_view_basic_meal, parent, false);
+
+        convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_view_basic_meal, parent, false);
 
         TextView tvMealName = convertView.findViewById(R.id.tvListMealName);
         TextView tvMealDescription = convertView.findViewById(R.id.tvListMealDescription);

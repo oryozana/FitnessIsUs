@@ -371,12 +371,7 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
                     DailyMenu.getCustomMeal().removeNeededIngredientForMeal(ingredient);
                     DailyMenu.getCustomMeal().addNeededIngredientForMeal(tmpIngredient2);
 
-//                    tvMealOverviewMealGrams.setText("Grams: " + meal.getGrams());
-//                    tvMealOverviewMealCalories.setText("Calories: " + meal.getCalories());
-//                    tvMealOverviewMealProteins.setText("Proteins: " + meal.getProteins());
-//                    tvMealOverviewMealFats.setText("Fats: " + meal.getFats());
                     customMealIngredientsAdapter.notifyDataSetChanged();
-
                     ad.cancel();
                 }
             }

@@ -25,11 +25,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageButton;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -357,12 +353,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         IntentFilter networkConnectionFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            registerReceiver(networkConnectionReceiver, networkConnectionFilter);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            registerReceiver(networkConnectionReceiver, networkConnectionFilter);
-        }
+        registerReceiver(networkConnectionReceiver, networkConnectionFilter);
 
         mediaPlayer.start();
         if (!me.getBooleanExtra("playMusic", true)) {
@@ -546,15 +537,6 @@ public class MainActivity extends AppCompatActivity {
                                 context.startActivity(intent);
                             }
                             else{
-                                if(!user.hasPreviousPlans()){
-                                    ArrayList<Plan> previousPlans = new ArrayList<>();
-
-                                    for(DataSnapshot previousPlan : dataSnapshot.child("previousPlans").getChildren())
-                                        previousPlans.add(new Plan(previousPlan, Plan.PREVIOUS_PLANS));
-
-                                    User.getCurrentUser().setPreviousPlans(previousPlans);
-                                }
-
                                 String[] fbDailyMenus = String.valueOf(dataSnapshot.child("userDailyMenus").getValue()).split("       ");
 
                                 ArrayList<String> dailyMenus = new ArrayList<String>();

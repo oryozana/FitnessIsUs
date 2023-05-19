@@ -1,14 +1,10 @@
 package com.example.fitnessisus;
 
 import android.content.Context;
-import android.widget.Toast;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,9 +16,9 @@ public class DailyMenu {
     private boolean isNeedToBeSaved = false;
     private static DailyMenu todayMenu;
     private static Meal newCustomMeal;
-    private ArrayList<Food> breakfast;
-    private ArrayList<Food> lunch;
-    private ArrayList<Food> dinner;
+    private final ArrayList<Food> breakfast;
+    private final ArrayList<Food> lunch;
+    private final ArrayList<Food> dinner;
     private double totalProteins;
     private double totalFats;
     private double totalCalories;
@@ -42,10 +38,6 @@ public class DailyMenu {
     public static ArrayList<DailyMenu> getDailyMenus() {
         removeDailyMenuDuplications();
         return dailyMenus;
-    }
-
-    public static void setDailyMenus(ArrayList<DailyMenu> dailyMenus) {
-        DailyMenu.dailyMenus = dailyMenus;
     }
 
     public static void setDailyMenus(Context context) {
@@ -217,10 +209,7 @@ public class DailyMenu {
     }
 
     public boolean isThereAtLeastOneThing(){
-        boolean found = false;
-
-        if(this.breakfast.size() != 0)
-            found = true;
+        boolean found = this.breakfast.size() != 0;
 
         if(this.lunch.size() != 0)
             found = true;
@@ -280,19 +269,6 @@ public class DailyMenu {
         }
     }
 
-    public void clearBreakfast(Context context){
-        if(hasBreakfast()){
-            ArrayList<Food> tmpBreakfast = new ArrayList<Food>(this.breakfast);
-            for(int i = 0; i < tmpBreakfast.size(); i++)
-                removeBreakfast(tmpBreakfast.get(i));
-
-            saveDailyMenuIntoFile(this, context);
-            Toast.makeText(context, "Breakfast successfully deleted.", Toast.LENGTH_SHORT).show();
-        }
-        else
-            Toast.makeText(context, "Breakfast already empty.", Toast.LENGTH_SHORT).show();
-    }
-
     public ArrayList<Ingredient> generateBreakfastIngredientsArray(){
         ArrayList<Ingredient> ingredients = new ArrayList<Ingredient>();
         Ingredient tmpIngredient;
@@ -340,19 +316,6 @@ public class DailyMenu {
         }
     }
 
-    public void clearLunch(Context context){
-        if(hasLunch()){
-            ArrayList<Food> tmpLunch = new ArrayList<Food>(this.lunch);
-            for(int i = 0; i < tmpLunch.size(); i++)
-                removeLunch(tmpLunch.get(i));
-
-            saveDailyMenuIntoFile(this, context);
-            Toast.makeText(context, "Lunch successfully deleted.", Toast.LENGTH_SHORT).show();
-        }
-        else
-            Toast.makeText(context, "Lunch already empty.", Toast.LENGTH_SHORT).show();
-    }
-
     public ArrayList<Ingredient> generateLunchIngredientsArray(){
         ArrayList<Ingredient> ingredients = new ArrayList<Ingredient>();
         Ingredient tmpIngredient;
@@ -398,19 +361,6 @@ public class DailyMenu {
                 }
             }
         }
-    }
-
-    public void clearDinner(Context context){
-        if(hasDinner()){
-            ArrayList<Food> tmpDinner = new ArrayList<Food>(this.dinner);
-            for(int i = 0; i < tmpDinner.size(); i++)
-                removeDinner(tmpDinner.get(i));
-
-            saveDailyMenuIntoFile(this, context);
-            Toast.makeText(context, "Dinner successfully deleted.", Toast.LENGTH_SHORT).show();
-        }
-        else
-            Toast.makeText(context, "Dinner already empty.", Toast.LENGTH_SHORT).show();
     }
 
     public ArrayList<Ingredient> generateDinnerIngredientsArray(){
@@ -506,21 +456,6 @@ public class DailyMenu {
         }
     }
 
-    public void clearAllFood(Context context){
-        this.breakfast.clear();
-        this.lunch.clear();
-        this.dinner.clear();
-
-        this.totalProteins = 0;
-        this.totalFats = 0;
-        this.totalCalories = 0;
-
-        saveDailyMenuIntoFile(this, context);
-        isNeedToBeSaved = true;
-
-        Toast.makeText(context, "Successfully deleted all food.", Toast.LENGTH_SHORT).show();
-    }
-
     public void addMealByMealName(String selectedMeal, Meal meal){
         if(selectedMeal.equals("Breakfast"))
             todayMenu.addBreakfast(meal);
@@ -546,20 +481,16 @@ public class DailyMenu {
     }
 
     public ArrayList<Ingredient> generateAllIngredientsNeededArrayList(){
-        ArrayList<Ingredient> allIngredients = new ArrayList<Ingredient>();
         ArrayList<Ingredient> tmpIngredients;
 
         tmpIngredients = generateBreakfastIngredientsArray();
-        for(int i = 0; i < tmpIngredients.size(); i++)
-            allIngredients.add(tmpIngredients.get(i));
+        ArrayList<Ingredient> allIngredients = new ArrayList<Ingredient>(tmpIngredients);
 
         tmpIngredients = generateLunchIngredientsArray();
-        for(int i = 0; i < tmpIngredients.size(); i++)
-            allIngredients.add(tmpIngredients.get(i));
+        allIngredients.addAll(tmpIngredients);
 
         tmpIngredients = generateDinnerIngredientsArray();
-        for(int i = 0; i < tmpIngredients.size(); i++)
-            allIngredients.add(tmpIngredients.get(i));
+        allIngredients.addAll(tmpIngredients);
 
         return allIngredients;
     }
@@ -683,11 +614,6 @@ public class DailyMenu {
         DailyMenu.newCustomMeal = newCustomMeal;
     }
 
-    public static void saveDailyMenusIntoFile(ArrayList<DailyMenu> dailyMenus, Context context){
-        for(DailyMenu dailyMenu : dailyMenus)
-            saveDailyMenuIntoFile(dailyMenu, context);
-    }
-
     public static void saveDailyMenuIntoFile(DailyMenu dailyMenu, Context context){
         FileOutputStream fos;
         OutputStreamWriter osw;
@@ -712,23 +638,13 @@ public class DailyMenu {
     }
 
     public static ArrayList<DailyMenu> getDailyMenusFromFile(Context context){
-        String[] dataParts = getFileData("dailyMenusFile", context).split("\n");
+        FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(context);
+        String[] dataParts = fileAndDatabaseHelper.getFileData("dailyMenusFile").split("\n");
         ArrayList<DailyMenu> dailyMenus = new ArrayList<DailyMenu>();
 
         for(int i = 1; i < dataParts.length; i++)
             dailyMenus.add(DailyMenu.generateDailyMenuObjectFromFile(dataParts[i]));
         return dailyMenus;
-    }
-
-    public static ArrayList<String> getDailyMenusDatesFromFile(Context context){
-        fillMissingDailyMenusDates(context);
-
-        String[] dataParts = getFileData("dailyMenusFile", context).split("\n");
-        ArrayList<String> dailyMenusDates = new ArrayList<String>();
-
-        for(int i = 1; i < dataParts.length; i++)
-            dailyMenusDates.add(DailyMenu.generateDailyMenuObjectFromFile(dataParts[i]).getDate());
-        return dailyMenusDates;
     }
 
     public static String getTheOldestDailyMenuDate(){
@@ -746,30 +662,6 @@ public class DailyMenu {
         }
 
         return dtf.format(oldestDailyMenu);
-    }
-
-    private static String getFileData(String fileName, Context context){
-        FileInputStream is;
-        InputStreamReader isr;
-        BufferedReader br;
-
-        String currentLine = "", allData = "";
-        try{
-            is = context.openFileInput(fileName);
-            isr = new InputStreamReader(is);
-            br = new BufferedReader(isr);
-
-            currentLine = br.readLine();
-            while(currentLine != null){
-                allData += currentLine + "\n";
-                currentLine = br.readLine();
-            }
-            br.close();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        return allData;
     }
 
     public boolean isNeedToBeSaved(){

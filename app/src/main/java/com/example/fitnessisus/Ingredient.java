@@ -99,10 +99,6 @@ public class Ingredient extends Food {
         return imgId;
     }
 
-    public void setImgId(int imgId) {
-        this.imgId = imgId;
-    }
-
     public static ArrayList<Ingredient> getIngredientsList(){
         return Ingredient.ingredients;
     }
@@ -114,16 +110,6 @@ public class Ingredient extends Food {
 
     public void addGrams(double grams){
         this.grams += grams;
-    }
-
-    public String getIngredientInfo(){
-        roundValues();
-        return this.name + ": " + this.grams + " grams, " + this.proteins + " proteins, " + this.fats + " fats and " + this.calories + " calories.";
-    }
-
-    @Override
-    public String toString() {
-        return super.toString();
     }
 
     public static void initiateIngredientsDatabase(Context context){
@@ -224,5 +210,10 @@ public class Ingredient extends Food {
         new Ingredient("canola oil", 0, 92, 828);
 
         Ingredient.context = null;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

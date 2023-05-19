@@ -345,52 +345,15 @@ public class FileAndDatabaseHelper {
     public void addIngredientIntoLocalDatabase(Ingredient ingredient){
         ContentValues cv = new ContentValues();
 
-        cv.put(my_db.INGREDIENT_NAME, ingredient.getName());
-        cv.put(my_db.PROTEINS, ingredient.getProteins());
-        cv.put(my_db.FATS, ingredient.getFats());
-        cv.put(my_db.CALORIES, ingredient.getCalories());
-        cv.put(my_db.INGREDIENT_PICTURE_ID, ingredient.getImgId());
+        cv.put(DBHelper.INGREDIENT_NAME, ingredient.getName());
+        cv.put(DBHelper.PROTEINS, ingredient.getProteins());
+        cv.put(DBHelper.FATS, ingredient.getFats());
+        cv.put(DBHelper.CALORIES, ingredient.getCalories());
+        cv.put(DBHelper.INGREDIENT_PICTURE_ID, ingredient.getImgId());
 
         sqdb = my_db.getWritableDatabase();
-        sqdb.insert(my_db.TABLE_NAME, null, cv);
+        sqdb.insert(DBHelper.TABLE_NAME, null, cv);
         sqdb.close();
-    }
-
-    public Ingredient getIngredientByName(String name) {
-        sqdb = my_db.getWritableDatabase();
-
-        Cursor c = sqdb.query(DBHelper.TABLE_NAME,null, null, null, null, null, null);
-
-        int col1 = c.getColumnIndex(DBHelper.INGREDIENT_NAME);
-        int col2 = c.getColumnIndex(DBHelper.PROTEINS);
-        int col3 = c.getColumnIndex(DBHelper.FATS);
-        int col4 = c.getColumnIndex(DBHelper.CALORIES);
-        int col5 = c.getColumnIndex(DBHelper.INGREDIENT_PICTURE_ID);
-
-        c.moveToFirst();
-
-        Ingredient ingredient = new Ingredient(name, -1, -1, -1, -1);
-        boolean found = false;
-
-        while(!c.isAfterLast() && !found) {
-            String t1 = c.getString(col1);
-
-            if(t1.equals(name)){
-                double t2 = c.getDouble(col2);
-                double t3 = c.getDouble(col3);
-                double t4 = c.getDouble(col4);
-                int t5 = c.getInt(col5);
-
-                ingredient = new Ingredient(t1, 1, t2, t3, t4, t5);  // Info based on 1 gram.
-                found = true;
-            }
-
-            c.moveToNext();
-        }
-
-        c.close();
-        sqdb.close();
-        return ingredient;
     }
 
     public ArrayList<Ingredient> getAllOfTheIngredients() {

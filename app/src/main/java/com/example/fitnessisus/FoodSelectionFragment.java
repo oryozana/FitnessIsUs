@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -166,7 +165,7 @@ public class FoodSelectionFragment extends Fragment implements View.OnClickListe
                 ArrayList<Ingredient> ingredientsNeededInfo = new ArrayList<Ingredient>();
                 Ingredient ingredient;
                 String mealName, ingredientName;
-                Double ingredientGrams;
+                double ingredientGrams;
 
                 if(isAdded() && isVisible() && getUserVisibleHint()) {
                     if (task.isSuccessful()) {
@@ -424,10 +423,7 @@ public class FoodSelectionFragment extends Fragment implements View.OnClickListe
         };
 
         IntentFilter networkConnectionFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            getActivity().registerReceiver(networkConnectionReceiver, networkConnectionFilter);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            getActivity().registerReceiver(networkConnectionReceiver, networkConnectionFilter);
+        getActivity().registerReceiver(networkConnectionReceiver, networkConnectionFilter);
 
         if(!networkConnectionReceiver.isOnline(getActivity())) {
             networkConnectionReceiver.noInternetAccess(getActivity());

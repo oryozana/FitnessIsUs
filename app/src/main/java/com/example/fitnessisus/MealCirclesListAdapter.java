@@ -18,25 +18,16 @@ public class MealCirclesListAdapter extends ArrayAdapter<Meal> {
 
     @NonNull
     @Override
-    public View getView(int position, @NonNull View convertView, @NonNull ViewGroup parent){
+    public View getView(int position, View convertView, @NonNull ViewGroup parent){
         Meal meal = getItem(position);
-        if(convertView == null)
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_view_circles_meal, parent, false);
+
+        convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_view_circles_meal, parent, false);
 
         TextView tvMealName = convertView.findViewById(R.id.tvCircleListMealName);
         TextView tvMealDescription = convertView.findViewById(R.id.tvCircleListMealDescription);
 
-        //     ImageButton ibtDeleteMeal = convertView.findViewById(R.id.ibtDeleteMeal);
-
         tvMealName.setText(meal.getName() + ":");
         tvMealDescription.setText(meal.getGrams() + " grams and " + meal.getCalories() + " calories.");
-
-//        ibtDeleteMeal.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
 
         return convertView;
     }

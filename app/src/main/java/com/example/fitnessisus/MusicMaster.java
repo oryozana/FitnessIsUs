@@ -12,7 +12,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -55,9 +54,6 @@ public class MusicMaster extends AppCompatActivity implements View.OnClickListen
         musicMasterLinearLayout = (LinearLayout) findViewById(R.id.musicMasterLinearLayout);
 
         initiateMediaPlayer();
-
-//        ibtPauseOrPlayMusic = (ImageButton) findViewById(R.id.ibtPauseOrPlayMusic);
-//        ibtPauseOrPlayMusic.setOnClickListener(this);
 
         btShuffleMusicMaster = (Button) findViewById(R.id.btShuffleMusicMaster);
         btShuffleMusicMaster.setOnClickListener(this);

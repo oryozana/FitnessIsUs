@@ -141,10 +141,7 @@ public class Plan implements Serializable {
         if(plan1 == null || plan2 == null)
             return false;
 
-        boolean isTheSame = true;
-
-        if(plan1.getTargetCalories() != plan2.getTargetCalories())
-            isTheSame = false;
+        boolean isTheSame = plan1.getTargetCalories() == plan2.getTargetCalories();
 
         if(plan1.getTargetProteins() != plan2.getTargetProteins())
             isTheSame = false;

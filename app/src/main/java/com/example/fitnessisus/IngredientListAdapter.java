@@ -20,10 +20,10 @@ public class IngredientListAdapter extends ArrayAdapter<Ingredient> {
 
     @NonNull
     @Override
-    public View getView(int position, @NonNull View convertView, @NonNull ViewGroup parent){
+    public View getView(int position, View convertView, @NonNull ViewGroup parent){
         Ingredient ingredient = getItem(position);
-        if(convertView == null)
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_view_basic_ingredient, parent, false);
+
+        convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_view_basic_ingredient, parent, false);
 
         ImageView civIngredientImage = convertView.findViewById(R.id.civIngredientImage);
         TextView tvIngredientName = convertView.findViewById(R.id.tvListIngredientName);

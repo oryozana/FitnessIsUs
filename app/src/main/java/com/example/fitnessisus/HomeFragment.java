@@ -13,19 +13,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
@@ -55,7 +52,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -100,10 +96,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     }
                 }, year, month, dayOfMonth);
 
-        // Set the minimum date to today
+        // Set the maximum date to today
         datePickerDialog.getDatePicker().setMaxDate(calendar.getTimeInMillis());
 
-        // Set the maximum date to a custom date
+        // Set the minimum date to a custom date
         String[] oldestDailyMenu = DailyMenu.getTheOldestDailyMenuDate().split("_");
         int oldestDay = Integer.parseInt(oldestDailyMenu[0]);
         int oldestMonth = Integer.parseInt(oldestDailyMenu[1]);

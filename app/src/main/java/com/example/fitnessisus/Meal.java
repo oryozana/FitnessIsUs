@@ -5,8 +5,7 @@ import java.util.Locale;
 
 public class Meal extends Food {
     private final ArrayList<Ingredient> ingredients = Ingredient.getIngredientsList();
-    private ArrayList<Ingredient> neededIngredientsForMeal = new ArrayList<Ingredient>();
-    protected int amount = 0;
+    private final ArrayList<Ingredient> neededIngredientsForMeal = new ArrayList<Ingredient>();
 
     public Meal(String name){
         super(name);
@@ -27,16 +26,6 @@ public class Meal extends Food {
         }
         updateMealInfo();
     }
-
-//    public Meal(Meal meal1, Meal meal2){
-//        super(meal2.name);
-//        if(meal1 != null) {
-//            this.name = meal1.name + " and " + this.name;
-//            addNeededIngredientsForMeal(meal1.neededIngredientsForMeal, meal2.neededIngredientsForMeal);
-//        }
-//        else
-//            setNeededIngredientsForMeal(meal2.neededIngredientsForMeal);
-//    }
 
     public String generateMealDescriptionForFiles(){
         String message = "Meal [ " + this.name + ": ";
@@ -104,14 +93,6 @@ public class Meal extends Food {
         roundValues();
     }
 
-    public int getIngredientIndexInMealIngredients(Ingredient ingredient){
-        for(int i = 0; i < this.neededIngredientsForMeal.size(); i++){
-            if(this.neededIngredientsForMeal.get(i).name.equals(ingredient.name))
-                return i;
-        }
-        return -1;
-    }
-
     public ArrayList<Ingredient> getNeededIngredientsForMeal() {
         return this.neededIngredientsForMeal;
     }
@@ -128,12 +109,6 @@ public class Meal extends Food {
         updateMealInfo();
     }
 
-    public void addNeededIngredientsForMeal(ArrayList<Ingredient> neededIngredientsForMeal) {
-        for(int i = 0; i < neededIngredientsForMeal.size(); i++)
-            this.neededIngredientsForMeal.add(neededIngredientsForMeal.get(i));
-        updateMealInfo();
-    }
-
     public void removeNeededIngredientForMeal(Ingredient ingredient){
         boolean found = false;
         for(int i = 0; i < this.neededIngredientsForMeal.size(); i++){
@@ -143,51 +118,6 @@ public class Meal extends Food {
             }
         }
         updateMealInfo();
-    }
-
-    public void addNeededIngredientsForMeal(ArrayList<Ingredient> neededIngredientsForMeal1, ArrayList<Ingredient> neededIngredientsForMeal2) {
-        for(int i = 0; i < neededIngredientsForMeal1.size(); i++)
-            this.neededIngredientsForMeal.add(neededIngredientsForMeal1.get(i));
-        for(int i = 0; i < neededIngredientsForMeal2.size(); i++)
-            this.neededIngredientsForMeal.add(neededIngredientsForMeal2.get(i));
-        updateMealInfo();
-    }
-
-    public void setNeededIngredientsForMeal(ArrayList<Ingredient> neededIngredientsForMeal) {
-        this.neededIngredientsForMeal.clear();
-        for(int i = 0; i < neededIngredientsForMeal.size(); i++)
-            this.neededIngredientsForMeal.add(neededIngredientsForMeal.get(i));
-        resetMealInfo();
-        updateMealInfo();
-    }
-
-    public void setNeededIngredientsForMeal(ArrayList<Ingredient> neededIngredientsForMeal, Ingredient ingredient) {
-        this.neededIngredientsForMeal.clear();
-        for(int i = 0; i < neededIngredientsForMeal.size(); i++)
-            this.neededIngredientsForMeal.add(neededIngredientsForMeal.get(i));
-        this.neededIngredientsForMeal.add(ingredient);
-        resetMealInfo();
-        updateMealInfo();
-    }
-
-    public void resetMealInfo(){
-        this.grams = 0;
-        this.proteins = 0;
-        this.fats = 0;
-        this.calories = 0;
-    }
-
-    public String getMealInfo(){
-        roundValues();
-        return "Name: " + this.name + "\n" + "Grams: " + this.grams + "\n" + "Protein: " + this.proteins + "\n" + "Fats: " + this.fats + "\n" + "Calories: " + this.calories + ".";
-    }
-
-    public int getAmount() {
-        return amount;
-    }
-
-    public void addAmount(int amount) {
-        this.amount += amount;
     }
 
     @Override

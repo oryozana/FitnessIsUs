@@ -11,7 +11,6 @@ import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,7 +37,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 
@@ -424,27 +422,6 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         });
     }
 
-//    public void getUserFromFirebaseDatabase(String username, String entered_password){
-//        databaseReference = FirebaseDatabase.getInstance().getReference("users");
-//        databaseReference.child(username).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DataSnapshot> task) {
-//                if(task.isSuccessful()){
-//                    if(task.getResult().exists()){
-//                        DataSnapshot dataSnapshot = task.getResult();
-//                        String password = String.valueOf(dataSnapshot.child("password").getValue());
-//
-//                        if(entered_password.equals(password)){
-//                            User.setCurrentUser(new User(dataSnapshot));
-//                        }
-//                    }
-//                    else
-//                        Toast.makeText(UserInfoScreen.this, "Not the correct password.", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
-//    }
-
     public void generatePlanAlertDialog(){
         AlertDialog ad;
         AlertDialog.Builder adb;
@@ -759,16 +736,11 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
 
     public void registerUnregisteredReceiver(){
         IntentFilter networkConnectionFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            registerReceiver(networkConnectionReceiver, networkConnectionFilter);
-        }
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            registerReceiver(networkConnectionReceiver, networkConnectionFilter);
-        }
+        registerReceiver(networkConnectionReceiver, networkConnectionFilter);
     }
 
     public void initiateVideoPlayer(){
-        Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.dinner_selection_background_video);
+        Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.user_selection_screen_background_video);
         videoView.setVideoURI(uri);
 
         if(me.getBooleanExtra("useVideos", true))

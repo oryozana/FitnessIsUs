@@ -1,7 +1,11 @@
 package com.example.fitnessisus;
 
-import android.app.DatePickerDialog;
-import android.graphics.Color;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,21 +16,24 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.eazegraph.lib.charts.PieChart;
 import org.eazegraph.lib.models.PieModel;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
+import java.util.ArrayList;
 
-public class StatisticsFragment extends Fragment implements View.OnClickListener {
+public class StatisticsFragment extends Fragment {
+
+    NetworkConnectionReceiver networkConnectionReceiver;
 
     TextView tvTargetCaloriesAtPlan, tvTargetCaloriesAtDailyMenu, tvCaloriesLeft, tvCaloriesMultiplication;
     TextView tvTargetProteinsAtPlan, tvTargetProteinsAtDailyMenu, tvProteinsLeft, tvProteinsMultiplication;
@@ -36,8 +43,7 @@ public class StatisticsFragment extends Fragment implements View.OnClickListener
     int gray, green, red;
     TextView tvShowGoal;
 
-    TextView tvPlanDates, tvNoInternetMessage;
-    Button btChangeAccordingToPlanType;
+    TextView tvInternetMessage, tvNoInternetMessage;
 
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
     LocalDateTime today = LocalDateTime.now();
@@ -90,11 +96,54 @@ public class StatisticsFragment extends Fragment implements View.OnClickListener
         tvFatsMultiplication = (TextView) view.findViewById(R.id.tvFatsMultiplication);
         pcFats = (PieChart) view.findViewById(R.id.pcFats);
 
-        tvPlanDates = (TextView) view.findViewById(R.id.tvPlanDates);
+        tvInternetMessage = (TextView) view.findViewById(R.id.tvInternetMessage);
         tvNoInternetMessage = (TextView) view.findViewById(R.id.tvNoInternetMessage);
-        btChangeAccordingToPlanType = (Button) view.findViewById(R.id.btChangeAccordingToPlanType);
+
+        handleNetworkConnection();
 
         updatePieCharts();
+        pcCalories.startAnimation();
+        pcProteins.startAnimation();
+        pcFats.startAnimation();
+
+        setCustomNetworkConnectionReceiver();
+    }
+
+    public void handleNetworkConnection(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if(networkInfo != null && networkInfo.isConnected()){
+            FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+            DatabaseReference databaseReference = firebaseDatabase.getReference("users");
+
+            if(!User.getCurrentUser().hasPreviousPlans()){
+                databaseReference.child(User.getCurrentUser().getUsername()).child("previousPlans").get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+                    @Override
+                    public void onSuccess(DataSnapshot dataSnapshot) {
+                        ArrayList<Plan> previousPlans = new ArrayList<>();
+
+                        for(DataSnapshot previousPlan : dataSnapshot.getChildren())
+                            previousPlans.add(new Plan(previousPlan, Plan.PREVIOUS_PLANS));
+
+                        User.getCurrentUser().setPreviousPlans(previousPlans);
+
+                        updatePieCharts();
+
+                        tvInternetMessage.setVisibility(View.VISIBLE);
+                        tvNoInternetMessage.setVisibility(View.GONE);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        tvNoInternetMessage.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        }
+        else {
+            if(!User.getCurrentUser().hasPreviousPlans())
+                tvNoInternetMessage.setVisibility(View.VISIBLE);
+        }
     }
 
     public void updatePieCharts(){
@@ -102,22 +151,20 @@ public class StatisticsFragment extends Fragment implements View.OnClickListener
             plan = User.getCurrentUser().getCurrentPlan();
             dailyMenu = DailyMenu.getTodayMenuFromAllDailyMenus(currentDate);
 
-            tvPlanDates.setVisibility(View.INVISIBLE);
-            btChangeAccordingToPlanType.setVisibility(View.GONE);
-            tvNoInternetMessage.setVisibility(View.GONE);
+            tvInternetMessage.setText("Menu and Plan are about: Today");
+            tvNoInternetMessage.setVisibility(View.VISIBLE);
         }
         else{
             dailyMenu = DailyMenu.getTodayMenu();
             plan = Plan.receivePlanFromDate(dailyMenu.getDate());
 
             if(dailyMenu.getDate().equals(currentDate))
-                tvPlanDates.setText("Menu and Plan are about: Today");
+                tvInternetMessage.setText("Menu and Plan are about: Today");
             else
-                tvPlanDates.setText("Menu and Plan are about: " + dailyMenu.getDate());
+                tvInternetMessage.setText("Menu and Plan are about: " + dailyMenu.getDate());
 
-            tvPlanDates.setVisibility(View.VISIBLE);
-            btChangeAccordingToPlanType.setVisibility(View.VISIBLE);
-            tvNoInternetMessage.setVisibility(View.GONE);
+            tvInternetMessage.setVisibility(View.VISIBLE);
+            tvNoInternetMessage.setVisibility(View.INVISIBLE);
         }
 
         tvShowGoal.setText("Your goal is: " + plan.getGoal());
@@ -159,8 +206,6 @@ public class StatisticsFragment extends Fragment implements View.OnClickListener
         pcCalories.addPieSlice(new PieModel("Calories ate", caloriesLeftPercentage, caloriesColorProgress));
         pcCalories.addPieSlice(new PieModel("Calories left", 100 - caloriesLeftPercentage, caloriesColorHaveLeft));
 
-        pcCalories.startAnimation();
-
 
         // Proteins:
         tvTargetProteinsAtPlan.setText("Target: " + plan.getTargetProteins());
@@ -195,8 +240,6 @@ public class StatisticsFragment extends Fragment implements View.OnClickListener
         pcProteins.addPieSlice(new PieModel("Proteins ate", proteinsLeftPercentage, proteinsColorProgress));
         pcProteins.addPieSlice(new PieModel("Proteins left", 100 - proteinsLeftPercentage, proteinsColorHaveLeft));
 
-        pcProteins.startAnimation();
-
 
         // Fats:
         tvTargetFatsAtPlan.setText("Target: " + plan.getTargetFats());
@@ -230,15 +273,35 @@ public class StatisticsFragment extends Fragment implements View.OnClickListener
 
         pcFats.addPieSlice(new PieModel("Fats ate", fatsLeftPercentage, fatsColorProgress));
         pcFats.addPieSlice(new PieModel("Fats left", 100 - fatsLeftPercentage, fatsColorHaveLeft));
+    }
 
-        pcFats.startAnimation();
+    public void setCustomNetworkConnectionReceiver() {
+        networkConnectionReceiver = new NetworkConnectionReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (isOnline(context))
+                    handleNetworkConnection();
+            }
+        };
     }
 
     @Override
-    public void onClick(View v) {
-        int viewId = v.getId();
+    public void onResume() {
+        super.onResume();
 
-//        if(viewId == btChangePlanDate.getId())
-//            showDatePickerForChoosingPlanDate();
+        IntentFilter networkConnectionFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(networkConnectionReceiver, networkConnectionFilter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        try {
+            getActivity().unregisterReceiver(networkConnectionReceiver);
+        }
+        catch (IllegalArgumentException e) {
+            e.getStackTrace();
+        }
     }
 }

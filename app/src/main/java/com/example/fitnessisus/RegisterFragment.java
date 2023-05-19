@@ -143,12 +143,12 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     public boolean passUserInfoTests(){
         boolean passTests = true;
 
-        if(etGetUsername.getText().toString().replaceAll(" ", "").equals("") && passTests){
+        if(etGetUsername.getText().toString().replaceAll(" ", "").equals("")){
             Toast.makeText(getActivity(), "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
             passTests = false;
         }
         else{
-            if(isUserAlreadyExistsInFirebase(etGetUsername.getText().toString()) && passTests){
+            if(isUserAlreadyExistsInFirebase(etGetUsername.getText().toString())){
                 Toast.makeText(getActivity(), "Username already exists.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }
@@ -163,6 +163,11 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                 Toast.makeText(getActivity(), "Password should be at least 4 characters wide.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }
+
+            if(etGetPassword.getText().toString().length() > 16 && passTests){
+                Toast.makeText(getActivity(), "Password should be at most 16 characters wide.", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
         }
 
         if(etGetEmail.getText().toString().replaceAll(" ", "").equals("") && passTests) {
@@ -172,6 +177,11 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         else{
             if(!etGetEmail.getText().toString().contains("@") && passTests){
                 Toast.makeText(getActivity(), "Email address should have @ in them.", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
+
+            if(!etGetEmail.getText().toString().contains(".") && passTests){
+                Toast.makeText(getActivity(), "Email address should have . in them.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }
         }

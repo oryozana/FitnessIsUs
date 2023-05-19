@@ -3,14 +3,8 @@ package com.example.fitnessisus;
 import java.util.ArrayList;
 
 public class FirebaseMeal {
-    private ArrayList<FirebaseIngredient> neededIngredientsForMeal = new ArrayList<FirebaseIngredient>();
+    private final ArrayList<FirebaseIngredient> neededIngredientsForMeal = new ArrayList<FirebaseIngredient>();
     private String name;
-
-    public FirebaseMeal(String name, ArrayList<Ingredient> ingredientsNeeded){
-        this.name = User.getCurrentUser().getUsername() + " - " + name;
-        for(int i = 0; i < ingredientsNeeded.size(); i++)
-            this.neededIngredientsForMeal.add(new FirebaseIngredient(ingredientsNeeded.get(i)));
-    }
 
     public FirebaseMeal(Meal meal){
         this.name = User.getCurrentUser().getUsername() + " - " + meal.getName();
@@ -28,9 +22,5 @@ public class FirebaseMeal {
 
     public ArrayList<FirebaseIngredient> getNeededIngredientsForMeal() {
         return this.neededIngredientsForMeal;
-    }
-
-    public void setNeededIngredientsForMeal(ArrayList<FirebaseIngredient> ingredientsNeeded){
-        this.neededIngredientsForMeal = ingredientsNeeded;
     }
 }
