@@ -167,7 +167,15 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
             }
         });
 
-        lvCustomMealIngredients.setOnItemLongClickListener(null);
+        lvCustomMealIngredients.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Ingredient selectedItem = (Ingredient) parent.getItemAtPosition(position);
+
+                removeIngredientFromCustomMealAlertDialog(selectedItem);
+                return true;
+            }
+        });
     }
 
     public void switchBetweenCustomMealsAndCustomSelection(){
@@ -822,6 +830,35 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
             }
         });
 
+        ad.show();
+    }
+
+    public void removeIngredientFromCustomMealAlertDialog(Ingredient ingredient){
+        AlertDialog ad;
+        AlertDialog.Builder adb;
+        adb = new AlertDialog.Builder(getActivity());
+        adb.setTitle("What do you want to do?");
+        adb.setMessage("You choose the ingredient: " + ingredient.getName());
+        adb.setIcon(R.drawable.ic_delete_icon);
+        adb.setCancelable(true);
+
+        adb.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Toast.makeText(getActivity(), ingredient.getName() + " deleted successfully.", Toast.LENGTH_SHORT).show();
+                DailyMenu.getCustomMeal().removeNeededIngredientForMeal(ingredient);
+                customMealIngredientsAdapter.notifyDataSetChanged();
+            }
+        });
+
+        adb.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        ad = adb.create();
         ad.show();
     }
 

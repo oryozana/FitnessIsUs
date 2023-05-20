@@ -69,7 +69,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
 
     boolean internetConnection = true, isChoosingProfilePicture = false;
     FileAndDatabaseHelper fileAndDatabaseHelper;
-    Song activeSong = Song.getSongs().get(0);
+    Song activeSong;
     User user = User.getCurrentUser();
 
     FirebaseDatabase usersDb;

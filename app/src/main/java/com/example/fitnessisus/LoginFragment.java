@@ -239,7 +239,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
 
         if(passTests){
             forgotUser.setPassword(newPassword);
-            updateUserPasswordInFirebaseAndInFile(newPassword);
+            updateUserPasswordInFirebaseAndInFile();
         }
         else{
             loginLoadingLinearLayout.setVisibility(View.GONE);
@@ -263,19 +263,27 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         return passTests;
     }
 
-    public void updateUserPasswordInFirebaseAndInFile(String newPassword){
+    public void updateUserPasswordInFirebaseAndInFile(){
         usersDb = FirebaseDatabase.getInstance();
         databaseReference = usersDb.getReference("users");
-        databaseReference.child(forgotUser.getUsername()).setValue(forgotUser).addOnCompleteListener(new OnCompleteListener<Void>() {
+        Toast.makeText(getActivity(), forgotUser + "", Toast.LENGTH_SHORT).show();
+        databaseReference.child(forgotUser.getUsername()).child("password").setValue(forgotUser.getPassword()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                User.setCurrentUser(forgotUser);
+                if(task.isSuccessful()){
+                    User.setCurrentUser(forgotUser);
 
-                if(fileAndDatabaseHelper.getPrimaryUser().getUsername().equals(forgotUser.getUsername()))
-                    fileAndDatabaseHelper.updatePrimaryUserPassword(newPassword);
+                    if(fileAndDatabaseHelper.hasPrimaryUser()){
+                        if(fileAndDatabaseHelper.getPrimaryUser().getUsername().equals(forgotUser.getUsername()))
+                            fileAndDatabaseHelper.updatePrimaryUserPassword(forgotUser.getPassword());
+                    }
 
-                me.setClass(getActivity(), MainActivity.class);
-                startActivity(me);
+                    me.setClass(getActivity(), MainActivity.class);
+                    me.putExtra("cameFromLogin", true);
+                    startActivity(me);
+                }
+                else
+                    Toast.makeText(getActivity(), "Failed to change password.", Toast.LENGTH_SHORT).show();
             }
         });
     }
