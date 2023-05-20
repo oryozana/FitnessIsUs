@@ -111,8 +111,9 @@ public class DailyMenu {
         return message;
     }
 
-    public String generateEmptyDailyMenuDescriptionForFiles(){
-        return "       DailyMenu { breakfast ( null ) lunch ( null ) dinner ( null ) date: " + this.date + " }";
+    public static String generateEmptyDailyMenuDescriptionForFiles(){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
+        return "       DailyMenu { breakfast ( null ) lunch ( null ) dinner ( null ) date: " + dtf.format(LocalDateTime.now()) + " }";
     }
 
     public static DailyMenu generateDailyMenuObjectFromFile(String data){

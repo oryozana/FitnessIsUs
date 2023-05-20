@@ -17,7 +17,7 @@ public class User implements Serializable {
     private final double startingWeight;
     private double weight;
     private Plan currentPlan;
-    private ArrayList<Plan> previousPlans = new ArrayList<Plan>();
+    private ArrayList<Plan> previousPlans;
     private String userDailyMenus;
     private int profilePictureId;
 
@@ -26,8 +26,10 @@ public class User implements Serializable {
         this.password = String.valueOf(dataSnapshot.child("password").getValue());
 
         this.currentPlan = new Plan(dataSnapshot.child("currentPlan"), Plan.CURRENT_PLAN);
+
+        this.previousPlans = new ArrayList<Plan>();
         for(DataSnapshot planInfo : dataSnapshot.child("previousPlans").getChildren())
-            previousPlans.add(new Plan(planInfo, Plan.PREVIOUS_PLANS));
+            this.previousPlans.add(new Plan(planInfo, Plan.PREVIOUS_PLANS));
 
         this.email = String.valueOf(dataSnapshot.child("email").getValue());
         this.startingWeight = Double.parseDouble(String.valueOf(dataSnapshot.child("startingWeight").getValue()));
@@ -60,6 +62,7 @@ public class User implements Serializable {
     }
 
     public void generatePreviousPlans(DataSnapshot dataSnapshot) {
+        this.previousPlans = new ArrayList<Plan>();
         for(DataSnapshot planInfo : dataSnapshot.getChildren())
             this.previousPlans.add(new Plan(planInfo, Plan.PREVIOUS_PLANS));
     }
@@ -110,7 +113,7 @@ public class User implements Serializable {
     }
 
     public boolean hasPreviousPlans(){
-        return previousPlans.size() != 0;
+        return previousPlans != null;
     }
 
     public int getProfilePictureId() {

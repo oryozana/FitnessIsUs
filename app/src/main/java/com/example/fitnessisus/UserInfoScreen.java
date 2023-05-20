@@ -437,7 +437,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         RadioGroup rgChooseGender = (RadioGroup) customAlertDialog.findViewById(R.id.rgChooseGender);
         Button btGeneratePlans = (Button) customAlertDialog.findViewById(R.id.btGeneratePlans);
 
-        ArrayAdapter<String> alertDialogAdapter = new ArrayAdapter<String>(UserInfoScreen.this, android.R.layout.simple_spinner_dropdown_item, Plan.getActiveLevelOptions());
+        ArrayAdapter<String> alertDialogAdapter = new ArrayAdapter<String>(UserInfoScreen.this, android.R.layout.simple_spinner_dropdown_item, Plan.activeLevelOptions);
         sHowActiveAreYou.setAdapter(alertDialogAdapter);
 
         LinearLayout showPlansLinearLayout = (LinearLayout) customAlertDialog.findViewById(R.id.showPlansLinearLayout);

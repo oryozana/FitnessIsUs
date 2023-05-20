@@ -115,7 +115,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
             double startingWeight = Double.parseDouble(etGetStartingWeight.getText().toString());
 
             int profilePictureId = getResources().getIdentifier("user_picture_" + (((int)(Math.random() * userPicturesAmount)) + 1), "drawable", getActivity().getPackageName());
-            User user = new User(username, password, email, startingWeight, userPlan, profilePictureId, DailyMenu.getTodayMenu().generateEmptyDailyMenuDescriptionForFiles());
+            User user = new User(username, password, email, startingWeight, userPlan, profilePictureId, DailyMenu.generateEmptyDailyMenuDescriptionForFiles());
 
             linearLayout.setVisibility(View.GONE);
             registerLoadingLinearLayout.setVisibility(View.VISIBLE);
@@ -130,14 +130,24 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         databaseReference.child(user.getUsername()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(cbRememberRegisteredUserInLocalDatabase.isChecked())
-                    fileAndDatabaseHelper.setPrimaryUser(user);
+                if(task.isSuccessful()){
+                    Toast.makeText(getActivity(), "User successfully created.", Toast.LENGTH_SHORT).show();
 
-                User.setCurrentUser(user);
-                Toast.makeText(getActivity(), "User successfully created.", Toast.LENGTH_SHORT).show();
+                    fileAndDatabaseHelper.removePrimaryUser();
+                    if(cbRememberRegisteredUserInLocalDatabase.isChecked())
+                        fileAndDatabaseHelper.setPrimaryUser(user);
 
-                me.setClass(getActivity(), MainActivity.class);
-                startActivity(me);
+                    User.setCurrentUser(user);
+                    DailyMenu.restartDailyMenusFile(getActivity());
+                    DailyMenu.setTodayMenu(null);
+                    DailyMenu.setDailyMenus(getActivity());
+                    DailyMenu.saveDailyMenuIntoFile(DailyMenu.generateDailyMenuObjectFromFile(DailyMenu.generateEmptyDailyMenuDescriptionForFiles()), getActivity());
+
+                    me.setClass(getActivity(), MainActivity.class);
+                    startActivity(me);
+                }
+                else
+                    Toast.makeText(getActivity(), "Failed to create user, please try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -289,7 +299,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         RadioGroup rgChooseGender = (RadioGroup) customAlertDialog.findViewById(R.id.rgChooseGender);
         Button btGeneratePlans = (Button) customAlertDialog.findViewById(R.id.btGeneratePlans);
 
-        ArrayAdapter<String> alertDialogAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, Plan.getActiveLevelOptions());
+        ArrayAdapter<String> alertDialogAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_dropdown_item, Plan.activeLevelOptions);
         sHowActiveAreYou.setAdapter(alertDialogAdapter);
 
         LinearLayout showPlansLinearLayout = (LinearLayout) customAlertDialog.findViewById(R.id.showPlansLinearLayout);

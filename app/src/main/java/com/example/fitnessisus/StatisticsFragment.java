@@ -120,13 +120,7 @@ public class StatisticsFragment extends Fragment {
                 databaseReference.child(User.getCurrentUser().getUsername()).child("previousPlans").get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                     @Override
                     public void onSuccess(DataSnapshot dataSnapshot) {
-                        ArrayList<Plan> previousPlans = new ArrayList<>();
-
-                        for(DataSnapshot previousPlan : dataSnapshot.getChildren())
-                            previousPlans.add(new Plan(previousPlan, Plan.PREVIOUS_PLANS));
-
-                        User.getCurrentUser().setPreviousPlans(previousPlans);
-
+                        User.getCurrentUser().generatePreviousPlans(dataSnapshot);
                         updatePieCharts();
 
                         tvInternetMessage.setVisibility(View.VISIBLE);
