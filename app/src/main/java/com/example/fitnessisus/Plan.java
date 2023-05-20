@@ -1,15 +1,12 @@
 package com.example.fitnessisus;
 
-import android.util.Log;
-
 import com.google.firebase.database.DataSnapshot;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class Plan implements Serializable {
+public class Plan {
     public static final String[] activeLevelOptions = new String[]{"Sedentary", "Lightly active", "Moderately active", "Very active", "Extra active"};
     public static final int CURRENT_PLAN = 0, PREVIOUS_PLANS = 1;
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");

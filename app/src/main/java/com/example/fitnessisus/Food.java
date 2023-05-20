@@ -1,8 +1,6 @@
 package com.example.fitnessisus;
 
-import java.io.Serializable;
-
-public class Food implements Serializable {
+public class Food {
     protected String name;
     protected double grams = 0;
     protected double proteins = 0;

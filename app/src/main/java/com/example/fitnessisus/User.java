@@ -4,12 +4,11 @@ import android.content.Context;
 
 import com.google.firebase.database.DataSnapshot;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class User implements Serializable {
+public class User {
     private static User currentUser;
     private final String username;
     private String password;
