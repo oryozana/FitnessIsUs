@@ -178,7 +178,7 @@ public class LoginAndRegister extends AppCompatActivity {
         super.onPostResume();
         videoView.resume();
         if(!me.getBooleanExtra("useVideos", true)){
-            videoView.setBackground(getDrawable(R.drawable.world_saved_custom_meals_background));
+            videoView.setBackground(getDrawable(R.drawable.login_and_register_background));
             videoView.stopPlayback();
         }
         else

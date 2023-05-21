@@ -160,7 +160,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                             if(task.isSuccessful()){
                                 if(task.getResult().exists()){
                                     DataSnapshot dataSnapshot = task.getResult();
-                                    String username = dataSnapshot.getKey();
                                     String email = String.valueOf(dataSnapshot.child("email").getValue());
 
                                     String enteredEmail = etGetEmailForgot.getText().toString();
