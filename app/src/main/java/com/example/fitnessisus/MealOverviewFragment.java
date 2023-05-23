@@ -28,7 +28,6 @@ public class MealOverviewFragment extends Fragment implements View.OnClickListen
     MainActivity.UploadInfoTask uploadInfoTask;
 
     private final String fromWhere;
-    private final Meal meal;
     private final Meal tmpMeal;
 
     LinearLayout mealOverviewMealSelectorLinearLayout;
@@ -53,20 +52,17 @@ public class MealOverviewFragment extends Fragment implements View.OnClickListen
     public MealOverviewFragment(String fromWhere, Meal meal){
         this.fromWhere = fromWhere;
         this.tmpMeal = new Meal(meal.getName(), meal.getNeededIngredientsForMeal2());
-        this.meal = meal;
     }
 
     public MealOverviewFragment(Meal meal, String mealType){
         fromWhere = "HomeFragment";
         this.mealType = mealType;
         this.tmpMeal = new Meal(meal.getName(), meal.getNeededIngredientsForMeal2());
-        this.meal = meal;
     }
 
     public MealOverviewFragment(Meal customMeal){
         fromWhere = "CustomMealsFragment";
         this.tmpMeal = new Meal(customMeal.getName(), customMeal.getNeededIngredientsForMeal2());
-        this.meal = customMeal;
         actNormal = false;
     }
 

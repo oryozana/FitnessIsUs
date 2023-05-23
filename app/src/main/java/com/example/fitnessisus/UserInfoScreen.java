@@ -75,7 +75,6 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
     FirebaseDatabase usersDb;
     DatabaseReference databaseReference;
 
-    Intent exitAppService;
     Intent me;
 
     @Override
@@ -699,7 +698,13 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
     }
 
     public void setCustomNetworkConnectionReceiver(){
-        unregisterRegisteredReceiver();
+        try{
+            unregisterReceiver(networkConnectionReceiver);
+        }
+        catch (IllegalArgumentException e){
+            e.getStackTrace();
+        }
+
         networkConnectionReceiver = null;
         networkConnectionReceiver = new NetworkConnectionReceiver() {
             @Override
@@ -722,19 +727,6 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
                 }
             }
         };
-        registerUnregisteredReceiver();
-    }
-
-    public void unregisterRegisteredReceiver(){
-        try{
-            unregisterReceiver(networkConnectionReceiver);
-        }
-        catch (IllegalArgumentException e){
-            e.getStackTrace();
-        }
-    }
-
-    public void registerUnregisteredReceiver(){
         IntentFilter networkConnectionFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(networkConnectionReceiver, networkConnectionFilter);
     }
@@ -807,7 +799,8 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onResume() {
         super.onResume();
-        registerUnregisteredReceiver();
+        IntentFilter networkConnectionFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkConnectionReceiver, networkConnectionFilter);
         mediaPlayer.start();
         if(!me.getBooleanExtra("playMusic", true)){
             mediaPlayer.stop();
@@ -816,7 +809,13 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onPause() {
-        unregisterRegisteredReceiver();
+        try{
+            unregisterReceiver(networkConnectionReceiver);
+        }
+        catch (IllegalArgumentException e){
+            e.getStackTrace();
+        }
+
         videoView.suspend();
         mediaPlayer.pause();
         super.onPause();
@@ -827,7 +826,6 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         videoView.stopPlayback();
         mediaPlayer.stop();
         mediaPlayer.release();
-        startService(exitAppService);
         super.onDestroy();
     }
 

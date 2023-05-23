@@ -54,14 +54,9 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
 
     Intent me;
 
-    public RegisterFragment() {
-
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override

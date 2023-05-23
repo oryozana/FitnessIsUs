@@ -98,7 +98,6 @@ public class MusicMaster extends AppCompatActivity implements View.OnClickListen
     public void shuffleStatusChange() {
         if(btShuffleMusicMaster.getText().toString().equals("Enable shuffle")){
             btShuffleMusicMaster.setText("Disable shuffle");
-            // activeSong = fileAndDatabaseHelper.getActiveSongAndShuffleIfNeedTo();
 
             Song.getSongs().get(((int)(Math.random() * Song.getSongs().size()))).playSong();
             activeSong = Song.getActiveSong();
