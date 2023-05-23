@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
                 fileAndDatabaseHelper.firstInitiateSettings();
                 fileAndDatabaseHelper.implementSettingsData();
                 firstInitiateCustomMealsNamesFile();
-                firstInitiateLocalUsersDatabase();
+                firstInitiateIngredientsDatabase();
                 firstInitiateDailyMenusFile();
                 firstInitiatePrimaryUser();
                 firstInitiateWeather();
@@ -469,7 +469,7 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences.edit().putString("DateOfUpdate: ", "").apply();
     }
 
-    public void firstInitiateLocalUsersDatabase() {
+    public void firstInitiateIngredientsDatabase() {
         my_db = new DBHelper(this);
         sqdb = my_db.getWritableDatabase();
         sqdb.close();

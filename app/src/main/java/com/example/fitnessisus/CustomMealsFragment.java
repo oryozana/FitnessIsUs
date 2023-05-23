@@ -735,13 +735,12 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
         btSaveCodeMeal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(checkIfCustomMealNameAlreadyExists(codeMeal.getName())){
+                if (checkIfCustomMealNameAlreadyExists(codeMeal.getName())) {
                     whatToDoWithCodeMealLinearLayout.setVisibility(View.GONE);
                     anotherCustomMealExistsLinearLayout.setVisibility(View.VISIBLE);
-                }
-                else{
+                } else {
                     String[] savedCustomMealsNames = getSavedCustomMealsNames();
-                    if(savedCustomMealsNames.length == 1)
+                    if (savedCustomMealsNames.length == 1)
                         switchBetweenCustomMealsAndCustomSelection();
 
                     saveCodeMealInAFile();
@@ -801,11 +800,14 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
             @Override
             public void onClick(View v) {
                 String tmpMealName = etCodeMealRename.getText().toString();
-
                 if(!tmpMealName.replaceAll(" ", "").equals("")){
-                    if(checkIfCustomMealNameAlreadyExists(tmpMealName)){
-                        Toast.makeText(getActivity(), "This name belong to another meal.", Toast.LENGTH_SHORT).show();
-                        tvShowRenameAttempt.setText("The name: " + tmpMealName + " already exists.");
+                    if(!tmpMealName.matches(pattern)) {
+                        if(checkIfCustomMealNameAlreadyExists(tmpMealName)) {
+                            Toast.makeText(getActivity(), "This name belong to another meal.", Toast.LENGTH_SHORT).show();
+                            tvShowRenameAttempt.setText("The name: " + tmpMealName + " already exists.");
+                        }
+                        else
+                            Toast.makeText(getActivity(), "Name must contains letters and numbers only.", Toast.LENGTH_SHORT).show();
                     }
                     else{
                         Toast.makeText(getActivity(), "Rename went successfully.", Toast.LENGTH_SHORT).show();

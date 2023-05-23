@@ -1,0 +1,766 @@
+@startuml
+class com.example.fitnessisus.Food {
+# String name
+# double grams
+# double proteins
+# double fats
+# double calories
++ String getName()
++ void setName(String)
++ double getGrams()
++ void setGrams(double)
++ void roundValues()
++ double getProteins()
++ void setProteins(double)
++ double getFats()
++ void setFats(double)
++ double getCalories()
++ void setCalories(double)
++ String toString()
+}
+class com.example.fitnessisus.DBHelper {
+- {static} String DATABASE_NAME
+- {static} int DATABASE_VERSION
++ {static} String TABLE_NAME
++ {static} String INGREDIENT_NAME
++ {static} String PROTEINS
++ {static} String FATS
++ {static} String CALORIES
++ {static} String INGREDIENT_PICTURE_ID
+~ String SQL_Create
+~ String SQL_Delete
++ void onCreate(SQLiteDatabase)
++ void onUpgrade(SQLiteDatabase,int,int)
+}
+class com.example.fitnessisus.UserInfoScreen {
+- NetworkConnectionReceiver networkConnectionReceiver
+- MediaPlayer mediaPlayer
+- VideoView videoView
+~ EditText etGetNewTargetCalories
+~ Button btSetPrimaryUser
+~ Button btSendToProfilePictureSelection
+~ Button btGetHelpCreatingANewPlan
+~ EditText etGetOldPassword
+~ TextView tvUsernameDisplay
+~ ImageView ivProfilePicture
+~ LinearLayout linearLayout
+~ Plan currentGeneratedPlan
+~ int currentPlanIndex
+~ String chosenGoal
+~ TextView tvPictureNumberOutOf
+~ Button btChoseProfilePicture
+~ LinearLayout profilePictureSelectionLinearLayout
+~ ImageButton ibtPreviousPicture
+~ ImageView ivProfilePictureSelector
+~ int currentPictureIndex
+~ boolean internetConnection
+~ FileAndDatabaseHelper fileAndDatabaseHelper
+~ Song activeSong
+~ User user
+~ FirebaseDatabase usersDb
+~ DatabaseReference databaseReference
+~ Intent exitAppService
+~ Intent me
+# void onCreate(Bundle)
++ void switchBetweenProfilePictureSelectionAndUserInfoScreen()
++ void setImageBasedOnIndex()
++ void previousPicture()
++ void nextPicture()
++ void profilePictureSelected()
++ void updateUserProfilePictureIdInFirebaseAndPrimaryUser(User)
++ void changePassword()
++ boolean passChangePasswordTests()
++ void updateUserPasswordInFirebaseAndInPrimaryUser(User)
++ void updatePlan()
++ boolean passUpdatePlanTests()
++ void updateUserPlanInFirebaseAndInPrimaryUser(String,Plan,Plan)
++ void generatePlanAlertDialog()
++ boolean passAlertDialogInfoTests(String,String,String,String)
++ void deleteUserAlertDialog()
++ void setPrimaryUser()
++ void removePrimaryUser()
++ void deleteUser()
++ void logoutUser()
++ void setCustomNetworkConnectionReceiver()
++ void unregisterRegisteredReceiver()
++ void registerUnregisteredReceiver()
++ void initiateVideoPlayer()
++ void initiateMediaPlayer()
++ boolean onCreateOptionsMenu(Menu)
++ boolean onOptionsItemSelected(MenuItem)
+# void onPostResume()
+# void onRestart()
+# void onResume()
+# void onPause()
+# void onDestroy()
++ void onClick(View)
++ void onBackPressed()
+}
+class com.example.fitnessisus.MainActivity {
+~ NetworkConnectionReceiver networkConnectionReceiver
+~ boolean isInternetConnectionAvailable
+~ UploadInfoTask uploadInfoTask
+- TextClock textClock
+~ RelativeLayout weatherLayout
+~ TextView tvCityName
+~ String response
+~ BottomNavigationView bottomNavigationView
+~ HomeFragment homeFragment
+~ FoodSelectionFragment foodSelectionFragment
+~ CustomMealsFragment customMealsFragment
+~ StatisticsFragment statisticsFragment
+- VideoView videoView
+- MediaPlayer mediaPlayer
+~ FileAndDatabaseHelper fADHelper
+~ DailyMenu todayMenu
+~ Song activeSong
+~ FileOutputStream fos
+~ OutputStreamWriter osw
+~ BufferedWriter bw
+~ String currentDate
+~ int currentHour
+~ SQLiteDatabase sqdb
+~ DBHelper my_db
+~ Intent me
+# void onCreate(Bundle)
++ Intent createTheFirstIntent(Intent)
++ void setAvailableWeatherInfo()
++ void initiateVideoPlayer()
++ void initiateMediaPlayer()
++ void setCustomNetworkConnectionReceiver()
+# void onPostResume()
+# void onResume()
+# void onPause()
+# void onDestroy()
++ boolean onCreateOptionsMenu(Menu)
++ boolean onOptionsItemSelected(MenuItem)
++ void firstInitiateCustomMealsNamesFile()
++ void firstInitiateDailyMenusFile()
++ void firstInitiatePrimaryUser()
++ void firstInitiateWeather()
++ void firstInitiateLocalUsersDatabase()
++ void updateWeatherInfo()
++ void onBackPressed()
+}
+class com.example.fitnessisus.MainActivity$UploadInfoTask {
+~ FirebaseDatabase usersDb
+~ DatabaseReference userReference
+~ Context context
+~ boolean isAlreadyRunning
+~ DailyMenu todayMenu
+# Void doInBackground(Void)
+# void onPreExecute()
++ void startUpdateDailyMenusPreparations(int)
++ void updateDailyMenusInFirebase(String,int)
+}
+class com.example.fitnessisus.MainActivity$WeatherTask {
+~ String weatherAPI
+~ String cityName
+# Void doInBackground(Void)
++ void getWeatherData()
+}
+class com.example.fitnessisus.FileAndDatabaseHelper {
+- {static} SQLiteDatabase sqdb
+- {static} DBHelper my_db
+- Context context
+- Intent me
++ String getFileData(String)
++ Song implementSettingsData()
++ void firstInitiateSettings()
++ void updateAppSettings(boolean[])
++ void updateSongSettings(String,boolean)
++ boolean isSettingsExist()
++ void saveRandomizeSongName()
++ boolean getPlayMusicStatus()
++ boolean getUseVideosStatus()
++ void setSendNotificationsStatus(boolean)
++ boolean getSendNotificationsStatus()
++ boolean getShowDigitalClockStatus()
++ Song getActiveSongAndShuffleIfNeedTo()
++ boolean hasCurrentActiveSong()
++ Song getCurrentActiveSong()
++ boolean getShuffleStatus()
++ void updateWeatherConditions(String,String,String,String,String)
++ void updateCityName(String)
++ boolean isNeedToUpdateWeather()
++ boolean hasWeatherConditions()
++ boolean hasCityName()
++ String getCityName()
++ String getForecast()
++ String getTemperature()
++ String getUpdatedAt()
++ String getDateOfUpdate()
++ void setPrimaryUser(User)
++ boolean hasPrimaryUser()
++ void updatePrimaryUserPassword(String)
++ void updatePrimaryUserPlan(Plan)
++ void updatePrimaryUserDailyMenus(String)
++ void updatePrimaryUserProfilePictureId(int)
++ User getPrimaryUser()
++ String getPrimaryUsername()
++ boolean checkIfPrimaryUserExist()
++ void removePrimaryUser()
++ void addIngredientIntoLocalDatabase(Ingredient)
++ ArrayList<Ingredient> getAllOfTheIngredients()
++ boolean isDatabaseEmpty()
+}
+class com.example.fitnessisus.FirebaseMeal {
+- ArrayList<FirebaseIngredient> neededIngredientsForMeal
+- String name
++ String getName()
++ void setName(String)
++ ArrayList<FirebaseIngredient> getNeededIngredientsForMeal()
+}
+class com.example.fitnessisus.IngredientListAdapter {
++ View getView(int,View,ViewGroup)
+}
+class com.example.fitnessisus.SendNotificationReceiver {
++ {static} String CHANNEL_1_ID
++ void onReceive(Context,Intent)
+- void buildAndSendNotification(Context,int,String,String)
+}
+class com.example.fitnessisus.FirebaseIngredient {
+- String name
+- double grams
++ double getGrams()
++ void setGrams(double)
++ String getName()
++ void setName(String)
+}
+class com.example.fitnessisus.MealCirclesListAdapter {
++ View getView(int,View,ViewGroup)
+}
+class com.example.fitnessisus.StatisticsFragment {
+~ NetworkConnectionReceiver networkConnectionReceiver
+~ TextView tvTargetCaloriesAtPlan
+~ TextView tvTargetProteinsAtPlan
+~ TextView tvTargetFatsAtPlan
+~ PieChart pcCalories
+~ int gray
+~ TextView tvShowGoal
+~ TextView tvInternetMessage
+~ DateTimeFormatter dtf
+~ LocalDateTime today
+~ String currentDate
+~ Plan plan
+~ DailyMenu dailyMenu
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
++ void handleNetworkConnection()
++ void updatePieCharts()
++ void setCustomNetworkConnectionReceiver()
++ void onResume()
++ void onPause()
+}
+class com.example.fitnessisus.FoodSelectionFragment {
+- NetworkConnectionReceiver networkConnectionReceiver
+~ MainActivity.UploadInfoTask uploadInfoTask
+~ CustomMealsFragment customMealsFragment
+~ MealOverviewFragment mealOverviewFragment
+~ LinearLayout linearLayout
+~ Button btSwitchBetweenLocalAndGlobalFood
+~ EditText etFilterFood
+~ ListView listView
+~ DailyMenu todayMenu
+~ ArrayList<Meal> internetMealsList
+~ MealListAdapter mealsAdapter
+~ ArrayList<Ingredient> ingredients
+~ IngredientListAdapter ingredientsAdapter
+~ boolean isOnLocalMode
+~ DatabaseReference databaseReference
+~ String cameFrom
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
++ void setIngredientListViewAdapters()
++ void setInternetListViewAdapter()
++ void initiateInternetListViewFields()
++ void recipesDatabaseNotFound()
++ void notEvenOneCustomMealAdded()
++ void ingredientOverviewAlertDialog(Ingredient)
++ void switchBetweenLocalAndGlobalFood()
++ void setCustomNetworkConnectionReceiver()
++ void onClick(View)
+}
+class com.example.fitnessisus.Plan {
++ {static} String[] activeLevelOptions
++ {static} int CURRENT_PLAN
+- {static} DateTimeFormatter dtf
+- String fromDate
+- String untilDate
+- double targetCalories
+- double targetProteins
+- double targetFats
+- String goal
++ {static} Plan receivePlanFromDate(String)
++ {static} boolean isTheSamePlan(Plan,Plan)
++ void roundValues()
++ String getFromDate()
++ void setFromDate(String)
++ String getUntilDate()
++ void setUntilDate(String)
++ void setUntilDateAsToday()
++ double getTargetCalories()
++ void setTargetCalories(double)
++ double getTargetProteins()
++ void setTargetProteins(double)
++ double getTargetFats()
++ void setTargetFats(double)
++ String getGoal()
++ void setGoal(String)
++ String toString()
+}
+class com.example.fitnessisus.LoginFragment {
+~ EditText etGetUsernameLoginInfo
+~ LinearLayout linearLayout
+~ CheckBox cbRememberLoggedUserInLocalDatabase
+~ TextView tvForgotPassword
+~ Button btLogin
+~ FileAndDatabaseHelper fileAndDatabaseHelper
+~ User forgotUser
+~ FirebaseDatabase usersDb
+~ DatabaseReference databaseReference
+~ Intent me
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
++ void getUserFromFirebaseDatabase(String,String)
++ void forgotPasswordAlertDialog()
++ void changePassword(String)
++ boolean passChangePasswordTests(String)
++ void updateUserPasswordInFirebaseAndInFile()
++ void onClick(View)
+}
+class com.example.fitnessisus.User {
+- {static} User currentUser
+- String username
+- String password
+- String email
+- double startingWeight
+- double weight
+- Plan currentPlan
+- ArrayList<Plan> previousPlans
+- String userDailyMenus
+- int profilePictureId
++ void generatePreviousPlans(DataSnapshot)
++ ArrayList<Plan> receivePreviousPlans()
++ String getUsername()
++ String getPassword()
++ void setPassword(String)
++ String getEmail()
++ double getStartingWeight()
++ double getWeight()
++ void setWeight(double)
++ Plan getCurrentPlan()
++ void setCurrentPlan(Plan)
++ void setPreviousPlans(ArrayList<Plan>)
++ boolean hasPreviousPlans()
++ int getProfilePictureId()
++ void setProfilePictureId(int)
++ {static} User getCurrentUser()
++ {static} void setCurrentUser(User)
++ String getUserDailyMenus()
++ void downloadUserDailyMenusFromTemporaryFile(Context)
++ void uploadUserDailyMenusIntoTemporaryFile(Context)
++ DailyMenu generateDailyMenuFromDescription(String)
++ String toString()
+}
+class com.example.fitnessisus.NetworkConnectionReceiver {
++ void onReceive(Context,Intent)
++ boolean isOnline(Context)
++ void noInternetAccess(Context)
+}
+class com.example.fitnessisus.Meal {
+- ArrayList<Ingredient> neededIngredientsForMeal
++ String generateMealDescriptionForFiles()
++ {static} Meal generateMealObjectFromFileDescription(String)
++ boolean canAddIngredient(Context,Ingredient)
++ void updateMealInfo()
++ ArrayList<Ingredient> getNeededIngredientsForMeal()
++ ArrayList<Ingredient> getNeededIngredientsForMeal2()
++ void addNeededIngredientForMeal(Context,Ingredient,String)
++ void removeNeededIngredientForMeal(Ingredient)
++ String toString()
+}
+class com.example.fitnessisus.Song {
+- {static} ArrayList<Song> songs
+- String name
+- boolean isPlaying
+- int id
++ void playSong()
++ void setAllSongSilence()
++ {static} int getActiveSongIndex()
++ {static} Song getActiveSong()
++ {static} Song getSongByName(String)
++ {static} ArrayList<Song> getSongs()
++ String getName()
++ int getId()
++ {static} void initiateSongs()
++ String toString()
+}
+class com.example.fitnessisus.HomeFragment {
+~ MainActivity.UploadInfoTask uploadInfoTask
+~ TextView tvTotalProteinsMain
+~ LinearLayout mainActivityLinearLayout
+~ MealOverviewFragment mealOverviewFragment
+~ MealCirclesListAdapter breakfastMealListAdapter
+~ ListView lvBreakfastMeals
+~ RelativeLayout changeTodayMenuLayout
+~ Button btSelectDailyMenuDate
+~ TextView tvDailyMenusDates
+~ DailyMenu todayMenu
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
++ void showDatePickerForChoosingTodayMenu()
++ void removeMealFromDailyMenuAlertDialog(Meal,String)
++ void onResume()
++ void updateMealsIfNeeded()
++ void onClick(View)
+}
+class com.example.fitnessisus.LoginAndRegister {
+- NetworkConnectionReceiver networkConnectionReceiver
+~ BottomNavigationView bottomNavigationView
+~ int notificationsPermissionId
+~ Calendar calendar
+- MediaPlayer mediaPlayer
+- VideoView videoView
+~ RegisterFragment registerFragment
+~ LoginFragment loginFragment
+~ Song activeSong
+~ Intent me
+# void onCreate(Bundle)
++ boolean isAlarmSet(int)
++ void initiateAlarms()
+- void createNotificationChannels()
++ void onRequestPermissionsResult(int,String[],int[])
++ void initiateVideoPlayer()
++ void initiateMediaPlayer()
+# void onPostResume()
+# void onRestart()
+# void onResume()
+# void onPause()
+# void onDestroy()
++ void onBackPressed()
+}
+class com.example.fitnessisus.RegisterFragment {
+~ EditText etGetUsername
+~ EditText etGetTargetCalories
+~ LinearLayout linearLayout
+~ CheckBox cbRememberRegisteredUserInLocalDatabase
+~ Button btRegister
+~ FileAndDatabaseHelper fileAndDatabaseHelper
+~ Plan currentGeneratedPlan
+~ int currentPlanIndex
+~ String chosenGoal
+~ ArrayList<String> usernamesList
+~ int userPicturesAmount
+~ FirebaseDatabase usersDb
+~ DatabaseReference databaseReference
+~ String pattern
+~ Intent me
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
++ void createUserAndUserPlan()
++ void saveUserInFirebaseAndAsPrimaryUserIfNeeded(User)
++ boolean passUserInfoTests()
++ boolean isUserAlreadyExistsInFirebase(String)
++ void getAllExistingUsernames()
++ void generatePlanAlertDialog()
++ boolean passAlertDialogInfoTests(String,String,String,String)
++ void onClick(View)
+}
+class com.example.fitnessisus.SettingsSetter {
+- VideoView videoView
+- MediaPlayer mediaPlayer
+~ RadioGroup rgPlayMusic
+~ RadioButton rbWeatherInfo
+~ Button btReturnToRecentActivity
+~ boolean playMusic
+~ boolean wantToSave
+~ boolean playMusicAtStart
+~ LinearLayout settingsSetterLinearLayout
+~ Song activeSong
+~ TextView tvCurrentSongName
+~ Calendar calendar
+~ {static} int[] requestsCodes
+~ FileAndDatabaseHelper fileAndDatabaseHelper
+~ Intent me
+# void onCreate(Bundle)
++ void notificationPermissionNotGranted()
+- void createNotificationChannels()
++ void initiateAlarms()
++ boolean isAlarmSet(int)
++ void cancelAlarms()
++ void setInitialChoices()
++ void saveSettings()
++ void getRadioGroupsOptionsSelected()
++ void goToMusicMaster()
++ void returnToRecentActivity()
++ void checkIfWantToSave()
++ void resetToPreviousSettings()
++ void getCapitalAlertDialog()
++ boolean onCreateOptionsMenu(Menu)
++ boolean onOptionsItemSelected(MenuItem)
++ void initiateVideoPlayer()
++ void initiateMediaPlayer()
+# void onPostResume()
+# void onRestart()
+# void onResume()
+# void onPause()
+# void onDestroy()
++ void onClick(View)
++ void onBackPressed()
+}
+class com.example.fitnessisus.MealOverviewFragment {
+~ MainActivity.UploadInfoTask uploadInfoTask
+- String fromWhere
+- Meal meal
+- Meal tmpMeal
+~ LinearLayout mealOverviewMealSelectorLinearLayout
+~ HomeFragment homeFragment
+~ FoodSelectionFragment foodSelectionFragment
+~ CustomMealsFragment customMealsFragment
+~ TextView tvMealOverviewMealName
+~ TextView tvMealOverviewMealCalories
+~ Button btMealOverviewConfirmMeal
+~ ListView lvMealOverviewIngredients
+~ IngredientListAdapter ingredientsAdapter
+~ Spinner sMealOverviewSelectMeal
+~ String mealType
+~ boolean actNormal
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
++ void setIngredientListViewAdapters()
++ void ingredientOverviewAlertDialog(Ingredient)
++ void addMealIntoTodayMenu()
++ void updateMeal()
++ void updateCustomMeal()
++ void exitMealOverview()
++ void onClick(View)
+}
+class com.example.fitnessisus.Ingredient {
+- {static} ArrayList<Ingredient> ingredients
+- int imgId
+- {static} Context context
++ String generateIngredientDescriptionForFiles()
++ {static} Ingredient generateIngredientObjectFromFileDescription(String)
++ {static} Ingredient getIngredientByName(String,double)
++ {static} Ingredient getIngredientByName(String)
++ int getImgId()
++ {static} ArrayList<Ingredient> getIngredientsList()
++ {static} void initiateIngredientList(Context)
++ void addGrams(double)
++ {static} void initiateIngredientsDatabase(Context)
++ String toString()
+}
+class com.example.fitnessisus.RecipeCode {
+~ String allLettersAndDigits
+~ int codeMaximumLength
+- String expirationTime
+- String code
+- FirebaseMeal firebaseMeal
++ String generateRandomCode()
++ String getCode()
++ String getExpirationTime()
++ FirebaseMeal getMeal()
++ void setMeal(FirebaseMeal)
+}
+class com.example.fitnessisus.MealListAdapter {
++ View getView(int,View,ViewGroup)
+}
+class com.example.fitnessisus.MusicMaster {
+- MediaPlayer mediaPlayer
+- VideoView videoView
+~ Button btFinishMusicMaster
+~ LinearLayout musicMasterLinearLayout
+~ RadioGroup rgMusicChose
+~ FileAndDatabaseHelper fileAndDatabaseHelper
+~ ArrayList<Song> songs
+~ Song activeSong
+~ Intent me
+# void onCreate(Bundle)
++ void getRadioGroupOptionSelected()
++ void initiateRadioButtons()
++ void shuffleStatusChange()
++ void finishMusicMaster()
++ void initiateVideoPlayer()
++ void initiateMediaPlayer()
++ void changeMediaPlayerSong()
++ boolean onCreateOptionsMenu(Menu)
++ boolean onOptionsItemSelected(MenuItem)
+- void resetToPreviousMusic()
+# void onPostResume()
+# void onRestart()
+# void onResume()
+# void onPause()
+# void onDestroy()
++ void onClick(View)
++ void onBackPressed()
+}
+class com.example.fitnessisus.CustomMealsFragment {
+~ NetworkConnectionReceiver networkConnectionReceiver
+~ MainActivity.UploadInfoTask uploadInfoTask
+~ Button btSendToCustomSelection
+~ LinearLayout customMealsAdditionsLinearLayout
+~ ListView lvCustomMealIngredients
+~ ImageButton ibtAddIngredient
+~ TextView tvCustomSelection
+~ EditText etCustomMeal
+~ IngredientListAdapter customMealIngredientsAdapter
+~ Meal customMeal
+~ ArrayList<Meal> customMealsList
+~ MealListAdapter customMealsAdapter
+~ String[] customMealsNames
+~ boolean isCustomSelection
+~ FileAndDatabaseHelper fileAndDatabaseHelper
+~ FoodSelectionFragment foodSelectionFragment
+~ MealOverviewFragment mealOverviewFragment
+~ FirebaseDatabase codesDb
+~ FirebaseDatabase recipesDb
+~ DatabaseReference databaseReference
+~ boolean internetConnection
+~ FileOutputStream fos
+~ OutputStreamWriter osw
+~ BufferedWriter bw
+~ String fileName
+~ String pattern
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
++ void onViewCreated(View,Bundle)
++ void setIngredientsAdapters()
++ void switchBetweenCustomMealsAndCustomSelection()
++ void initiateCustomMealsList()
++ ArrayList<Ingredient> getIngredientsFromFileByCustomMealName(String)
++ String getName(String)
++ double getGrams(String)
++ boolean checkIfAtLeastOneCustomMealAdded()
++ void notEvenOneCustomMealAdded()
++ void setMealsListViewAdapter()
++ void ingredientOverviewAlertDialog(Ingredient)
++ void customMealOptionsAlertDialog(Meal)
++ void useCodeAlertDialog()
++ void removeIngredientFromCustomMealAlertDialog(Ingredient)
++ boolean passCodeTests(String)
++ boolean checkIfCustomMealNameAlreadyExists(String)
++ void saveCustomMealInAFile()
++ void saveCodeMealInAFile()
++ void removeCustomMealFile(String)
++ String[] getSavedCustomMealsNames()
++ void removeSavedCustomMealName(String)
++ void saveAndClearCustomMeal()
++ boolean checkIfCustomMealIsOk()
++ void saveCustomMealNameInsideFile()
++ void saveCodeMealNameInsideFile()
++ void setCustomNetworkConnectionReceiver()
++ void onClick(View)
+}
+class com.example.fitnessisus.DailyMenu {
+- {static} ArrayList<DailyMenu> dailyMenus
+- boolean isNeedToBeSaved
+- {static} DailyMenu todayMenu
+- {static} Meal newCustomMeal
+- ArrayList<Food> breakfast
+- ArrayList<Food> lunch
+- ArrayList<Food> dinner
+- double totalProteins
+- double totalFats
+- double totalCalories
+- String date
++ {static} ArrayList<DailyMenu> getDailyMenus()
++ {static} void setDailyMenus(Context)
++ {static} DailyMenu getTodayMenu()
++ {static} void setTodayMenu(DailyMenu)
++ String generateDailyMenuDescriptionForFiles()
++ {static} String generateEmptyDailyMenuDescriptionForFiles()
++ {static} DailyMenu generateDailyMenuObjectFromFile(String)
++ {static} void restartDailyMenusFile(Context)
++ boolean isThereAtLeastOneThing()
+- void roundNutritionalValues()
+- void addFoodNutritionalValues(Food)
+- void subtractFoodNutritionalValues(Food)
++ ArrayList<Food> getBreakfast()
++ boolean hasBreakfast()
++ void addBreakfast(Food)
++ void removeBreakfast(Food)
++ ArrayList<Ingredient> generateBreakfastIngredientsArray()
++ ArrayList<Food> getLunch()
++ boolean hasLunch()
++ void addLunch(Food)
++ void removeLunch(Food)
++ ArrayList<Ingredient> generateLunchIngredientsArray()
++ ArrayList<Food> getDinner()
++ boolean hasDinner()
++ void addDinner(Food)
++ void removeDinner(Food)
++ ArrayList<Ingredient> generateDinnerIngredientsArray()
++ ArrayList<Meal> getBreakfastAsMealsTypeOnly()
++ ArrayList<Meal> getLunchAsMealsTypeOnly()
++ ArrayList<Meal> getDinnerAsMealsTypeOnly()
++ {static} void fillMissingDailyMenusDates(Context)
++ boolean canAddFood(Context,Food)
++ void addMealByMealName(Context,String,Meal)
++ void addIngredientByMealName(Context,String,Ingredient,int)
++ ArrayList<Ingredient> generateAllIngredientsNeededArrayList()
++ void replaceMeal(Meal,String)
++ void removeMeal(Meal,String)
++ void correctNutritiousValues()
++ {static} boolean hasTodayMenuInsideAllDailyMenus(String)
++ {static} DailyMenu getTodayMenuFromAllDailyMenus(String)
++ {static} void removeDailyMenuDuplications()
++ {static} void removeDailyMenuDuplicationsAndAddAnotherOne(DailyMenu)
++ {static} boolean hasCustomMeal()
++ {static} Meal getCustomMeal()
++ {static} void saveCustomMeal(Meal)
++ {static} void saveDailyMenuIntoFile(DailyMenu,Context)
++ {static} ArrayList<DailyMenu> getDailyMenusFromFile(Context)
++ {static} String getTheOldestDailyMenuDate()
++ boolean isNeedToBeSaved()
++ void setIsNeedToBeSaved(boolean)
++ double getTotalProteins()
++ double getTotalFats()
++ double getTotalCalories()
++ String getDate()
++ String toString()
+}
+
+
+android.database.sqlite.SQLiteOpenHelper <|-- com.example.fitnessisus.DBHelper
+com.example.fitnessisus.OnClickListener <|.. com.example.fitnessisus.UserInfoScreen
+androidx.appcompat.app.AppCompatActivity <|-- com.example.fitnessisus.UserInfoScreen
+androidx.appcompat.app.AppCompatActivity <|-- com.example.fitnessisus.MainActivity
+com.example.fitnessisus.MainActivity +.. com.example.fitnessisus.MainActivity$UploadInfoTask
+com.example.fitnessisus.AsyncTask <|-- com.example.fitnessisus.MainActivity$UploadInfoTask
+com.example.fitnessisus.MainActivity +.. com.example.fitnessisus.MainActivity$WeatherTask
+com.example.fitnessisus.AsyncTask <|-- com.example.fitnessisus.MainActivity$WeatherTask
+android.widget.ArrayAdapter <|-- com.example.fitnessisus.IngredientListAdapter
+android.content.BroadcastReceiver <|-- com.example.fitnessisus.SendNotificationReceiver
+android.widget.ArrayAdapter <|-- com.example.fitnessisus.MealCirclesListAdapter
+androidx.fragment.app.Fragment <|-- com.example.fitnessisus.StatisticsFragment
+com.example.fitnessisus.OnClickListener <|.. com.example.fitnessisus.FoodSelectionFragment
+androidx.fragment.app.Fragment <|-- com.example.fitnessisus.FoodSelectionFragment
+com.example.fitnessisus.OnClickListener <|.. com.example.fitnessisus.LoginFragment
+androidx.fragment.app.Fragment <|-- com.example.fitnessisus.LoginFragment
+android.content.BroadcastReceiver <|-- com.example.fitnessisus.NetworkConnectionReceiver
+com.example.fitnessisus.Food <|-- com.example.fitnessisus.Meal
+java.io.Serializable <|.. com.example.fitnessisus.Song
+androidx.appcompat.app.AppCompatActivity <|-- com.example.fitnessisus.Song
+com.example.fitnessisus.OnClickListener <|.. com.example.fitnessisus.HomeFragment
+androidx.fragment.app.Fragment <|-- com.example.fitnessisus.HomeFragment
+androidx.appcompat.app.AppCompatActivity <|-- com.example.fitnessisus.LoginAndRegister
+com.example.fitnessisus.OnClickListener <|.. com.example.fitnessisus.RegisterFragment
+androidx.fragment.app.Fragment <|-- com.example.fitnessisus.RegisterFragment
+com.example.fitnessisus.OnClickListener <|.. com.example.fitnessisus.SettingsSetter
+androidx.appcompat.app.AppCompatActivity <|-- com.example.fitnessisus.SettingsSetter
+com.example.fitnessisus.OnClickListener <|.. com.example.fitnessisus.MealOverviewFragment
+androidx.fragment.app.Fragment <|-- com.example.fitnessisus.MealOverviewFragment
+com.example.fitnessisus.Food <|-- com.example.fitnessisus.Ingredient
+android.widget.ArrayAdapter <|-- com.example.fitnessisus.MealListAdapter
+com.example.fitnessisus.OnClickListener <|.. com.example.fitnessisus.MusicMaster
+androidx.appcompat.app.AppCompatActivity <|-- com.example.fitnessisus.MusicMaster
+com.example.fitnessisus.OnClickListener <|.. com.example.fitnessisus.CustomMealsFragment
+androidx.fragment.app.Fragment <|-- com.example.fitnessisus.CustomMealsFragment
+@enduml
