@@ -100,7 +100,7 @@ public class Plan {
 
     public static Plan receivePlanFromDate(String date){
         ArrayList<Plan> previousPlans = User.getCurrentUser().receivePreviousPlans();
-        if(previousPlans != null){
+        if(previousPlans != null && !date.equals(dtf.format(LocalDateTime.now()))){
 
             int day = Integer.parseInt(date.split("_")[0]);
             int month = Integer.parseInt(date.split("_")[1]);
