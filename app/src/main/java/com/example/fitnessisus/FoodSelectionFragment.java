@@ -318,7 +318,7 @@ public class FoodSelectionFragment extends Fragment implements View.OnClickListe
                     passTests = false;
                 }
 
-                if(etAlertDialogIngredientGrams.getText().toString().equals("0") && passTests) {
+                if(etAlertDialogIngredientGrams.getText().toString().replaceAll("0", "").equals("") && passTests) {
                     Toast.makeText(getActivity(), "Must be more than 0 grams.", Toast.LENGTH_SHORT).show();
                     passTests = false;
                 }

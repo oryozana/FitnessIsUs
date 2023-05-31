@@ -44,6 +44,7 @@
             android:layout_height="wrap_content"
             android:hint="Enter here: "
             android:textSize="8pt"
+            android:textColorHint="@color/black"
             android:maxLength="4"
             android:textColor="@color/black"
             android:inputType="number" />

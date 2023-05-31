@@ -19,6 +19,8 @@
             android:layout_height="wrap_content"
             android:textSize="11pt"
             android:layout_marginBottom="10pt"
+            android:gravity="center"
+            android:textStyle="bold"
             android:text="Enter the needed information below to register: " />
 
         <EditText

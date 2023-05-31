@@ -19,6 +19,8 @@
             android:textSize="11pt"
             android:layout_marginTop="10pt"
             android:layout_marginBottom="10pt"
+            android:textStyle="bold"
+            android:gravity="center"
             android:text="Enter the needed information below to login: " />
 
         <EditText
@@ -49,10 +51,11 @@
             android:layout_width="150pt"
             android:layout_height="wrap_content"
             android:textSize="7pt"
-            android:textColor="#2b2fd4"
+            android:textColor="@color/normal_blue_color_for_views"
             android:gravity="start"
             android:layout_margin="2pt"
             android:clickable="true"
+            android:textStyle="bold"
             android:text="Forgot password?"/>
 
         <Button

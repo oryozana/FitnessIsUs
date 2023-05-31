@@ -46,6 +46,8 @@
             android:padding="10pt"
             android:text="Choose your custom meal, from the options below:"
             android:textSize="10pt"
+            android:gravity="center"
+            android:textColor="@color/white"
             android:visibility="gone" />
 
         <ListView
