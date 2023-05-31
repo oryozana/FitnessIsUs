@@ -50,7 +50,8 @@ public class DailyMenu {
         if(todayMenu == null) {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
             LocalDateTime today = LocalDateTime.now();
-            return new DailyMenu(dtf.format(today));
+
+            return DailyMenu.getTodayMenuFromAllDailyMenus(dtf.format(today));
         }
         return todayMenu;
     }
