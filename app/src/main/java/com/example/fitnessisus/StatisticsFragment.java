@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -120,16 +121,19 @@ public class StatisticsFragment extends Fragment {
                 databaseReference.child(User.getCurrentUser().getUsername()).child("previousPlans").get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
                     @Override
                     public void onSuccess(DataSnapshot dataSnapshot) {
-                        User.getCurrentUser().generatePreviousPlans(dataSnapshot);
-                        updatePieCharts();
+                        if(isAdded() && isVisible() && getUserVisibleHint()) {
+                            User.getCurrentUser().generatePreviousPlans(dataSnapshot);
+                            updatePieCharts();
 
-                        tvInternetMessage.setVisibility(View.VISIBLE);
-                        tvNoInternetMessage.setVisibility(View.GONE);
+                            tvInternetMessage.setVisibility(View.VISIBLE);
+                            tvNoInternetMessage.setVisibility(View.GONE);
+                        }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        tvNoInternetMessage.setVisibility(View.VISIBLE);
+                        if(isAdded() && isVisible() && getUserVisibleHint())
+                            tvNoInternetMessage.setVisibility(View.VISIBLE);
                     }
                 });
             }
@@ -171,14 +175,25 @@ public class StatisticsFragment extends Fragment {
         tvTargetCaloriesAtPlan.setText("Target: " + plan.getTargetCalories());
         tvTargetCaloriesAtDailyMenu.setText("You ate: " + dailyMenu.getTotalCalories());
 
-        int caloriesLeftPercentage = Math.toIntExact(Math.round((dailyMenu.getTotalCalories() / plan.getTargetCalories()) * 100));
+        int caloriesLeftPercentage;
+        if(dailyMenu.getTotalCalories() <= plan.getTargetCalories() * 100)
+            caloriesLeftPercentage = Math.toIntExact(Math.round((dailyMenu.getTotalCalories() / plan.getTargetCalories()) * 100));
+        else
+            caloriesLeftPercentage = 100 * 10 + 1;
+
         int overCaloriesPie = 1;
         while(caloriesLeftPercentage > 100){
-            overCaloriesPie++;
+            if(overCaloriesPie < 10)
+                overCaloriesPie++;
+
             caloriesLeftPercentage -= 100;
         }
 
-        tvCaloriesMultiplication.setText("X" + overCaloriesPie);
+        if(overCaloriesPie < 10)
+            tvCaloriesMultiplication.setText("X" + overCaloriesPie);
+        else
+            tvCaloriesMultiplication.setText("XXX");
+
 
         double caloriesHaveLeft = Math.round((plan.getTargetCalories() - dailyMenu.getTotalCalories()) * 1000) / 1000;
         int caloriesColorProgress, caloriesColorHaveLeft = gray;
@@ -205,14 +220,25 @@ public class StatisticsFragment extends Fragment {
         tvTargetProteinsAtPlan.setText("Target: " + plan.getTargetProteins());
         tvTargetProteinsAtDailyMenu.setText("You ate: " + dailyMenu.getTotalProteins());
 
-        int proteinsLeftPercentage = Math.toIntExact(Math.round((dailyMenu.getTotalProteins() / plan.getTargetProteins()) * 100));
+        int proteinsLeftPercentage;
+        if(dailyMenu.getTotalProteins() <= plan.getTargetProteins() * 100)
+            proteinsLeftPercentage = Math.toIntExact(Math.round((dailyMenu.getTotalProteins() / plan.getTargetProteins()) * 100));
+        else
+            proteinsLeftPercentage = 100 * 10 + 1;
+
         int overProteinsPie = 1;
         while(proteinsLeftPercentage > 100){
-            overProteinsPie++;
+            if(overProteinsPie < 10)
+                overProteinsPie++;
+
             proteinsLeftPercentage -= 100;
         }
 
-        tvProteinsMultiplication.setText("X" + overProteinsPie);
+        if(overProteinsPie < 10)
+            tvProteinsMultiplication.setText("X" + overProteinsPie);
+        else
+            tvProteinsMultiplication.setText("XXX");
+
 
         double proteinsHaveLeft = Math.round((plan.getTargetProteins() - dailyMenu.getTotalProteins()) * 1000) / 1000;
         int proteinsColorProgress, proteinsColorHaveLeft = gray;
@@ -239,14 +265,24 @@ public class StatisticsFragment extends Fragment {
         tvTargetFatsAtPlan.setText("Target: " + plan.getTargetFats());
         tvTargetFatsAtDailyMenu.setText("You ate: " + dailyMenu.getTotalFats());
 
-        int fatsLeftPercentage = Math.toIntExact(Math.round((dailyMenu.getTotalFats() / plan.getTargetFats()) * 100));
+        int fatsLeftPercentage;
+        if(dailyMenu.getTotalFats() <= plan.getTargetFats() * 100)
+            fatsLeftPercentage = Math.toIntExact(Math.round((dailyMenu.getTotalFats() / plan.getTargetFats()) * 100));
+        else
+            fatsLeftPercentage = 100 * 10 + 1;
+
         int overFatsPie = 1;
         while(fatsLeftPercentage > 100){
-            overFatsPie++;
+            if(overFatsPie < 10)
+                overFatsPie++;
             fatsLeftPercentage -= 100;
         }
 
-        tvFatsMultiplication.setText("X" + overFatsPie);
+        if(overFatsPie < 10)
+            tvFatsMultiplication.setText("X" + overFatsPie);
+        else
+            tvFatsMultiplication.setText("XXX");
+
 
         double fatsHaveLeft = Math.round((plan.getTargetFats() - dailyMenu.getTotalFats()) * 1000) / 1000;
         int fatsColorProgress, fatsColorHaveLeft = gray;
@@ -285,6 +321,14 @@ public class StatisticsFragment extends Fragment {
 
         IntentFilter networkConnectionFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         getActivity().registerReceiver(networkConnectionReceiver, networkConnectionFilter);
+
+        FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(getActivity());
+        if(fileAndDatabaseHelper.hasPrimaryUser()) {
+            if(fileAndDatabaseHelper.getPrimaryUsername().equals(User.getCurrentUser().getUsername()))
+                User.getCurrentUser().setCurrentPlan(fileAndDatabaseHelper.getPrimaryUser().getCurrentPlan());
+        }
+
+        updatePieCharts();
     }
 
     @Override

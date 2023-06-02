@@ -453,10 +453,12 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
                     databaseReference.child(firebaseMeal.getName()).setValue(firebaseMeal.getNeededIngredientsForMeal()).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            Toast.makeText(getActivity(), "Meal successfully uploaded.", Toast.LENGTH_SHORT).show();
+                            if(isAdded() && isVisible() && getUserVisibleHint()) {
+                                Toast.makeText(getActivity(), "Meal successfully uploaded.", Toast.LENGTH_SHORT).show();
 
-                            loadingLinearLayout.setVisibility(View.GONE);
-                            customMealsOptionsLinearLayout.setVisibility(View.VISIBLE);
+                                loadingLinearLayout.setVisibility(View.GONE);
+                                customMealsOptionsLinearLayout.setVisibility(View.VISIBLE);
+                            }
                         }
                     });
                 }
@@ -543,11 +545,13 @@ public class CustomMealsFragment extends Fragment implements View.OnClickListene
                     databaseReference.child(recipeCode.getCode()).setValue(recipeCode).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            Toast.makeText(getActivity(), "Code successfully created.", Toast.LENGTH_SHORT).show();
-                            tvShowGeneratedCode.setText(recipeCode.getCode());
+                            if(isAdded() && isVisible() && getUserVisibleHint()) {
+                                Toast.makeText(getActivity(), "Code successfully created.", Toast.LENGTH_SHORT).show();
+                                tvShowGeneratedCode.setText(recipeCode.getCode());
 
-                            loadingLinearLayout.setVisibility(View.GONE);
-                            showCodeLinearLayout.setVisibility(View.VISIBLE);
+                                loadingLinearLayout.setVisibility(View.GONE);
+                                showCodeLinearLayout.setVisibility(View.VISIBLE);
+                            }
                         }
                     });
                 }

@@ -53,6 +53,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="numberDecimal"
+            android:maxLength="3"
             android:hint="Enter your weight (kg): " />
 
         <TextView
@@ -69,6 +70,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Enter your target calories: "
+            android:maxLength="7"
             android:inputType="numberDecimal" />
 
         <EditText
@@ -77,6 +79,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Enter your target proteins: "
+            android:maxLength="7"
             android:inputType="numberDecimal" />
 
         <EditText
@@ -85,6 +88,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Enter your target fats: "
+            android:maxLength="7"
             android:inputType="numberDecimal" />
 
         <Button

@@ -9,8 +9,9 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="normal_color_for_icons">#0303EE</color>
-    <color name="normal_red_color_for_warnings">#FF0000</color>
     <color name="normal_blue_color_for_views">#080DD5</color>
+    <color name="normal_color_for_buttons">#2858E6</color>
+    <color name="normal_red_color_for_warnings">#FF0000</color>
 
     <color name="gray">#808080</color>
     <color name="green">#66BB6A</color>

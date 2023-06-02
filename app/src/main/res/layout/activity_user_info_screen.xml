@@ -12,8 +12,8 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -117,6 +117,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Enter your target calories: "
+                android:maxLength="7"
                 android:inputType="numberDecimal" />
 
             <EditText
@@ -125,6 +126,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Enter your target proteins: "
+                android:maxLength="7"
                 android:inputType="numberDecimal" />
 
             <EditText
@@ -133,6 +135,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="Enter your target fats: "
+                android:maxLength="7"
                 android:inputType="numberDecimal" />
 
             <Button

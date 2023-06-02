@@ -140,12 +140,12 @@ public class Plan {
         if(plan1 == null || plan2 == null)
             return false;
 
-        boolean isTheSame = plan1.getTargetCalories() == plan2.getTargetCalories();
+        boolean isTheSame = Math.round(plan1.getTargetCalories()) == Math.round(plan2.getTargetCalories());
 
-        if(plan1.getTargetProteins() != plan2.getTargetProteins())
+        if(Math.round(plan1.getTargetProteins()) != Math.round(plan2.getTargetProteins()))
             isTheSame = false;
 
-        if(plan1.getTargetFats() != plan2.getTargetFats())
+        if(Math.round(plan1.getTargetFats()) != Math.round(plan2.getTargetFats()))
             isTheSame = false;
 
         return isTheSame;

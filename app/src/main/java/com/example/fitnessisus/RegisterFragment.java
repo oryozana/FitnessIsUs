@@ -50,6 +50,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     FirebaseDatabase usersDb;
     DatabaseReference databaseReference;
 
+    String emailPattern = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
     String pattern = "^[a-zA-Z0-9 ]+$"; // Only allows letters and numbers
 
     Intent me;
@@ -125,24 +126,25 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         databaseReference.child(user.getUsername()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()){
-                    Toast.makeText(getActivity(), "User successfully created.", Toast.LENGTH_SHORT).show();
+                if(isAdded() && isVisible() && getUserVisibleHint()) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(getActivity(), "User successfully created.", Toast.LENGTH_SHORT).show();
 
-                    fileAndDatabaseHelper.removePrimaryUser();
-                    if(cbRememberRegisteredUserInLocalDatabase.isChecked())
-                        fileAndDatabaseHelper.setPrimaryUser(user);
+                        fileAndDatabaseHelper.removePrimaryUser();
+                        if (cbRememberRegisteredUserInLocalDatabase.isChecked())
+                            fileAndDatabaseHelper.setPrimaryUser(user);
 
-                    User.setCurrentUser(user);
-                    DailyMenu.restartDailyMenusFile(getActivity());
-                    DailyMenu.setTodayMenu(null);
-                    DailyMenu.setDailyMenus(getActivity());
-                    DailyMenu.saveDailyMenuIntoFile(DailyMenu.generateDailyMenuObjectFromFile(DailyMenu.generateEmptyDailyMenuDescriptionForFiles()), getActivity());
+                        User.setCurrentUser(user);
+                        DailyMenu.restartDailyMenusFile(getActivity());
+                        DailyMenu.setTodayMenu(null);
+                        DailyMenu.setDailyMenus(getActivity());
+                        DailyMenu.saveDailyMenuIntoFile(DailyMenu.generateDailyMenuObjectFromFile(DailyMenu.generateEmptyDailyMenuDescriptionForFiles()), getActivity());
 
-                    me.setClass(getActivity(), MainActivity.class);
-                    startActivity(me);
+                        me.setClass(getActivity(), MainActivity.class);
+                        startActivity(me);
+                    } else
+                        Toast.makeText(getActivity(), "Failed to create user, please try again.", Toast.LENGTH_SHORT).show();
                 }
-                else
-                    Toast.makeText(getActivity(), "Failed to create user, please try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -187,6 +189,26 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
             passTests = false;
         }
         else{
+            if(!etGetEmail.getText().toString().matches(emailPattern) && passTests){
+                Toast.makeText(getActivity(), "Email address not valid.", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
+
+            if(etGetEmail.getText().toString().split("@")[0].contains(".") && passTests){
+                Toast.makeText(getActivity(), "Email address should have @ and only then .", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
+
+            if(etGetEmail.getText().toString().split("@").length != 2 && passTests){
+                Toast.makeText(getActivity(), "Email address should have only one @ in them.", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
+
+            if(etGetEmail.getText().toString().split("\\.").length != 2 && passTests){
+                Toast.makeText(getActivity(), "Email address should have only one . in them.", Toast.LENGTH_SHORT).show();
+                passTests = false;
+            }
+
             if(!etGetEmail.getText().toString().contains("@") && passTests){
                 Toast.makeText(getActivity(), "Email address should have @ in them.", Toast.LENGTH_SHORT).show();
                 passTests = false;
@@ -217,7 +239,14 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                 passTests = false;
             }
             else{
-                if(!(0 < Double.parseDouble(etGetTargetCalories.getText().toString()) && Double.parseDouble(etGetTargetCalories.getText().toString()) < 5000)){
+                if(etGetTargetCalories.getText().toString().contains(".")) {
+                    if (!(etGetTargetCalories.getText().toString().split("\\.")[1].length() <= 3)) {
+                        Toast.makeText(getActivity(), "Target calories shouldn't be that specific.", Toast.LENGTH_SHORT).show();
+                        passTests = false;
+                    }
+                }
+
+                if(!(0 < Double.parseDouble(etGetTargetCalories.getText().toString()) && Double.parseDouble(etGetTargetCalories.getText().toString()) < 5000) && passTests){
                     Toast.makeText(getActivity(), "Target calories should be between 0 to 5000.", Toast.LENGTH_SHORT).show();
                     passTests = false;
                 }
@@ -230,7 +259,14 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                 passTests = false;
             }
             else{
-                if(!(0 < Double.parseDouble(etGetTargetProteins.getText().toString()) && Double.parseDouble(etGetTargetProteins.getText().toString()) < 1000)){
+                if(etGetTargetProteins.getText().toString().contains(".")) {
+                    if (!(etGetTargetProteins.getText().toString().split("\\.")[1].length() <= 3)) {
+                        Toast.makeText(getActivity(), "Target proteins shouldn't be that specific.", Toast.LENGTH_SHORT).show();
+                        passTests = false;
+                    }
+                }
+
+                if(!(0 < Double.parseDouble(etGetTargetProteins.getText().toString()) && Double.parseDouble(etGetTargetProteins.getText().toString()) < 1000) && passTests){
                     Toast.makeText(getActivity(), "Target proteins should be between 0 to 1000.", Toast.LENGTH_SHORT).show();
                     passTests = false;
                 }
@@ -243,7 +279,14 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
                 passTests = false;
             }
             else{
-                if(!(0 < Double.parseDouble(etGetTargetFats.getText().toString()) && Double.parseDouble(etGetTargetFats.getText().toString()) < 1000)){
+                if(etGetTargetFats.getText().toString().contains(".")) {
+                    if (!(etGetTargetFats.getText().toString().split("\\.")[1].length() <= 3)) {
+                        Toast.makeText(getActivity(), "Target fats shouldn't be that specific.", Toast.LENGTH_SHORT).show();
+                        passTests = false;
+                    }
+                }
+
+                if(!(0 < Double.parseDouble(etGetTargetFats.getText().toString()) && Double.parseDouble(etGetTargetFats.getText().toString()) < 1000) && passTests){
                     Toast.makeText(getActivity(), "Target fats should be between 0 to 1000.", Toast.LENGTH_SHORT).show();
                     passTests = false;
                 }
@@ -266,15 +309,16 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         databaseReference.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if(task.isSuccessful()){
-                    if(task.getResult().exists()){
-                        DataSnapshot dataSnapshot = task.getResult();
-                        for(DataSnapshot user : dataSnapshot.getChildren())
-                            usernamesList.add(user.getKey());
-                    }
+                if(isAdded() && isVisible() && getUserVisibleHint()) {
+                    if (task.isSuccessful()) {
+                        if (task.getResult().exists()) {
+                            DataSnapshot dataSnapshot = task.getResult();
+                            for (DataSnapshot user : dataSnapshot.getChildren())
+                                usernamesList.add(user.getKey());
+                        }
+                    } else
+                        Toast.makeText(getActivity(), "Failed to load users.", Toast.LENGTH_SHORT).show();
                 }
-                else
-                    Toast.makeText(getActivity(), "Failed to load users.", Toast.LENGTH_SHORT).show();
             }
         });
     }

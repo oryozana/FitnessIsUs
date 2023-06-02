@@ -81,30 +81,29 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         databaseReference.child(username).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if(task.isSuccessful()){
-                    if(task.getResult().exists()){
-                        DataSnapshot dataSnapshot = task.getResult();
-                        String password = String.valueOf(dataSnapshot.child("password").getValue());
+                if(isAdded() && isVisible() && getUserVisibleHint()) {
+                    if (task.isSuccessful()) {
+                        if (task.getResult().exists()) {
+                            DataSnapshot dataSnapshot = task.getResult();
+                            String password = String.valueOf(dataSnapshot.child("password").getValue());
 
-                        if(enteredPassword.equals(password)){
-                            User.setCurrentUser(new User(dataSnapshot));
-                            User.getCurrentUser().uploadUserDailyMenusIntoTemporaryFile(getActivity());
+                            if (enteredPassword.equals(password)) {
+                                User.setCurrentUser(new User(dataSnapshot));
+                                User.getCurrentUser().uploadUserDailyMenusIntoTemporaryFile(getActivity());
 
-                            if(cbRememberLoggedUserInLocalDatabase.isChecked())
-                                fileAndDatabaseHelper.setPrimaryUser(User.getCurrentUser());
+                                if (cbRememberLoggedUserInLocalDatabase.isChecked())
+                                    fileAndDatabaseHelper.setPrimaryUser(User.getCurrentUser());
 
-                            me.setClass(getActivity(), MainActivity.class);
-                            me.putExtra("cameFromLogin", 0);
-                            startActivity(me);
-                        }
-                        else
+                                me.setClass(getActivity(), MainActivity.class);
+                                me.putExtra("cameFromLogin", 0);
+                                startActivity(me);
+                            } else
+                                Toast.makeText(getActivity(), "Username or password incorrect.", Toast.LENGTH_SHORT).show();
+                        } else
                             Toast.makeText(getActivity(), "Username or password incorrect.", Toast.LENGTH_SHORT).show();
-                    }
-                    else
+                    } else
                         Toast.makeText(getActivity(), "Username or password incorrect.", Toast.LENGTH_SHORT).show();
                 }
-                else
-                    Toast.makeText(getActivity(), "Username or password incorrect.", Toast.LENGTH_SHORT).show();
 
                 loginLoadingLinearLayout.setVisibility(View.GONE);
                 linearLayout.setVisibility(View.VISIBLE);
@@ -157,37 +156,36 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                     databaseReference.child(enteredUsername).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DataSnapshot> task) {
-                            if(task.isSuccessful()){
-                                if(task.getResult().exists()){
-                                    DataSnapshot dataSnapshot = task.getResult();
-                                    String email = String.valueOf(dataSnapshot.child("email").getValue());
+                            if(isAdded() && isVisible() && getUserVisibleHint()) {
+                                if (task.isSuccessful()) {
+                                    if (task.getResult().exists()) {
+                                        DataSnapshot dataSnapshot = task.getResult();
+                                        String email = String.valueOf(dataSnapshot.child("email").getValue());
 
-                                    String enteredEmail = etGetEmailForgot.getText().toString();
+                                        String enteredEmail = etGetEmailForgot.getText().toString();
 
-                                    if(email.equals(enteredEmail)){
-                                        forgotUser = new User(dataSnapshot);
-                                        forgotUser.uploadUserDailyMenusIntoTemporaryFile(getActivity());
+                                        if (email.equals(enteredEmail)) {
+                                            forgotUser = new User(dataSnapshot);
+                                            forgotUser.uploadUserDailyMenusIntoTemporaryFile(getActivity());
 
-                                        loadingLinearLayout.setVisibility(View.GONE);
-                                        newPasswordLinearLayout.setVisibility(View.VISIBLE);
-                                        Toast.makeText(getActivity(), "User found successfully.", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else {
+                                            loadingLinearLayout.setVisibility(View.GONE);
+                                            newPasswordLinearLayout.setVisibility(View.VISIBLE);
+                                            Toast.makeText(getActivity(), "User found successfully.", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(getActivity(), "Username or email incorrect.", Toast.LENGTH_SHORT).show();
+                                            loadingLinearLayout.setVisibility(View.GONE);
+                                            forgotPasswordLinearLayout.setVisibility(View.VISIBLE);
+                                        }
+                                    } else {
                                         Toast.makeText(getActivity(), "Username or email incorrect.", Toast.LENGTH_SHORT).show();
                                         loadingLinearLayout.setVisibility(View.GONE);
                                         forgotPasswordLinearLayout.setVisibility(View.VISIBLE);
                                     }
-                                }
-                                else {
+                                } else {
                                     Toast.makeText(getActivity(), "Username or email incorrect.", Toast.LENGTH_SHORT).show();
                                     loadingLinearLayout.setVisibility(View.GONE);
                                     forgotPasswordLinearLayout.setVisibility(View.VISIBLE);
                                 }
-                            }
-                            else {
-                                Toast.makeText(getActivity(), "Username or email incorrect.", Toast.LENGTH_SHORT).show();
-                                loadingLinearLayout.setVisibility(View.GONE);
-                                forgotPasswordLinearLayout.setVisibility(View.VISIBLE);
                             }
                         }
                     });
@@ -269,20 +267,21 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         databaseReference.child(forgotUser.getUsername()).child("password").setValue(forgotUser.getPassword()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()){
-                    User.setCurrentUser(forgotUser);
+                if(isAdded() && isVisible() && getUserVisibleHint()) {
+                    if (task.isSuccessful()) {
+                        User.setCurrentUser(forgotUser);
 
-                    if(fileAndDatabaseHelper.hasPrimaryUser()){
-                        if(fileAndDatabaseHelper.getPrimaryUser().getUsername().equals(forgotUser.getUsername()))
-                            fileAndDatabaseHelper.updatePrimaryUserPassword(forgotUser.getPassword());
-                    }
+                        if (fileAndDatabaseHelper.hasPrimaryUser()) {
+                            if (fileAndDatabaseHelper.getPrimaryUser().getUsername().equals(forgotUser.getUsername()))
+                                fileAndDatabaseHelper.updatePrimaryUserPassword(forgotUser.getPassword());
+                        }
 
-                    me.setClass(getActivity(), MainActivity.class);
-                    me.putExtra("cameFromLogin", true);
-                    startActivity(me);
+                        me.setClass(getActivity(), MainActivity.class);
+                        me.putExtra("cameFromLogin", true);
+                        startActivity(me);
+                    } else
+                        Toast.makeText(getActivity(), "Failed to change password.", Toast.LENGTH_SHORT).show();
                 }
-                else
-                    Toast.makeText(getActivity(), "Failed to change password.", Toast.LENGTH_SHORT).show();
             }
         });
     }

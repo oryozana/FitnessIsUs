@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -37,8 +38,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 
 public class FoodSelectionFragment extends Fragment implements View.OnClickListener {
-
-    private NetworkConnectionReceiver networkConnectionReceiver;
 
     MainActivity.UploadInfoTask uploadInfoTask;
 
@@ -183,13 +182,6 @@ public class FoodSelectionFragment extends Fragment implements View.OnClickListe
                                 }
                                 internetMealsList.add(new Meal(mealName, ingredientsNeededInfo));
                                 mealsAdapter.notifyDataSetChanged();
-                            }
-
-                            try {
-                                getActivity().unregisterReceiver(networkConnectionReceiver);
-                            }
-                            catch (IllegalArgumentException e) {
-                                e.getStackTrace();
                             }
                         }
                         else {
@@ -361,72 +353,46 @@ public class FoodSelectionFragment extends Fragment implements View.OnClickListe
     }
 
     public void switchBetweenLocalAndGlobalFood(){
-        if(!etFilterFood.getText().toString().equals(""))
-            etFilterFood.setText("");
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);  // Set initial value.
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        boolean isInternetConnectionAvailable = (networkInfo != null && networkInfo.isConnected());
 
-        isOnLocalMode = !isOnLocalMode;  // Must be after the filter reset... if not produce error.
+        if(isInternetConnectionAvailable || !isOnLocalMode){
+            if(!etFilterFood.getText().toString().equals(""))
+                etFilterFood.setText("");
 
-        if(isOnLocalMode){
-            btSwitchBetweenLocalAndGlobalFood.setText("Choose from internet");
+            isOnLocalMode = !isOnLocalMode;  // Must be after the filter reset... if not produce error.
 
-            setIngredientListViewAdapters();
-
-            try{
-                getActivity().unregisterReceiver(networkConnectionReceiver);
+            if(isOnLocalMode){
+                btSwitchBetweenLocalAndGlobalFood.setText("Choose from internet");
+                setIngredientListViewAdapters();
             }
-            catch (IllegalArgumentException e){
-                e.getStackTrace();
+            else{
+                btSwitchBetweenLocalAndGlobalFood.setText("Choose from local");
+                setInternetListViewAdapter();
             }
         }
-        else{
-            btSwitchBetweenLocalAndGlobalFood.setText("Choose from local");
-            setCustomNetworkConnectionReceiver();
-            setInternetListViewAdapter();
-        }
+        else
+            noInternetAccessAlertDialog();
     }
 
-    public void setCustomNetworkConnectionReceiver(){
-        networkConnectionReceiver = new NetworkConnectionReceiver() {
+    public void noInternetAccessAlertDialog(){
+        AlertDialog ad;
+        AlertDialog.Builder adb;
+        adb = new AlertDialog.Builder(getActivity());
+        adb.setTitle("Oh no...");
+        adb.setMessage("Internet connection unavailable!" + "\n" + "Connect to the internet and try again.");
+        adb.setIcon(R.drawable.ic_network_not_found);
+
+        adb.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
             @Override
-            public void onReceive(Context context, Intent intent) {
-                try{
-                    if(!isOnline(getActivity()))
-                        noInternetAccess(context);
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
+            public void onClick(DialogInterface dialog, int which) {
+
             }
+        });
 
-            @Override
-            public void noInternetAccess(Context context){
-                AlertDialog ad;
-                AlertDialog.Builder adb;
-                adb = new AlertDialog.Builder(context);
-                adb.setTitle("Internet connection not found!");
-                adb.setMessage("Connect to the internet and try again.");
-                adb.setIcon(R.drawable.ic_network_not_found);
-                adb.setCancelable(false);
-
-                adb.setNegativeButton("Go back to local", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switchBetweenLocalAndGlobalFood();
-                    }
-                });
-
-                ad = adb.create();
-                ad.show();
-            }
-        };
-
-        IntentFilter networkConnectionFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        getActivity().registerReceiver(networkConnectionReceiver, networkConnectionFilter);
-
-        if(!networkConnectionReceiver.isOnline(getActivity())) {
-            networkConnectionReceiver.noInternetAccess(getActivity());
-            getActivity().unregisterReceiver(networkConnectionReceiver);
-        }
+        ad = adb.create();
+        ad.show();
     }
 
     @Override

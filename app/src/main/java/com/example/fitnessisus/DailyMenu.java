@@ -47,13 +47,16 @@ public class DailyMenu {
     }
 
     public static DailyMenu getTodayMenu() {
-        if(todayMenu == null) {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
-            LocalDateTime today = LocalDateTime.now();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd_MM_yyyy");
+        LocalDateTime today = LocalDateTime.now();
 
+        if(todayMenu == null)
             return DailyMenu.getTodayMenuFromAllDailyMenus(dtf.format(today));
-        }
-        return todayMenu;
+
+        if(todayMenu.getBreakfast() != null && todayMenu.getLunch() != null && todayMenu.getDinner() != null)
+            return todayMenu;
+
+        return new DailyMenu(dtf.format(today));
     }
 
     public static void setTodayMenu(DailyMenu todayMeals) {
@@ -498,6 +501,7 @@ public class DailyMenu {
     public void addIngredientByMealName(Context context, String selectedMeal, Ingredient ingredient, int grams){
         if(canAddFood(context, ingredient)){
             Ingredient tmpIngredient = Ingredient.getIngredientByName(ingredient.getName(), grams);
+            todayMenu = getTodayMenuFromAllDailyMenus(todayMenu.getDate());
 
             if(selectedMeal.equals("Breakfast"))
                 todayMenu.addBreakfast(tmpIngredient);

@@ -27,6 +27,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number"
+            android:maxLength="3"
             android:hint="Enter your age: " />
 
         <EditText
@@ -35,6 +36,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="numberDecimal"
+            android:maxLength="3"
             android:hint="Enter your height (cm): " />
 
         <EditText
@@ -43,6 +45,7 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="numberDecimal"
+            android:maxLength="3"
             android:hint="Enter your weight (kg): " />
 
         <TextView

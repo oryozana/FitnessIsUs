@@ -96,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
     SQLiteDatabase sqdb;
     DBHelper my_db;
 
+    private static boolean isInActivity = true;
+
     Intent me;
 
     @Override
@@ -108,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Welcome back " + User.getCurrentUser().getUsername() + "!.", Toast.LENGTH_SHORT).show();
             me.removeExtra("cameFromLogin");
         }
+
+        isInActivity = true;
 
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);  // Set initial value.
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
@@ -184,6 +188,12 @@ public class MainActivity extends AppCompatActivity {
             textClock.setVisibility(View.VISIBLE);
         else
             weatherLayout.setVisibility(View.VISIBLE);
+
+        if(todayMenu != null)
+            DailyMenu.saveDailyMenuIntoFile(todayMenu, MainActivity.this);
+
+        DailyMenu.setDailyMenus(MainActivity.this);
+        DailyMenu.setTodayMenu(DailyMenu.getTodayMenu());
 
         initiateMediaPlayer();
         initiateVideoPlayer();
@@ -336,6 +346,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPostResume() {
         super.onPostResume();
+        isInActivity = true;
+
         videoView.resume();
         if (!me.getBooleanExtra("useVideos", true)) { // videoView background cause of the clock.
             videoView.stopPlayback();
@@ -351,6 +363,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        isInActivity = true;
 
         IntentFilter networkConnectionFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(networkConnectionReceiver, networkConnectionFilter);
@@ -373,6 +386,8 @@ public class MainActivity extends AppCompatActivity {
 
         videoView.suspend();
         mediaPlayer.pause();
+
+        isInActivity = false;
         super.onPause();
     }
 
@@ -381,6 +396,8 @@ public class MainActivity extends AppCompatActivity {
         videoView.stopPlayback();
         mediaPlayer.stop();
         mediaPlayer.release();
+
+        isInActivity = false;
         super.onDestroy();
     }
 
@@ -512,6 +529,9 @@ public class MainActivity extends AppCompatActivity {
 
         public void startUpdateDailyMenusPreparations(int counter) {
             User user = User.getCurrentUser();
+            if(user == null)
+                return;
+
             isAlreadyRunning = true;
 
             usersDb = FirebaseDatabase.getInstance();
@@ -521,7 +541,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<DataSnapshot> task) {
                     if (task.isSuccessful()) {
-                        if (task.getResult().exists()) {
+                        if (task.getResult().exists() && isInActivity && todayMenu != null) {
                             DataSnapshot dataSnapshot = task.getResult();
                             if(!user.getPassword().equals(dataSnapshot.child("password").getValue())){
                                 Toast.makeText(context, "Password has changed from another device.", Toast.LENGTH_SHORT).show();
@@ -587,11 +607,15 @@ public class MainActivity extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(context);
-                            if (fileAndDatabaseHelper.getPrimaryUsername().equals(username))
-                                fileAndDatabaseHelper.updatePrimaryUserDailyMenus(userDailyMenus);
+                            if(isInActivity && User.getCurrentUser() != null && todayMenu != null) {
+                                FileAndDatabaseHelper fileAndDatabaseHelper = new FileAndDatabaseHelper(context);
+                                if(fileAndDatabaseHelper.hasPrimaryUser()) {
+                                    if (fileAndDatabaseHelper.getPrimaryUsername().equals(username))
+                                        fileAndDatabaseHelper.updatePrimaryUserDailyMenus(userDailyMenus);
+                                }
 
-                            todayMenu.setIsNeedToBeSaved(false);
+                                todayMenu.setIsNeedToBeSaved(false);
+                            }
                             isAlreadyRunning = false;
                         }
                     })
@@ -624,7 +648,8 @@ public class MainActivity extends AppCompatActivity {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            setAvailableWeatherInfo();
+                            if(isInActivity)
+                                setAvailableWeatherInfo();
                         }
                     });
                 }
@@ -667,7 +692,8 @@ public class MainActivity extends AppCompatActivity {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    updateWeatherInfo();
+                    if(isInActivity)
+                        updateWeatherInfo();
                 }
             });
         }

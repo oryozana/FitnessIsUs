@@ -322,6 +322,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         tvTotalCaloriesMain.setText("Total calories: " + todayMenu.getTotalCalories() + " .");
     }
 
+
+
     @Override
     public void onClick(View v) {
         int viewId = v.getId();

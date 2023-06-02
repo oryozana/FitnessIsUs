@@ -91,6 +91,11 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
                 activeSong = fileAndDatabaseHelper.getCurrentActiveSong();
         }
 
+        if(User.getCurrentUser() == null){
+            logoutUser();
+            return;
+        }
+
         profilePictureSelectionLinearLayout = (LinearLayout) findViewById(R.id.profilePictureSelectionLinearLayout);
         linearLayout = (LinearLayout) findViewById(R.id.userInfoScreenLinearLayout);
         videoView = (VideoView) findViewById(R.id.userInfoScreenVideoView);
@@ -238,7 +243,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         boolean passTests = passChangePasswordTests();
 
         if(passTests){
-            if(internetConnection){
+            if(internetConnection && User.getCurrentUser() != null){
                 String userPassword = User.getCurrentUser().getPassword();
 
                 if(userPassword.equals(etGetOldPassword.getText().toString())){
@@ -281,6 +286,9 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         databaseReference.child(user.getUsername()).child("password").setValue(user.getPassword()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
+                if(User.getCurrentUser() == null)
+                    return;
+
                 Toast.makeText(UserInfoScreen.this, "Password successfully changed.", Toast.LENGTH_SHORT).show();
                 fileAndDatabaseHelper.updatePrimaryUserPassword(etGetNewPassword.getText().toString());
                 etGetOldPassword.setText("");
@@ -293,11 +301,20 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         boolean passTests = passUpdatePlanTests();
 
         if(passTests){
-            if(internetConnection){
+            if(internetConnection && User.getCurrentUser() != null){
                 String targetCalories = etGetNewTargetCalories.getText().toString();
                 String targetProteins = etGetNewTargetProteins.getText().toString();
                 String targetFats = etGetNewTargetFats.getText().toString();
                 Plan tmpPlan = new Plan(targetCalories, targetProteins, targetFats);
+
+                if(loseWeightPlan != null && maintainWeightPlan != null && gainWeightPlan != null) {
+                    if (currentPlanIndex == 1)
+                        currentGeneratedPlan = loseWeightPlan;
+                    if (currentPlanIndex == 2)
+                        currentGeneratedPlan = maintainWeightPlan;
+                    if (currentPlanIndex == 3)
+                        currentGeneratedPlan = gainWeightPlan;
+                }
 
                 if(Plan.isTheSamePlan(tmpPlan, currentGeneratedPlan))
                     tmpPlan.setGoal(chosenGoal);
@@ -326,7 +343,14 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
             passTests = false;
         }
         else{
-            if(!(0 < Double.parseDouble(targetCalories) && Double.parseDouble(targetCalories) < 5000)){
+            if(targetCalories.contains(".")) {
+                if (!(targetCalories.split("\\.")[1].length() <= 3)) {
+                    Toast.makeText(UserInfoScreen.this, "Target calories shouldn't be that specific.", Toast.LENGTH_SHORT).show();
+                    passTests = false;
+                }
+            }
+
+            if(!(0 < Double.parseDouble(targetCalories) && Double.parseDouble(targetCalories) < 5000) && passTests){
                 Toast.makeText(UserInfoScreen.this, "Target calories should be between 0 to 5000.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }
@@ -338,7 +362,14 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
                 passTests = false;
             }
             else{
-                if(!(0 < Double.parseDouble(targetProteins) && Double.parseDouble(targetProteins) < 1000)){
+                if(targetProteins.contains(".")) {
+                    if (!(targetProteins.split("\\.")[1].length() <= 3)) {
+                        Toast.makeText(UserInfoScreen.this, "Target proteins shouldn't be that specific.", Toast.LENGTH_SHORT).show();
+                        passTests = false;
+                    }
+                }
+
+                if(!(0 < Double.parseDouble(targetProteins) && Double.parseDouble(targetProteins) < 1000) && passTests){
                     Toast.makeText(UserInfoScreen.this, "Target proteins should be between 0 to 1000.", Toast.LENGTH_SHORT).show();
                     passTests = false;
                 }
@@ -351,7 +382,14 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
                 passTests = false;
             }
             else{
-                if(!(0 < Double.parseDouble(targetFats) && Double.parseDouble(targetFats) < 1000)){
+                if(targetFats.contains(".")) {
+                    if (!(targetFats.split("\\.")[1].length() <= 3)) {
+                        Toast.makeText(UserInfoScreen.this, "Target fats shouldn't be that specific.", Toast.LENGTH_SHORT).show();
+                        passTests = false;
+                    }
+                }
+
+                if(!(0 < Double.parseDouble(targetFats) && Double.parseDouble(targetFats) < 1000) && passTests){
                     Toast.makeText(UserInfoScreen.this, "Target fats should be between 0 to 1000.", Toast.LENGTH_SHORT).show();
                     passTests = false;
                 }
@@ -368,6 +406,9 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         databaseReference.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
+                if(User.getCurrentUser() == null)
+                    return;
+
                 User user = new User(dataSnapshot);
                 if(!user.getPassword().equals(User.getCurrentUser().getPassword())) {
                     Toast.makeText(UserInfoScreen.this, "Password has changed from another device.", Toast.LENGTH_SHORT).show();
@@ -398,11 +439,11 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
                             public void onSuccess(Void unused) {
                                 Toast.makeText(UserInfoScreen.this, "Plan successfully updated.", Toast.LENGTH_SHORT).show();
 
-                                user.setCurrentPlan(newPlan);
-                                user.setPreviousPlans(previousPlans);
+                                User.getCurrentUser().setCurrentPlan(newPlan);
+                                User.getCurrentUser().setPreviousPlans(previousPlans);
 
                                 if (fileAndDatabaseHelper.getPrimaryUsername().equals(user.getUsername()))
-                                    fileAndDatabaseHelper.updatePrimaryUserPlan(user.getCurrentPlan());
+                                    fileAndDatabaseHelper.updatePrimaryUserPlan(User.getCurrentUser().getCurrentPlan());
 
                                 etGetNewTargetCalories.setText("");
                                 etGetNewTargetProteins.setText("");
