@@ -501,18 +501,22 @@ public class DailyMenu {
     public void addIngredientByMealName(Context context, String selectedMeal, Ingredient ingredient, int grams){
         if(canAddFood(context, ingredient)){
             Ingredient tmpIngredient = Ingredient.getIngredientByName(ingredient.getName(), grams);
-            todayMenu = getTodayMenuFromAllDailyMenus(todayMenu.getDate());
+            DailyMenu.setTodayMenu(getTodayMenuFromAllDailyMenus(todayMenu.getDate()));
 
-            if(selectedMeal.equals("Breakfast"))
-                todayMenu.addBreakfast(tmpIngredient);
+            if(todayMenu != null) {
+                if (selectedMeal.equals("Breakfast"))
+                    todayMenu.addBreakfast(tmpIngredient);
 
-            if(selectedMeal.equals("Lunch"))
-                todayMenu.addLunch(tmpIngredient);
+                if (selectedMeal.equals("Lunch"))
+                    todayMenu.addLunch(tmpIngredient);
 
-            if(selectedMeal.equals("Dinner"))
-                todayMenu.addDinner(tmpIngredient);
+                if (selectedMeal.equals("Dinner"))
+                    todayMenu.addDinner(tmpIngredient);
 
-            Toast.makeText(context, "Ingredient successfully added.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Ingredient successfully added.", Toast.LENGTH_SHORT).show();
+            }
+            else
+                Toast.makeText(context, "Something went wrong, please restart the app.", Toast.LENGTH_SHORT).show();
         }
     }
 

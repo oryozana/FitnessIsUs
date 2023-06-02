@@ -221,7 +221,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         }
 
         if(passTests){
-            if(etGetStartingWeight.getText().toString().replaceAll(" ", "").equals("")) {
+            if(etGetStartingWeight.getText().toString().replaceAll(" ", "").equals("") || etGetStartingWeight.getText().toString().equals(".")) {
                 Toast.makeText(getActivity(), "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }
@@ -234,7 +234,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         }
 
         if(passTests){
-            if(etGetTargetCalories.getText().toString().replaceAll(" ", "").equals("")){
+            if(etGetTargetCalories.getText().toString().replaceAll(" ", "").equals("") || etGetTargetCalories.getText().toString().equals(".")){
                 Toast.makeText(getActivity(), "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }
@@ -254,7 +254,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         }
 
         if(passTests){
-            if(etGetTargetProteins.getText().toString().replaceAll(" ", "").equals("")){
+            if(etGetTargetProteins.getText().toString().replaceAll(" ", "").equals("") || etGetTargetProteins.getText().toString().equals(".")){
                 Toast.makeText(getActivity(), "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }
@@ -274,7 +274,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         }
 
         if(passTests){
-            if(etGetTargetFats.getText().toString().replaceAll(" ", "").equals("")){
+            if(etGetTargetFats.getText().toString().replaceAll(" ", "").equals("") || etGetTargetFats.getText().toString().equals(".")){
                 Toast.makeText(getActivity(), "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }
@@ -475,7 +475,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
     public boolean passAlertDialogInfoTests(String weight, String height, String age, String activeLevel) {
         boolean passTests = true;
 
-        if(weight.replaceAll(" ", "").equals("")){
+        if(weight.replaceAll(" ", "").equals("") || weight.equals(".")){
             Toast.makeText(getActivity(), "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
             passTests = false;
         }
@@ -487,7 +487,7 @@ public class RegisterFragment extends Fragment implements View.OnClickListener {
         }
 
         if(passTests){
-            if(height.replaceAll(" ", "").equals("")){
+            if(height.replaceAll(" ", "").equals("") || height.equals(".")){
                 Toast.makeText(getActivity(), "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }

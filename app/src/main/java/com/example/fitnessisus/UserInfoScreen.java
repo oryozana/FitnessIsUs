@@ -261,7 +261,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
     public boolean passChangePasswordTests(){
         boolean passTests = true;
 
-        if(etGetOldPassword.getText().toString().replaceAll(" ", "").equals("") && passTests){
+        if(etGetOldPassword.getText().toString().replaceAll(" ", "").equals("")){
             Toast.makeText(this, "Enter your old password!", Toast.LENGTH_SHORT).show();
             passTests = false;
         }
@@ -338,7 +338,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         String targetProteins = etGetNewTargetProteins.getText().toString();
         String targetFats = etGetNewTargetFats.getText().toString();
 
-        if(targetCalories.replaceAll(" ", "").equals("")){
+        if(targetCalories.replaceAll(" ", "").equals("") || targetCalories.equals(".")){
             Toast.makeText(UserInfoScreen.this, "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
             passTests = false;
         }
@@ -357,7 +357,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         }
 
         if(passTests){
-            if(targetProteins.replaceAll(" ", "").equals("")){
+            if(targetProteins.replaceAll(" ", "").equals("") || targetProteins.equals(".")){
                 Toast.makeText(UserInfoScreen.this, "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }
@@ -377,7 +377,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         }
 
         if(passTests){
-            if(targetFats.replaceAll(" ", "").equals("")){
+            if(targetFats.replaceAll(" ", "").equals("") || targetFats.equals(".")){
                 Toast.makeText(UserInfoScreen.this, "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }
@@ -614,7 +614,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
     public boolean passAlertDialogInfoTests(String weight, String height, String age, String activeLevel) {
         boolean passTests = true;
 
-        if(weight.replaceAll(" ", "").equals("")){
+        if(weight.replaceAll(" ", "").equals("") || weight.equals(".")){
             Toast.makeText(UserInfoScreen.this, "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
             passTests = false;
         }
@@ -626,7 +626,7 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
         }
 
         if(passTests){
-            if(height.replaceAll(" ", "").equals("")){
+            if(height.replaceAll(" ", "").equals("") || height.equals(".")){
                 Toast.makeText(UserInfoScreen.this, "One or more of the fields is empty.", Toast.LENGTH_SHORT).show();
                 passTests = false;
             }
