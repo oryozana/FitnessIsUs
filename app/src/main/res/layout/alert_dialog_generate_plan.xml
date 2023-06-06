@@ -35,7 +35,7 @@
             android:layout_width="125pt"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="numberDecimal"
+            android:inputType="number"
             android:maxLength="3"
             android:hint="Enter your height (cm): " />
 
@@ -44,7 +44,7 @@
             android:layout_width="125pt"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="numberDecimal"
+            android:inputType="number"
             android:maxLength="3"
             android:hint="Enter your weight (kg): " />
 

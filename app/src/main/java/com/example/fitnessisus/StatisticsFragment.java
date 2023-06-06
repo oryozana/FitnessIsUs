@@ -275,6 +275,7 @@ public class StatisticsFragment extends Fragment {
         while(fatsLeftPercentage > 100){
             if(overFatsPie < 10)
                 overFatsPie++;
+
             fatsLeftPercentage -= 100;
         }
 
