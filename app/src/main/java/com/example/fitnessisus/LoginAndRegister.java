@@ -18,6 +18,7 @@ import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.widget.VideoView;
 
@@ -228,7 +229,10 @@ public class LoginAndRegister extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

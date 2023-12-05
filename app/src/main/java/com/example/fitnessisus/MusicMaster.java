@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -231,7 +232,11 @@ public class MusicMaster extends AppCompatActivity implements View.OnClickListen
     }
 
     @Override
-    public void onBackPressed() {
-        Toast.makeText(this, "Press finish to exit!", Toast.LENGTH_SHORT).show();
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            Toast.makeText(this, "Press finish to exit!", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

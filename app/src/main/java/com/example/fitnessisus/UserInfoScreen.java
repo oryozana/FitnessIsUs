@@ -12,6 +12,7 @@ import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -912,12 +913,16 @@ public class UserInfoScreen extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public void onBackPressed(){
-        if(isChoosingProfilePicture)
-            switchBetweenProfilePictureSelectionAndUserInfoScreen();
-        else{
-            me.setClass(UserInfoScreen.this, MainActivity.class);
-            startActivity(me);
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            if(isChoosingProfilePicture)
+                switchBetweenProfilePictureSelectionAndUserInfoScreen();
+            else{
+                me.setClass(UserInfoScreen.this, MainActivity.class);
+                startActivity(me);
+            }
+            return true;
         }
+        return super.onKeyDown(keyCode, event);
     }
 }

@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -660,7 +661,11 @@ public class SettingsSetter extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public void onBackPressed() {
-        returnToRecentActivity();
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            returnToRecentActivity();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
